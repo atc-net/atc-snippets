@@ -1,4 +1,4 @@
-# General GitHub repository setup
+# General GitHub repository setup on `atc-net`
 
 NOTE: This repository in only usefull for ATC members - but all a allowed to copy and/or get inspired.
 
