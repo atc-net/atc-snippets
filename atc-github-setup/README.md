@@ -1,8 +1,8 @@
 # General GitHub repository setup on `atc-net`
 
-NOTE: This repository in only usefull for ATC members - but all a allowed to copy and/or get inspired.
+NOTE: This repository in only usefull for ATC members - but all are allowed to copy and/or get inspired.
 
-This is a guide / how to setup a repository in atc-net on GitHub.
+This is a guide on how to setup a repository in atc-net on GitHub.
 
 The guide is a example on how to setup a repository based on a project name called "Hallo World Project". And by using the template, you can find the "Hallo World Project" and replace for correct naming and format.
 The place-holders will look like this:
