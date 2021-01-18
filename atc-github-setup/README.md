@@ -73,3 +73,10 @@ Steps:
    - Replace Kebab-version
    - Replace Pascal-dot-version
    - Replace [PROJECT-TEXT]
+
+ - After first PR is pushed into the repository, an update can be made under `Branch protection rule` ->
+`Require branches to be up to date before merging` with checkmarks on:
+   - dotnet-test
+   - dotnet5-build (macos-latest)
+   - dotnet5-build (ubuntu-latest)
+   - dotnet5-build (windows-latest)
