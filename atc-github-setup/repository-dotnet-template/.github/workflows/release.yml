@@ -1,0 +1,53 @@
+name: "Release"
+
+on:
+  workflow_dispatch:
+
+env:
+  ATC_EMAIL: 'atcnet.org@gmail.com'
+  ATC_NAME: 'Atc-Net'
+  NUGET_REPO_URL: 'https://api.nuget.org/v3/index.json'
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/stable'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛒 Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_WORKFLOWS }}
+
+      - name: ⚛️ Sets environment variables - branch-name
+        uses: nelonoel/branch-name@v1.0.1
+
+      - name: ⚛️ Sets environment variables - Nerdbank.GitVersioning
+        uses: dotnet/nbgv@master
+        with:
+          setAllVars: true
+
+      - name: ⚙️ Setup dotnet 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '5.0.x'
+
+      - name: 📋 Prepare build for release
+        run: |
+          dotnet clean -c Release
+          dotnet restore
+          dotnet build -c Release /p:UseSourceLink=true --no-restore
+
+      - name: ⏩ Merge to release-branch
+        run: |
+          git config --local user.email ${{ env.ATC_EMAIL }}
+          git config --local user.name ${{ env.ATC_NAME }}
+          git checkout release
+          git merge --ff-only stable
+          git push origin release
+
+      - name: 🗳️ Creating library package for release
+        run: dotnet pack -c Release --no-restore -o ${GITHUB_WORKSPACE}/packages -p:RepositoryBranch=$BRANCH_NAME -p:ContinuousIntegrationBuild=true /p:PublicRelease=true
+
+      - name: 📦 Push packages to NuGet
+        run: dotnet nuget push ${GITHUB_WORKSPACE}/packages/'Atc.[Hallo.World.Project].'${NBGV_NuGetPackageVersion}'.nupkg' -k ${{ secrets.NUGET_KEY }} -s ${{ env.NUGET_REPO_URL }} --skip-duplicate
