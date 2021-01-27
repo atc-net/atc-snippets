@@ -1,6 +1,0 @@
-{
-	"Mappings": {
-		"Src": { "Paths": [ "src" ] },
-		"Test": { "Paths": [ "test" ] }
-	}
-}
