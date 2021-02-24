@@ -71,6 +71,8 @@ $envResourceName        = Get-ResourceName -companyAbbreviation $companyAbbrevia
 $resourceGroupName      = Get-ResourceGroupName -serviceName $serviceName -systemName $systemName -environmentName $environmentName
 $resourceName           = Get-ResourceName -serviceAbbreviation $serviceAbbreviation -companyAbbreviation $companyAbbreviation -systemAbbreviation $systemAbbreviation -environmentName $environmentName
 
+# Write setup
+
 Write-Host "**********************************************************************" -ForegroundColor White
 Write-Host "* Environment name                 : $environmentName" -ForegroundColor White
 Write-Host "* Env. resource group name         : $envResourceGroupName" -ForegroundColor White
