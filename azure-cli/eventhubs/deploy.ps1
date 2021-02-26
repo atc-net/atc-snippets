@@ -201,7 +201,6 @@ foreach ($eventHubName in $eventHubNames) {
   Throw-WhenError -output $output
 }
 
-
 Write-Host "  Creating consumer groups for eventhubs in namespace $eventHubNamespaceName" -ForegroundColor DarkYellow
 foreach ($eventHubConsumerGroup in $eventHubConsumerGroups) {
     $consumerGroupName = $eventHubConsumerGroup.Name
