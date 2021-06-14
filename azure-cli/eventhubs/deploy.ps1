@@ -34,12 +34,6 @@ $output = az extension add `
 
 Throw-WhenError -output $output
 
-$output = az extension add `
-  --name azure-iot `
-  --yes
-
-Throw-WhenError -output $output
-
 # Naming rule configurations
 $companyAbbreviation = "xxx"
 $systemName          = "xxx"
