@@ -25,5 +25,26 @@ $output = az extension add `
 Throw-WhenError -output $output
 
 
-Write-Host "  Install Azure DevOps extension" -ForegroundColor DarkYellow
-az extension add --name azure-devops --yes
+
+TO-BE-SORTED:
+-------------
+
+datafactory
+
+databricks
+
+kusto
+
+log-analytics
+
+scheduled-query
+
+aks-preview
+
+mixed-reality
+
+azure-cli-ml vs. ml?!
+
+webpubsub
+
+azure-devops

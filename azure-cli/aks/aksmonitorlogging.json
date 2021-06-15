@@ -1,0 +1,42 @@
+[
+  {
+    "category": "kube-apiserver",
+    "enabled": true,
+    "retentionPolicy": {
+      "days": 0,
+      "enabled": false
+    }
+  },
+  {
+    "category": "kube-audit",
+    "enabled": true,
+    "retentionPolicy": {
+      "days": 0,
+      "enabled": false
+    }
+  },
+  {
+    "category": "kube-controller-manager",
+    "enabled": true,
+    "retentionPolicy": {
+      "days": 0,
+      "enabled": false
+    }
+  },
+  {
+    "category": "kube-scheduler",
+    "enabled": true,
+    "retentionPolicy": {
+      "days": 0,
+      "enabled": false
+    }
+  },
+  {
+    "category": "cluster-autoscaler",
+    "enabled": true,
+    "retentionPolicy": {
+      "days": 0,
+      "enabled": false
+    }
+  }
+]

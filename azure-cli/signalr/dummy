@@ -1,0 +1,20 @@
+#############################################################################################
+# Provision SignalR
+#############################################################################################
+Write-Host "Provision SignalR Service" -ForegroundColor DarkGreen
+$output = az signalr create `
+  --name $signalRName `
+  --location $location `
+  --resource-group $resourceGroupName `
+  --sku Standard_S1 `
+  --unit-count 1 `
+  --allowed-origins * `
+  --service-mode Default
+
+Throw-WhenError -output $output
+
+$signalrPrimaryConnectionString = az signalr key list `
+  --name $signalRName `
+  --resource-group $resourceGroupName `
+  --query primaryConnectionString `
+  -o tsv

@@ -1,0 +1,26 @@
+    #############################################################################################
+    # Provision Synapse Workspace
+    #############################################################################################
+    Write-Host "Provision synapse workspace" -ForegroundColor DarkGreen
+
+    Write-Host "  Creating synapse workspace" -ForegroundColor DarkYellow
+    az synapse workspace create `
+        --name $synapseWorkspaceName `
+        --resource-group $resourceGroupName `
+        --storage-account $storageAccountName `
+        --file-system $fileShareName `
+        --sql-admin-login-user $sqlAdminLoginUser `
+        --sql-admin-login-password $sqlAdminLoginPassword `
+        --location $location
+
+    #############################################################################################
+    # Provision Synapse SQL Pool
+    #############################################################################################
+    #Write-Host "Provision Synapse SQL Pool" -ForegroundColor DarkGreen
+    #
+    #az synapse sql pool create `
+    #    --resource-group $resourceGroupName `
+    #    --name $synapseSqlPoolName `
+    #    --performance-level $synapseSqlPoolPerformanceLevel `
+    #    --workspace-name $synapseWorkspaceName
+}

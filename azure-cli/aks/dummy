@@ -1,0 +1,63 @@
+#############################################################################################
+# Provision AKS Cluster
+#############################################################################################
+Write-Host "Provision AKS Cluster" -ForegroundColor DarkGreen
+
+Write-Host "  Creating AKS Cluster" -ForegroundColor DarkYellow
+$output = az aks create `
+  --name $aksClusterName `
+  --resource-group $resourceGroupName `
+  --location $location `
+  --enable-managed-identity `
+  --enable-addons monitoring `
+  --workspace-resource-id $logAnalyticsId `
+  --node-count 1 `
+  --vm-set-type VirtualMachineScaleSets `
+  --load-balancer-sku standard `
+  --enable-cluster-autoscaler `
+  --min-count 1 `
+  --max-count 3 `
+  --node-vm-size Standard_DS2_v2 `
+  --no-ssh-key `
+  --kubernetes-version "1.15.7" `
+  --service-principal $env:servicePrincipalId `
+  --client-secret $env:servicePrincipalKey `
+  --tags `
+    Env=$environmentName `
+    System=$systemName
+
+Throw-WhenError -output $output
+
+Write-Host "  Attaching Container Registry to AKS Cluster" -ForegroundColor DarkYellow
+$output = az aks update `
+  --name $aksClusterName `
+  --resource-group $resourceGroupName `
+  --attach-acr $containerRegistryName
+
+Throw-WhenError -output $output
+
+$aksId = $(az aks show -n $aksClusterName -g $resourceGroupName -o tsv --query id)
+
+
+#############################################################################################
+# Connect resources with Azure Monitor
+#############################################################################################
+Write-Host "Connect resources with Azure Monitor" -ForegroundColor DarkGreen
+
+Write-Host "  Creating Diagnostic Setting for AKS" -ForegroundColor DarkYellow
+
+$aksMonitorLogging = Get-Content "json-files/aksmonitorlogging.json" -Raw
+$aksMonitorLogging = $aksMonitorLogging -replace '\s+', '' -replace '"', '\"'
+
+$aksMonitorMetrics = Get-Content "json-files/aksmonitormetrics.json" -Raw
+$aksMonitorMetrics = $aksMonitorMetrics -replace '\s+', '' -replace '"', '\"'
+
+$output = az monitor diagnostic-settings create `
+--resource $aksId `
+--name "AksToMonitorDiagnostics" `
+--workspace $logAnalyticsId `
+--resource-group $resourceGroupName `
+--logs $aksMonitorLogging `
+--metrics $aksMonitorMetrics
+
+Throw-WhenError -output $output
