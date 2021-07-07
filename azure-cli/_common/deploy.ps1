@@ -1,3 +1,31 @@
+<#
+  .SYNOPSIS
+  Deploys Azure services with the Azure CLI tool
+
+  .DESCRIPTION
+  The deploy.ps1 script deploys Azure service using the CLI tool to a resource group in the relevant environment.
+
+  .PARAMETER environmentType
+  Specifies the environment type. Staging (DevTest) or production
+
+  .PARAMETER environmentName
+   Specifies the environment name. E.g. Dev, Test etc.
+
+   .PARAMETER location
+   Specifies the location where the services are deployed. Default is West Europe
+
+  .PARAMETER namingConfig
+   Specifies the configuration element used to build the resource names for the resource group and the services
+
+  .INPUTS
+  None. You cannot pipe objects to deploy.ps1.
+
+  .OUTPUTS
+  None. Udeploy.ps1 does not generate any output.
+
+  .EXAMPLE
+  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -namingConfig [PSCustomObject]@{companyAbbreviation = "xxx" systemName = "xxx" systemAbbreviation  = "xxx" serviceName = "xxx" serviceAbbreviation = "xxx"}
+#>
 param (
   [Parameter(Mandatory = $false)]
   [ValidateNotNullOrEmpty()]
@@ -8,7 +36,22 @@ param (
   [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
-  $environmentName
+  $environmentName,
+
+  [Parameter(Mandatory = $false)]
+  [ValidateNotNullOrEmpty()]
+  [string]
+  $location = "westeurope",
+
+  [Parameter(Mandatory = $true)]
+  [ValidateNotNullOrEmpty()]
+  [PSCustomObject] $namingConfig = @(
+    companyAbbreviation = 'xxx'
+    systemName = 'xxx'
+    systemAbbreviation = 'xxx'
+    serviceName = 'xxx'
+    serviceAbbreviation = 'xxx'
+  )
 )
 
 #############################################################################################
@@ -17,8 +60,8 @@ param (
 Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 
 # import utility functions
-. ".\deploy.utilities.ps1"
-. ".\deploy.naming.ps1"
+. "$PSScriptRoot\deploy.utilities\deploy.utilities.ps1"
+. "$PSScriptRoot\deploy.naming\deploy.naming.ps1"
 
 # Install required extensions
 Write-Host "  Installing required extensions" -ForegroundColor DarkYellow
@@ -40,16 +83,6 @@ $output = az extension add `
 
 Throw-WhenError -output $output
 
-# Naming rule configurations
-$companyAbbreviation = "xxx"
-$systemName          = "xxx"
-$systemAbbreviation  = "xxx"
-$serviceName         = "xxx"
-$serviceAbbreviation = "xxx"
-
-# Location
-$location = "westeurope"
-
 # Resource tags
 $resourceTags = @(
   "Owner=Auto Deployed",
@@ -59,17 +92,24 @@ $resourceTags = @(
   "Source=https://repo_url"
 )
 
+# Set global variables
+$global:EnvironmentType = $environmentType
+$global:EnvironmentName = $environmentName
+$global:Location = $location
+$global:NamingConfig = $namingConfig
+$global:ResourceTags = $resourceTags
+
 #############################################################################################
 # Resource naming section
 #############################################################################################
 
 # Environment Resource Names
-$envResourceGroupName   = Get-ResourceGroupName -systemName $systemName -environmentName $environmentName
-$envResourceName        = Get-ResourceName -companyAbbreviation $companyAbbreviation -systemAbbreviation $systemAbbreviation -environmentName $environmentName
+$envResourceGroupName   = Get-ResourceGroupName -systemName $namingConfig.systemName -environmentName $environmentName
+$envResourceName        = Get-ResourceName -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $environmentName
 
 # Resource Names
-$resourceGroupName      = Get-ResourceGroupName -serviceName $serviceName -systemName $systemName -environmentName $environmentName
-$resourceName           = Get-ResourceName -serviceAbbreviation $serviceAbbreviation -companyAbbreviation $companyAbbreviation -systemAbbreviation $systemAbbreviation -environmentName $environmentName
+$resourceGroupName      = Get-ResourceGroupName -serviceName $namingConfig.serviceName -systemName $namingConfig.systemName -environmentName $environmentName
+$resourceName           = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $environmentName
 
 # Write setup
 
@@ -91,3 +131,8 @@ $output = az group create `
   --tags $resourceTags
 
 Throw-WhenError -output $output
+
+#############################################################################################
+# Provision Azure Container Registry
+#############################################################################################
+& "$PSScriptRoot\..\acr\deploy.ps1"
