@@ -1,18 +1,18 @@
 function Set-KeyVaultSecret {
   param (
-    [Parameter(Mandatory=$true)]
-    [string]
-    $keyVaultName,
-
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $resourceGroupName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
+    [string]
+    $keyVaultName,
+
+    [Parameter(Mandatory = $true)]
     [string]
     $secretName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [securestring]
     $secret
@@ -48,12 +48,7 @@ function Set-KeyVaultSecretPlain {
     $secretPlain
   )
 
-  Write-Host "  Querying $secretName secret" -ForegroundColor DarkYellow
-  $output = az keyvault secret show `
-    --name $secretName `
-    --vault-name $keyVaultName `
-    --query value `
-    --output tsv
+  $output = Get-KeyVaultSecret -keyVaultName $keyVaultName -secretName $secretName
 
   if ($secretPlain -ne $output) {
 

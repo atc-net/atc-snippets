@@ -1,9 +1,9 @@
 <#
   .SYNOPSIS
-  Deploys Azure services with the Azure CLI tool
+  Deploys Azure resource groups and key vaults with the Azure CLI tool
 
   .DESCRIPTION
-  The deploy.ps1 script deploys Azure service using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys Azure resource groups and key vaults for an application with an environment resource group and a service recource group
 
   .PARAMETER environmentType
   Specifies the environment type. Staging (DevTest) or production
@@ -61,8 +61,8 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 # import utility functions
 . "$PSScriptRoot\utilities\deploy.utilities.ps1"
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
-. "$PSScriptRoot\..\monitor\get_LogAnalyticsId.ps1"
-. "$PSScriptRoot\..\keyvault\get_KeyVaultSecret.ps1"
+. "$PSScriptRoot\..\ad\new_ServiceSPN.ps1"
+. "$PSScriptRoot\..\keyvault\set_KeyVaultSPNPolicy.ps1"
 
 # Install required extensions
 . "$PSScriptRoot\extensions.ps1"
@@ -71,18 +71,11 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 # Resource naming section
 #############################################################################################
 
-# Environment Resource Names
 $envResourceGroupName   = Get-ResourceGroupName -systemName $namingConfig.systemName -environmentName $namingConfig.environmentName
 $envKeyVaultName        = Get-ResourceName -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix "kv"
 
-# Resource Names
 $resourceGroupName      = Get-ResourceGroupName -serviceName $namingConfig.serviceName -systemName $namingConfig.systemName -environmentName $namingConfig.environmentName
 $keyVaultName           = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'kv'
-$registryName           = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'cr'
-$appServicePlanName     = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'plan'
-$aksClusterName         = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'aks'
-$logAnalyticsName       = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'log'
-$insightsName           = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'appi'
 
 # Write setup
 
@@ -93,31 +86,31 @@ Write-Host "* Resource group name              : $resourceGroupName" -Foreground
 Write-Host "**********************************************************************" -ForegroundColor White
 
 #############################################################################################
-# Provision Azure Container Registry
+# Provision resource groups
 #############################################################################################
-#& "$PSScriptRoot\..\acr\deploy.ps1" -resourceGroupName $resourceGroupName -registryName $registryName -resourceTags $resourceTags
+
+& "$PSScriptRoot\..\group\deploy.ps1" -resourceGroupName $envResourceGroupName -resourceTags $resourceTags
+& "$PSScriptRoot\..\group\deploy.ps1" -resourceGroupName $resourceGroupName -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Azure App Service Plan
+# Provision Azure Key Vaults
 #############################################################################################
-#& "$PSScriptRoot\..\appservice\deploy.ps1" -resourceGroupName $resourceGroupName -appServicePlanName $appServicePlanName -resourceTags $resourceTags
+& "$PSScriptRoot\..\keyvault\deploy.ps1" -resourceGroupName $envResourceGroupName -keyVaultName $envKeyVaultName -resourceTags $resourceTags
+& "$PSScriptRoot\..\keyvault\deploy.ps1" -resourceGroupName $resourceGroupName -keyVaultName $keyVaultName -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Log Analytics and Application Insights
+# Provision Service Principles
 #############################################################################################
-#& "$PSScriptRoot\..\monitor\deploy.ps1" -resourceGroupName $resourceGroupName -logAnalyticsName $logAnalyticsName -insightsNam $insightsName -resourceTags $resourceTags
+# Create service priniple and save info to environment key vault
+New-ServiceSPN -companyHostName "company.com" -envResourceGroupName $envResourceGroupName -envKeyVaultName $envKeyVaultName `
+-environmentName $namingConfig.environmentName `
+-systemAbbreviation $namingConfig.systemAbbreviation `
+-systemName $namingConfig.systemName `
+-serviceAbbreviation $namingConfig.systemAbbreviation `
+-serviceName $namingConfig.serviceName `
 
-#############################################################################################
-# Provision Azure Kubernetes Cluster (AKS)
-#############################################################################################
-$logAnalyticsId = Get-LogAnalyticsId -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
-
-$clientIdName = Get-SpnClientIdName -environmentName $namingConfig.environmentName -systemAbbreviation $namingConfig.systemAbbreviation -serviceAbbreviation $namingConfig.serviceAbbreviation
-$clientSecretName = Get-SpnClientSecretName -environmentName $namingConfig.environmentName -systemAbbreviation $namingConfig.systemAbbreviation -serviceAbbreviation $namingConfig.serviceAbbreviation
-$clientId = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $clientIdName
-$clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $clientSecretName
-
-& "$PSScriptRoot\..\aks\deploy.ps1" -resourceGroupName $resourceGroupName `
--environmentName $namingConfig.environmentName -systemName $namingConfig.systemName `
--aksClusterName $aksClusterName -logAnalyticsId $logAnalyticsId -registryName $registryName `
--clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) -resourceTags $resourceTags
+# Grant access to SPN to the service key vault
+Set-KeyVaultSPNPolicy -resourceGroupName $resourceGroupName -envKeyVaultName $envKeyVaultName -keyVaultName $keyVaultName `
+-environmentName $namingConfig.environmentName `
+-systemAbbreviation $namingConfig.systemAbbreviation `
+-serviceAbbreviation $namingConfig.systemAbbreviation `

@@ -1,12 +1,15 @@
 <#
   .SYNOPSIS
-  Deploys Azure Container Registry instance
+  Deploys Azure app service plan
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Container Registry instance using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys an Azure app service plan using the CLI tool to a resource group in the relevant environment.
 
   .PARAMETER environmentType
   Specifies the environment type. Staging (DevTest) or production
+
+  .PARAMETER environmentName
+  Specifies the environment name. E.g. Dev, Test etc.
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
@@ -14,8 +17,8 @@
   .PARAMETER resourceGroupName
   Specifies the name of the resource group
 
-  .PARAMETER registryName
-  Specifies the name of the Container Registry
+  .PARAMETER appServicePlanName
+  Specifies the name of the app service plan
 
   .PARAMETER resourceTags
   Specifies the tag elements that will be used to tag the deployed services
@@ -24,10 +27,10 @@
   None. You cannot pipe objects to deploy.ps1.
 
   .OUTPUTS
-  None. deploy.ps1 does not generate any output.
+  None. Udeploy.ps1 does not generate any output.
 
   .EXAMPLE
-  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -registryName xxxxxxdevxxxcr
+  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -appServicePlanName xxxxxxdevxxxplan
 #>
 param (
   [Parameter(Mandatory = $false)]
@@ -49,26 +52,27 @@ param (
   [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
-  $registryName,
+  $appServicePlanName,
 
   [Parameter(Mandatory = $false)]
   [string[]] $resourceTags = @()
 )
 
 #############################################################################################
-# Azure Container Registry
+# Provision app service plan
 #############################################################################################
-Write-Host "Provision Azure Container Registry" -ForegroundColor DarkGreen
+Write-Host "Provision app service plan" -ForegroundColor DarkGreen
 
-Write-Host "  Creating Azure Container Registry" -ForegroundColor DarkYellow
-
-$containerRegistryLoginServer = az acr create `
+$sku = 'S1'
+if ($environmentType -eq 'Production') {
+  $sku = 'P1V2'
+}
+Write-Host "  Create app service plan" -ForegroundColor DarkYellow
+$appServicePlanId = az appservice plan create `
+  --name $appServicePlanName `
+  --location $location `
   --resource-group $resourceGroupName `
-  --name $registryName `
-  --sku Standard `
-  --admin-enabled `
+  --sku $sku `
   --tags $resourceTags `
-  --query loginServer `
-  --output tsv
-
-Throw-WhenError -output $containerRegistryLoginServer
+  --query id
+  Throw-WhenError -output $appServicePlanId

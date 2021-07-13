@@ -10,7 +10,6 @@ function Throw-WhenError {
     Write-Error $output
     throw
   }
-
 }
 
 function ConvertTo-PlainText {

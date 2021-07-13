@@ -1,9 +1,9 @@
 <#
   .SYNOPSIS
-  Deploys Azure Container Registry instance
+  Deploys a log analytics workspace and application insights
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Container Registry instance using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys a log analytics workspace and application insights using the CLI tool to a resource group in the relevant environment.
 
   .PARAMETER environmentType
   Specifies the environment type. Staging (DevTest) or production
@@ -14,8 +14,11 @@
   .PARAMETER resourceGroupName
   Specifies the name of the resource group
 
-  .PARAMETER registryName
-  Specifies the name of the Container Registry
+  .PARAMETER logAnalyticsName
+  Specifies the name of the Log Analytics workspace
+
+  .PARAMETER insightsName
+  Specifies the name of the Application Insights
 
   .PARAMETER resourceTags
   Specifies the tag elements that will be used to tag the deployed services
@@ -49,26 +52,42 @@ param (
   [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
-  $registryName,
+  $logAnalyticsName,
+
+  [Parameter(Mandatory = $true)]
+  [ValidateNotNullOrEmpty()]
+  [string]
+  $insightsName,
 
   [Parameter(Mandatory = $false)]
   [string[]] $resourceTags = @()
 )
 
 #############################################################################################
-# Azure Container Registry
+# Provision log analytics resource
 #############################################################################################
-Write-Host "Provision Azure Container Registry" -ForegroundColor DarkGreen
+Write-Host "Provision Log Analytics Workspace" -ForegroundColor DarkGreen
 
-Write-Host "  Creating Azure Container Registry" -ForegroundColor DarkYellow
-
-$containerRegistryLoginServer = az acr create `
+$logAnalyticsId = az monitor log-analytics workspace create `
+  --workspace-name $logAnalyticsName `
+  --location $location `
   --resource-group $resourceGroupName `
-  --name $registryName `
-  --sku Standard `
-  --admin-enabled `
   --tags $resourceTags `
-  --query loginServer `
-  --output tsv
+  --query id
 
-Throw-WhenError -output $containerRegistryLoginServer
+Throw-WhenError -output $logAnalyticsId
+
+#############################################################################################
+# Provision application insights resource
+#############################################################################################
+Write-Host "Provision application insights" -ForegroundColor DarkGreen
+
+Write-Host "  Creating application insights" -ForegroundColor DarkYellow
+$output = az monitor app-insights component create `
+  --app $insightsName `
+  --location $location `
+  --resource-group $resourceGroupName `
+  --application-type web `
+  --kind web `
+  --tags $resourceTags
+Throw-WhenError -output $output

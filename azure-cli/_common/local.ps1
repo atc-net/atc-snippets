@@ -6,22 +6,33 @@
 param (
   [ValidateNotNullOrEmpty()]
   [string]
-  $subscriptionId = "d6db0093-ba02-4db3-b89e-d44aa5522ae7"
+  $subscriptionId = "00000000-0000-0000-0000-000000000000"
 )
 Write-Host "Initialize local deployment" -ForegroundColor Blue
 
-az login --allow-no-subscriptions
-az account set --subscription $subscriptionId
+. "$PSScriptRoot\..\account\set_loginaccount.ps1"
+
+$subscriptionId = "dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a"
+Set-LoginAccount -subscriptionId $subscriptionId
 
 $environmentType = "DevTest"
-$environmentName = "Dev"
+
 $namingConfig = [PSCustomObject]@{
+  environmentName = "Dev"
   companyAbbreviation = "xxx"
   systemName          = "xxx"
   systemAbbreviation  = "xxx"
   serviceName         = "xxx"
   serviceAbbreviation = "xxx"
 }
+$resourceTags = @(
+  "Owner=Auto Deployed",
+  "System=$($namingConfig.systemName)",
+  "Environment=$($namingConfig.environmentName)",
+  "Service=$($namingConfig.serviceName)",
+  "Source=https://repo_url"
+)
 
-& "$PSScriptRoot\deploy.ps1" -environmentType $environmentType -environmentName $environmentName -namingConfig $namingConfig
+#& "$PSScriptRoot\deploy.initial.ps1" -environmentType $environmentType -namingConfig $namingConfig -resourceTags $resourceTags
+& "$PSScriptRoot\deploy.ps1" -environmentType $environmentType -namingConfig $namingConfig -resourceTags $resourceTags
 

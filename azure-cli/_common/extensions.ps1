@@ -24,27 +24,29 @@ $output = az extension add `
 
 Throw-WhenError -output $output
 
+$output = az extension add `
+  --name log-analytics `
+  --yes
 
+Throw-WhenError -output $output
 
-TO-BE-SORTED:
--------------
+# TO-BE-SORTED:
+# -------------
 
-datafactory
+# datafactory
 
-databricks
+# databricks
 
-kusto
+# kusto
 
-log-analytics
+# scheduled-query
 
-scheduled-query
+# aks-preview
 
-aks-preview
+# mixed-reality
 
-mixed-reality
+# azure-cli-ml vs. ml?!
 
-azure-cli-ml vs. ml?!
+# webpubsub
 
-webpubsub
-
-azure-devops
+# azure-devops
