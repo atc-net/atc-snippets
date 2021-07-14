@@ -152,6 +152,34 @@ function Get-SpnClientIdName {
   return $systemAbbreviation.ToLower() + "-" + $environmentName.ToLower() + "-" + $serviceAbbreviation.ToLower() + $serviceInstance + "-clientid"
 }
 
+function Get-SpnObjectIdName {
+  param (
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $environmentName,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $systemAbbreviation,
+
+    [Parameter(Mandatory=$true)]
+    [string]
+    $serviceAbbreviation,
+
+    [Parameter(Mandatory=$false)]
+    [string]
+    $serviceInstance = ""
+  )
+
+  if ($serviceInstance.Length -gt 0) {
+    $serviceInstance = "-" + $serviceInstance.ToLower()
+  }
+
+  return $systemAbbreviation.ToLower() + "-" + $environmentName.ToLower() + "-" + $serviceAbbreviation.ToLower() + $serviceInstance + "-objectid"
+}
+
 function Get-SpnClientSecretName {
   param (
     [Parameter(Mandatory=$true)]

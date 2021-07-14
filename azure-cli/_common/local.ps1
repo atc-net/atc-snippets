@@ -8,6 +8,7 @@ param (
   [string]
   $subscriptionId = "00000000-0000-0000-0000-000000000000"
 )
+
 Write-Host "Initialize local deployment" -ForegroundColor Blue
 
 . "$PSScriptRoot\..\account\set_loginaccount.ps1"
@@ -34,5 +35,5 @@ $resourceTags = @(
 )
 
 #& "$PSScriptRoot\deploy.initial.ps1" -environmentType $environmentType -namingConfig $namingConfig -resourceTags $resourceTags
-& "$PSScriptRoot\deploy.ps1" -environmentType $environmentType -namingConfig $namingConfig -resourceTags $resourceTags
+& "$PSScriptRoot\deploy.ps1" -tenantId $tenantId -environmentType $environmentType -namingConfig $namingConfig -resourceTags $resourceTags
 

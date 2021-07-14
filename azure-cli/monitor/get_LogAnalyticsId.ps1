@@ -8,7 +8,7 @@ function Get-LogAnalyticsId {
       [string]
       $resourceGroup
     )
-    Write-Host "Get log analytics id" -ForegroundColor DarkYellow
+    Write-Host "  Get log analytics id" -ForegroundColor DarkYellow
     $logAnalyticsId =az monitor log-analytics workspace show `
       --workspace-name $logAnalyticsName `
       --resource-group $resourceGroup `

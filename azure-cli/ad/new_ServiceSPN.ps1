@@ -65,6 +65,8 @@ function New-ServiceSPN {
     --identifier-uris $spnAppIdentityId `
     --query appId
 
+   $objectId = az ad sp  show --id $clientId --query objectId --out tsv
+
   Write-Host "  Generating SPN secret (Client App ID: $clientId)" -ForegroundColor DarkYellow
   $clientSecret = az ad app credential reset --id $clientId --query password
   $clientSecret = $clientSecret.Remove($clientSecret.Length - 1, 1).Remove(0, 1) # Remove lead/trail quotes
@@ -73,6 +75,12 @@ function New-ServiceSPN {
   $null = az ad sp create --id $clientId
 
   $clientIdName = Get-SpnClientIdName `
+    -environmentName $environmentName `
+    -systemAbbreviation $systemAbbreviation `
+    -serviceAbbreviation $serviceAbbreviation `
+    -serviceInstance $serviceInstance
+
+  $objectIdName = Get-SpnObjectIdName `
     -environmentName $environmentName `
     -systemAbbreviation $systemAbbreviation `
     -serviceAbbreviation $serviceAbbreviation `
@@ -89,6 +97,12 @@ function New-ServiceSPN {
     -resourceGroupName $envResourceGroupName `
     -secretName $clientIdName `
     -secretPlain $clientId
+
+  Set-KeyVaultSecretPlain `
+  -keyVaultName $envKeyVaultName `
+  -resourceGroupName $envResourceGroupName `
+  -secretName $objectIdName `
+  -secretPlain $objectId
 
   Set-KeyVaultSecretPlain `
     -keyVaultName $envKeyVaultName `
