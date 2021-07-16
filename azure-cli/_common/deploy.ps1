@@ -84,6 +84,7 @@ $envResourceGroupName   = Get-ResourceGroupName -systemName $namingConfig.system
 $envKeyVaultName        = Get-ResourceName -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix "kv"
 
 # Resource Names
+# Microsoft recommended abbreviations https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations 
 $resourceGroupName      = Get-ResourceGroupName -serviceName $namingConfig.serviceName -systemName $namingConfig.systemName -environmentName $namingConfig.environmentName
 $keyVaultName           = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'kv'
 $registryName           = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'cr'
@@ -95,6 +96,7 @@ $cosmosAccountName      = Get-ResourceName -serviceAbbreviation $namingConfig.se
 $storageAccountName     = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'st'
 $eventHubNamespaceName  = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'evhns'
 $databricksName         = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'dbw'
+$functionName           = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'func'
 
 # Write setup
 
@@ -113,6 +115,7 @@ Write-Host "* Cosmos database                  : $cosmosAccountName" -Foreground
 Write-Host "* Storage account                  : $storageAccountName" -ForegroundColor White
 Write-Host "* Event hub namespace              : $eventHubNamespaceName" -ForegroundColor White
 Write-Host "* Databricks workspace             : $databricksName" -ForegroundColor White
+Write-Host "* Function app                     : $functionName" -ForegroundColor White
 Write-Host "**********************************************************************" -ForegroundColor White
 
 $clientIdName = Get-SpnClientIdName -environmentName $namingConfig.environmentName -systemAbbreviation $namingConfig.systemAbbreviation -serviceAbbreviation $namingConfig.serviceAbbreviation
@@ -136,8 +139,8 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 # Provision Log Analytics and Application Insights
 #############################################################################################
 #& "$PSScriptRoot\..\monitor\deploy.ps1" -resourceGroupName $resourceGroupName -logAnalyticsName $logAnalyticsName -insightsNam $insightsName -resourceTags $resourceTags
-$logAnalyticsId = Get-LogAnalyticsId -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
-$logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
+# $logAnalyticsId = Get-LogAnalyticsId -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
+# $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
 
 #############################################################################################
 # Provision Azure Kubernetes Cluster (AKS)
@@ -163,9 +166,16 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #& "$PSScriptRoot\..\eventhubs\deploy.ps1" -resourceGroupName $resourceGroupName -eventHubNamespaceName $eventHubNamespaceName -storageAccountName $storageAccountName -resourceTags $resourceTags
 
 #############################################################################################
-# Databricks
+# Provision Databricks
 #############################################################################################
-& "$PSScriptRoot\..\databricks\deploy.ps1" -tenantId $tenantId -resourceGroupName $resourceGroupName `
--databricksName $databricksName -objectId $objectId -logAnalyticsId $logAnalyticsId -logAnalyticsKey $logAnalyticsKey `
--clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) `
- -resourceTags $resourceTags
+# & "$PSScriptRoot\..\databricks\deploy.ps1" -tenantId $tenantId -resourceGroupName $resourceGroupName `
+# -databricksName $databricksName -objectId $objectId -logAnalyticsId $logAnalyticsId -logAnalyticsKey $logAnalyticsKey `
+# -clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) `
+#  -resourceTags $resourceTags
+
+#############################################################################################
+# Provision function app
+#############################################################################################
+& "$PSScriptRoot\..\functionapp\deploy.ps1" -resourceGroupName $resourceGroupName `
+-functionName $functionName -storageAccountName $storageAccountName -insightsName $insightsName  `
+-appServicePlanName $appServicePlanName -keyVaultName $keyVaultName -resourceTags $resourceTags
