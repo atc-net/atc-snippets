@@ -97,7 +97,8 @@ $storageAccountName     = Get-ResourceName -serviceAbbreviation $namingConfig.se
 $eventHubNamespaceName  = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'evhns'
 $databricksName         = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'dbw'
 $functionName           = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'func'
-
+$iotHubName             = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'iot'
+$sqlServerName          = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'sql'
 # Write setup
 
 Write-Host "**********************************************************************" -ForegroundColor White
@@ -116,6 +117,8 @@ Write-Host "* Storage account                  : $storageAccountName" -Foregroun
 Write-Host "* Event hub namespace              : $eventHubNamespaceName" -ForegroundColor White
 Write-Host "* Databricks workspace             : $databricksName" -ForegroundColor White
 Write-Host "* Function app                     : $functionName" -ForegroundColor White
+Write-Host "* IoT Hub                          : $iotHubName" -ForegroundColor White
+Write-Host "* SQL server                       : $sqlServerName" -ForegroundColor White
 Write-Host "**********************************************************************" -ForegroundColor White
 
 $clientIdName = Get-SpnClientIdName -environmentName $namingConfig.environmentName -systemAbbreviation $namingConfig.systemAbbreviation -serviceAbbreviation $namingConfig.serviceAbbreviation
@@ -128,50 +131,50 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 #############################################################################################
 # Provision Azure Container Registry
 #############################################################################################
-#& "$PSScriptRoot\..\acr\deploy.ps1" -resourceGroupName $resourceGroupName -registryName $registryName -resourceTags $resourceTags
+& "$PSScriptRoot\..\acr\deploy.ps1" -resourceGroupName $resourceGroupName -registryName $registryName -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Azure App Service Plan
 #############################################################################################
-#& "$PSScriptRoot\..\appservice\deploy.ps1" -resourceGroupName $resourceGroupName -appServicePlanName $appServicePlanName -resourceTags $resourceTags
+& "$PSScriptRoot\..\appservice\deploy.ps1" -resourceGroupName $resourceGroupName -appServicePlanName $appServicePlanName -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Log Analytics and Application Insights
 #############################################################################################
-#& "$PSScriptRoot\..\monitor\deploy.ps1" -resourceGroupName $resourceGroupName -logAnalyticsName $logAnalyticsName -insightsNam $insightsName -resourceTags $resourceTags
-# $logAnalyticsId = Get-LogAnalyticsId -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
-# $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
+& "$PSScriptRoot\..\monitor\deploy.ps1" -resourceGroupName $resourceGroupName -logAnalyticsName $logAnalyticsName -insightsNam $insightsName -resourceTags $resourceTags
+ $logAnalyticsId = Get-LogAnalyticsId -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
+ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
 
 #############################################################################################
 # Provision Azure Kubernetes Cluster (AKS)
 #############################################################################################
-# & "$PSScriptRoot\..\aks\deploy.ps1" -resourceGroupName $resourceGroupName `
-# -environmentName $namingConfig.environmentName -systemName $namingConfig.systemName `
-# -aksClusterName $aksClusterName -logAnalyticsId $logAnalyticsId -registryName $registryName `
-# -clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) -resourceTags $resourceTags
+& "$PSScriptRoot\..\aks\deploy.ps1" -resourceGroupName $resourceGroupName `
+-environmentName $namingConfig.environmentName -systemName $namingConfig.systemName `
+-aksClusterName $aksClusterName -logAnalyticsId $logAnalyticsId -registryName $registryName `
+-clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Cosmos Db account
 #############################################################################################
-#& "$PSScriptRoot\..\cosmosdb\deploy.ps1" -resourceGroupName $resourceGroupName -cosmosAccountName $cosmosAccountName -resourceTags $resourceTags
+& "$PSScriptRoot\..\cosmosdb\deploy.ps1" -resourceGroupName $resourceGroupName -cosmosAccountName $cosmosAccountName -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Storage Account
 #############################################################################################
-#& "$PSScriptRoot\..\storage\deploy.ps1" -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -resourceTags $resourceTags
+& "$PSScriptRoot\..\storage\deploy.ps1" -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Event Hubs
 #############################################################################################
-#& "$PSScriptRoot\..\eventhubs\deploy.ps1" -resourceGroupName $resourceGroupName -eventHubNamespaceName $eventHubNamespaceName -storageAccountName $storageAccountName -resourceTags $resourceTags
+& "$PSScriptRoot\..\eventhubs\deploy.ps1" -resourceGroupName $resourceGroupName -eventHubNamespaceName $eventHubNamespaceName -storageAccountName $storageAccountName -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Databricks
 #############################################################################################
-# & "$PSScriptRoot\..\databricks\deploy.ps1" -tenantId $tenantId -resourceGroupName $resourceGroupName `
-# -databricksName $databricksName -objectId $objectId -logAnalyticsId $logAnalyticsId -logAnalyticsKey $logAnalyticsKey `
-# -clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) `
-#  -resourceTags $resourceTags
+& "$PSScriptRoot\..\databricks\deploy.ps1" -tenantId $tenantId -resourceGroupName $resourceGroupName `
+-databricksName $databricksName -objectId $objectId -logAnalyticsId $logAnalyticsId -logAnalyticsKey $logAnalyticsKey `
+-clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) `
+ -resourceTags $resourceTags
 
 #############################################################################################
 # Provision function app
@@ -179,3 +182,17 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 & "$PSScriptRoot\..\functionapp\deploy.ps1" -resourceGroupName $resourceGroupName `
 -functionName $functionName -storageAccountName $storageAccountName -insightsName $insightsName  `
 -appServicePlanName $appServicePlanName -keyVaultName $keyVaultName -resourceTags $resourceTags
+
+#############################################################################################
+# Provision IoTHub
+#############################################################################################
+& "$PSScriptRoot\..\iot\deploy.ps1" -resourceGroupName $resourceGroupName `
+-iotHubName $iotHubName -iotHubSasPolicyNameWebApi 'webapiService' -iotHubSasPolicyNameFunctionApp 'functionAppService' `
+-iotHubProcessorConsumerGroupName 'processorfunction' -resourceTags $resourceTags
+
+#############################################################################################
+# Provision SQL server
+#############################################################################################
+& "$PSScriptRoot\..\sql\deploy.ps1" -resourceGroupName $resourceGroupName `
+-sqlServerName $sqlServerName -dbName 'sqldb' -keyVaultName $keyVaultName `
+-resourceTags $resourceTags
