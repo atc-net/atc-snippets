@@ -18,13 +18,13 @@ SPARK_CONF_DIR=$SPARK_HOME/conf
 # header as part of the request
 tee -a "$SPARK_CONF_DIR/spark-env.sh" << EOF
 export DB_CLUSTER_ID=$DB_CLUSTER_ID
-export LOG_ANALYTICS_WORKSPACE_ID="/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourcegroups/xxx-dev-xxx/providers/microsoft.operationalinsights/workspaces/xxxxxxdevxxxlog""/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourcegroups/xxx-dev-xxx/providers/microsoft.operationalinsights/workspaces/xxxxxxdevxxxlog""/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourcegroups/xxx-dev-xxx/providers/microsoft.operationalinsights/workspaces/xxxxxxdevxxxlog""/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourcegroups/xxx-dev-xxx/providers/microsoft.operationalinsights/workspaces/xxxxxxdevxxxlog"
-export LOG_ANALYTICS_WORKSPACE_KEY="qy7WiraXyqTfq2MQKW7O19mDt+Evv8sb6wuAX6NwW2l3LT7KsxPn+191ORgKteCleTJcMd5pJw4Pl60WM4LoJA==""qy7WiraXyqTfq2MQKW7O19mDt+Evv8sb6wuAX6NwW2l3LT7KsxPn+191ORgKteCleTJcMd5pJw4Pl60WM4LoJA==""qy7WiraXyqTfq2MQKW7O19mDt+Evv8sb6wuAX6NwW2l3LT7KsxPn+191ORgKteCleTJcMd5pJw4Pl60WM4LoJA=="
-export AZ_SUBSCRIPTION_ID="dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a""dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a""dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a""dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a"
-export AZ_RSRC_GRP_NAME="xxx-DEV-xxx""xxx-DEV-xxx""xxx-DEV-xxx""xxx-DEV-xxx"
+export LOG_ANALYTICS_WORKSPACE_ID="/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourcegroups/xxx-dev-xxx/providers/microsoft.operationalinsights/workspaces/xxxxxxdevxxxlog""/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourcegroups/xxx-dev-xxx/providers/microsoft.operationalinsights/workspaces/xxxxxxdevxxxlog""/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourcegroups/xxx-dev-xxx/providers/microsoft.operationalinsights/workspaces/xxxxxxdevxxxlog""/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourcegroups/xxx-dev-xxx/providers/microsoft.operationalinsights/workspaces/xxxxxxdevxxxlog""/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourcegroups/xxx-dev-xxx/providers/microsoft.operationalinsights/workspaces/xxxxxxdevxxxlog""/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourcegroups/xxx-dev-xxx/providers/microsoft.operationalinsights/workspaces/xxxxxxdevxxxlog""/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourcegroups/xxx-dev-xxx/providers/microsoft.operationalinsights/workspaces/xxxxxxdevxxxlog"
+export LOG_ANALYTICS_WORKSPACE_KEY="qy7WiraXyqTfq2MQKW7O19mDt+Evv8sb6wuAX6NwW2l3LT7KsxPn+191ORgKteCleTJcMd5pJw4Pl60WM4LoJA==""qy7WiraXyqTfq2MQKW7O19mDt+Evv8sb6wuAX6NwW2l3LT7KsxPn+191ORgKteCleTJcMd5pJw4Pl60WM4LoJA==""qy7WiraXyqTfq2MQKW7O19mDt+Evv8sb6wuAX6NwW2l3LT7KsxPn+191ORgKteCleTJcMd5pJw4Pl60WM4LoJA==""qy7WiraXyqTfq2MQKW7O19mDt+Evv8sb6wuAX6NwW2l3LT7KsxPn+191ORgKteCleTJcMd5pJw4Pl60WM4LoJA==""qy7WiraXyqTfq2MQKW7O19mDt+Evv8sb6wuAX6NwW2l3LT7KsxPn+191ORgKteCleTJcMd5pJw4Pl60WM4LoJA==""qy7WiraXyqTfq2MQKW7O19mDt+Evv8sb6wuAX6NwW2l3LT7KsxPn+191ORgKteCleTJcMd5pJw4Pl60WM4LoJA=="
+export AZ_SUBSCRIPTION_ID="dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a""dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a""dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a""dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a""dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a""dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a""dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a"
+export AZ_RSRC_GRP_NAME="xxx-DEV-xxx""xxx-DEV-xxx""xxx-DEV-xxx""xxx-DEV-xxx""xxx-DEV-xxx""xxx-DEV-xxx""xxx-DEV-xxx"
 export AZ_RSRC_PROV_NAMESPACE="Microsoft.Databricks"
 export AZ_RSRC_TYPE="workspaces"
-export AZ_RSRC_NAME="xxxxxxdevxxxdbw""xxxxxxdevxxxdbw""xxxxxxdevxxxdbw""xxxxxxdevxxxdbw"
+export AZ_RSRC_NAME="xxxxxxdevxxxdbw""xxxxxxdevxxxdbw""xxxxxxdevxxxdbw""xxxxxxdevxxxdbw""xxxxxxdevxxxdbw""xxxxxxdevxxxdbw""xxxxxxdevxxxdbw"
 
 # Note: All REGEX filters below are implemented with java.lang.String.matches(...).  This implementation essentially appends ^...$ around
 # the regular expression, so the entire string must match the regex.  If you need to allow for other values you should include .* before and/or
@@ -123,6 +123,21 @@ cat << EOF > "$DB_HOME/driver/conf/00-custom-spark-driver-defaults.conf"
     "spark.unifiedListener.sink" = "org.apache.spark.listeners.sink.loganalytics.LogAnalyticsListenerSink"
 }
 EOF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -39,7 +39,7 @@ function Enable-SparkMonitoringToLogAnalytics {
 
     (Get-Content "$PSScriptRoot\spark-monitoring.sh" -Raw) `
       -replace "AZ_RSRC_NAME=","AZ_RSRC_NAME=""$resourceName""" `
-      | Set-Content "$PSScriptRoot.\spark-monitoring.sh"
+      | Set-Content "$PSScriptRoot\spark-monitoring.sh"
 
     Write-Host "  Creating spark-monitoring folder in filesystem" -ForegroundColor DarkYellow
     dbfs mkdirs dbfs:/databricks/spark-monitoring

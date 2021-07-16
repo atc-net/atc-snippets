@@ -14,8 +14,23 @@
   .PARAMETER resourceGroupName
   Specifies the name of the resource group
 
-  .PARAMETER registryName
-  Specifies the name of the Container Registry
+  .PARAMETER databricksName
+  Specifies the name of the Databricks workspace
+
+   .PARAMETER clientId
+  Specifies the name of the Databricks workspace
+
+   .PARAMETER clientSecret
+  Specifies the object id for the Service Principle
+
+   .PARAMETER objectId
+  Specifies the object id for the Service Principle
+
+  .PARAMETER logAnalyticsId
+  Specifies the id for the log analytics workspace
+
+   .PARAMETER logAnalyticsKey
+  Specifies the primary for the log analytics workspace
 
   .PARAMETER resourceTags
   Specifies the tag elements that will be used to tag the deployed services
@@ -84,10 +99,10 @@ param (
 #############################################################################################
 
 # import utility functions
-. "$PSScriptRoot\set_DatabricksSpnAdminUser.ps1"
-. "$PSScriptRoot\convertTo_DatabricksPersonalAccessToken.ps1"
-. "$PSScriptRoot\enable_SparkMonitoringToLogAnalytics.ps1"
-. "$PSScriptRoot\set_DatabricksGlobalInitScript.ps1"
+. "$PSScriptRoot\utilities\set_DatabricksSpnAdminUser.ps1"
+. "$PSScriptRoot\utilities\convertTo_DatabricksPersonalAccessToken.ps1"
+. "$PSScriptRoot\utilities\enable_SparkMonitoringToLogAnalytics.ps1"
+. "$PSScriptRoot\utilities\set_DatabricksGlobalInitScript.ps1"
 
 $subscriptionId = az account show --query id
 Throw-WhenError -output $subscriptionId
@@ -187,10 +202,10 @@ Enable-SparkMonitoringToLogAnalytics `
 Write-Host "  Setting up pyodbc driver" -ForegroundColor DarkYellow
 
 dbfs mkdirs dbfs:/databricks/drivers
-dbfs cp --overwrite "$PSScriptRoot\drivers\msodbcsql17_17.7.2.1-1_amd64.deb" dbfs:/databricks/drivers/msodbcsql17_amd64.deb
+dbfs cp --overwrite "$PSScriptRoot\utilities\drivers\msodbcsql17_17.7.2.1-1_amd64.deb" dbfs:/databricks/drivers/msodbcsql17_amd64.deb
 
 Set-DatabricksGlobalInitScript `
   -workspaceUrl $workspaceUrl `
   -bearerToken $accessToken `
   -initScriptName "pyodbc-driver" `
-  -initScriptContent (Get-Content "$PSScriptRoot\pyodbc-driver.sh" -Raw)
+  -initScriptContent (Get-Content "$PSScriptRoot\utilities\drivers\pyodbc-driver.sh" -Raw)
