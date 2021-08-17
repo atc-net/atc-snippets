@@ -55,8 +55,6 @@ Throw-WhenError -output $output
 
 # mixed-reality
 
-# azure-cli-ml vs. ml?!
-
 # webpubsub
 
 # azure-devops

@@ -94,6 +94,8 @@ $sqlServerName          = Get-ResourceName -namingConfig $namingConfig  -suffix 
 $sqlServerName          = Get-ResourceName -namingConfig $namingConfig  -suffix 'sql'
 $dataLakeName           = Get-ResourceName -namingConfig $namingConfig  -suffix 'dls'
 $mlWorkspaceName        = Get-ResourceName -namingConfig $namingConfig  -suffix 'mlw'
+$signalRName            = Get-ResourceName -namingConfig $namingConfig  -suffix 'sigr'
+$synapseWorkspaceName   = Get-ResourceName -namingConfig $namingConfig  -suffix 'syn'
 
 # Write setup
 
@@ -117,6 +119,8 @@ Write-Host "* IoT Hub                          : $iotHubName" -ForegroundColor W
 Write-Host "* SQL server                       : $sqlServerName" -ForegroundColor White
 Write-Host "* Data Lake                        : $dataLakeName" -ForegroundColor White
 Write-Host "* Maschine Learning workspace      : $mlWorkspaceName" -ForegroundColor White
+Write-Host "* SignalR                          : $signalRName" -ForegroundColor White
+Write-Host "* Synapse workspace                : $synapseWorkspaceName" -ForegroundColor White
 Write-Host "**********************************************************************" -ForegroundColor White
 
 $clientIdName = Get-SpnClientIdName -environmentName $namingConfig.environmentName -systemAbbreviation $namingConfig.systemAbbreviation -serviceAbbreviation $namingConfig.serviceAbbreviation
@@ -129,7 +133,7 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 # #############################################################################################
 # # Provision Azure Container Registry
 # #############################################################################################
-& "$PSScriptRoot\..\acr\deploy.ps1" -resourceGroupName $resourceGroupName -registryName $registryName -resourceTags $resourceTags
+# & "$PSScriptRoot\..\acr\deploy.ps1" -resourceGroupName $resourceGroupName -registryName $registryName -resourceTags $resourceTags
 
 # #############################################################################################
 # # Provision Azure App Service Plan
@@ -139,9 +143,9 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 #############################################################################################
 # Provision Log Analytics and Application Insights
 #############################################################################################
-& "$PSScriptRoot\..\monitor\deploy.ps1" -resourceGroupName $resourceGroupName -logAnalyticsName $logAnalyticsName -insightsNam $insightsName -resourceTags $resourceTags
- $logAnalyticsId = Get-LogAnalyticsId -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
- $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
+# & "$PSScriptRoot\..\monitor\deploy.ps1" -resourceGroupName $resourceGroupName -logAnalyticsName $logAnalyticsName -insightsNam $insightsName -resourceTags $resourceTags
+#  $logAnalyticsId = Get-LogAnalyticsId -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
+#  $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
 
 # #############################################################################################
 # # Provision Azure Kubernetes Cluster (AKS)
@@ -159,7 +163,7 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 # #############################################################################################
 # # Provision Storage Account
 # #############################################################################################
-& "$PSScriptRoot\..\storage\deploy.ps1" -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -resourceTags $resourceTags
+# & "$PSScriptRoot\..\storage\deploy.ps1" -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -resourceTags $resourceTags
 
 # #############################################################################################
 # # Provision Event Hubs
@@ -195,15 +199,27 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 # -sqlServerName $sqlServerName -dbName 'sqldb' -keyVaultName $keyVaultName `
 # -resourceTags $resourceTags
 
-#############################################################################################
-# Provision Data Lake
-#############################################################################################
-& "$PSScriptRoot\..\datalake\deploy.ps1" -resourceGroupName $resourceGroupName -storageAccountName $dataLakeName -resourceTags $resourceTags
+# #############################################################################################
+# # Provision Data Lake
+# #############################################################################################
+# & "$PSScriptRoot\..\datalake\deploy.ps1" -resourceGroupName $resourceGroupName -storageAccountName $dataLakeName -resourceTags $resourceTags
 
-#############################################################################################
-# Provision Maschine Learning workspace
-#############################################################################################
-& "$PSScriptRoot\..\ml\deploy.ps1" -resourceGroupName $resourceGroupName `
--mlWorkspaceName $mlWorkspaceName -dataLakeName $storageAccountName `
--insightsName $insightsName -keyVaultName $keyVaultName -registryName $registryName `
--resourceTags $resourceTags
+# #############################################################################################
+# # Provision Maschine Learning workspace
+# #############################################################################################
+# & "$PSScriptRoot\..\ml\deploy.ps1" -resourceGroupName $resourceGroupName `
+# -mlWorkspaceName $mlWorkspaceName -dataLakeName $storageAccountName `
+# -insightsName $insightsName -keyVaultName $keyVaultName -registryName $registryName `
+# -resourceTags $resourceTags
+
+# #############################################################################################
+# # Provision SignalR
+# #############################################################################################
+# & "$PSScriptRoot\..\signalR\deploy.ps1" -resourceGroupName $resourceGroupName -signalRName $signalRName -resourceTags $resourceTags
+
+# #############################################################################################
+# # Provision Synapse workspace
+# #############################################################################################
+# & "$PSScriptRoot\..\synapse\deploy.ps1" -resourceGroupName $resourceGroupName `
+# -synapseWorkspaceName $synapseWorkspaceName -storageAccountName $dataLakeName -keyVaultName $keyVaultName `
+# -resourceTags $resourceTags
