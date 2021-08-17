@@ -1,3 +1,14 @@
+class NamingConfig
+{
+    # Optionally, add attributes to prevent invalid values
+    [ValidateNotNullOrEmpty()][string]$EnvironmentName
+    [ValidateNotNullOrEmpty()][string]$CompanyAbbreviation
+    [ValidateNotNullOrEmpty()][string]$SystemName
+    [ValidateNotNullOrEmpty()][string]$SystemAbbreviation
+    [ValidateNotNullOrEmpty()][string]$ServiceName
+    [ValidateNotNullOrEmpty()][string]$ServiceAbbreviation
+}
+
 function Get-ResourceGroupName {
   param (
     [Parameter(Mandatory=$true)]
@@ -24,31 +35,19 @@ function Get-ResourceGroupName {
 
 function Get-ResourceName {
   param (
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $companyAbbreviation,
-
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $systemAbbreviation,
-
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $environmentName,
+    [Parameter(Mandatory = $true)]
+    [NamingConfig] $namingConfig,
 
     [Parameter(Mandatory=$false)]
-    [string]
-    $serviceAbbreviation = "",
+    [bool]
+    $environmentName = $false,
 
     [Parameter(Mandatory=$false)]
     [string]
     $suffix = ""
   )
-
-  return $companyAbbreviation.ToLower() + $systemAbbreviation.ToLower() + $environmentName.ToLower() + $serviceAbbreviation.ToLower() + $suffix.ToLower()
+ 
+  return $namingConfig.companyAbbreviation.ToLower() + $namingConfig.systemAbbreviation.ToLower() + $namingConfig.environmentName.ToLower() +  $(if (-not $environmentName) { $namingConfig.serviceAbbreviation.ToLower() }) + $suffix.ToLower()
 }
 
 function Get-AppIdentityUri {

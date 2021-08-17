@@ -42,15 +42,7 @@ param (
   $location = "westeurope",
 
   [Parameter(Mandatory = $true)]
-  [ValidateNotNullOrEmpty()]
-  [PSCustomObject] $namingConfig = @(
-    environmentName = 'xxx'
-    companyAbbreviation = 'xxx'
-    systemName = 'xxx'
-    systemAbbreviation = 'xxx'
-    serviceName = 'xxx'
-    serviceAbbreviation = 'xxx'
-  ),
+  [NamingConfig] $namingConfig,
 
   [Parameter(Mandatory = $false)]
   [string[]] $resourceTags = @()
@@ -81,24 +73,28 @@ if (!$tenantId) {
 
 # Environment Resource Names
 $envResourceGroupName   = Get-ResourceGroupName -systemName $namingConfig.systemName -environmentName $namingConfig.environmentName
-$envKeyVaultName        = Get-ResourceName -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix "kv"
+$envKeyVaultName        = Get-ResourceName -namingConfig $namingConfig -environmentName $true -suffix 'kv'
 
 # Resource Names
-# Microsoft recommended abbreviations https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations 
+# Microsoft recommended abbreviations https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations
 $resourceGroupName      = Get-ResourceGroupName -serviceName $namingConfig.serviceName -systemName $namingConfig.systemName -environmentName $namingConfig.environmentName
-$keyVaultName           = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'kv'
-$registryName           = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'cr'
-$appServicePlanName     = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'plan'
-$aksClusterName         = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'aks'
-$logAnalyticsName       = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'log'
-$insightsName           = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'appi'
-$cosmosAccountName      = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'cosmos'
-$storageAccountName     = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'st'
-$eventHubNamespaceName  = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'evhns'
-$databricksName         = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'dbw'
-$functionName           = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'func'
-$iotHubName             = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'iot'
-$sqlServerName          = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'sql'
+$keyVaultName           = Get-ResourceName -namingConfig $namingConfig -suffix 'kv'
+$registryName           = Get-ResourceName -namingConfig $namingConfig  -suffix 'cr'
+$appServicePlanName     = Get-ResourceName -namingConfig $namingConfig  -suffix 'plan'
+$aksClusterName         = Get-ResourceName -namingConfig $namingConfig  -suffix 'aks'
+$logAnalyticsName       = Get-ResourceName -namingConfig $namingConfig  -suffix 'log'
+$insightsName           = Get-ResourceName -namingConfig $namingConfig  -suffix 'appi'
+$cosmosAccountName      = Get-ResourceName -namingConfig $namingConfig  -suffix 'cosmos'
+$storageAccountName     = Get-ResourceName -namingConfig $namingConfig  -suffix 'st'
+$eventHubNamespaceName  = Get-ResourceName -namingConfig $namingConfig  -suffix 'evhns'
+$databricksName         = Get-ResourceName -namingConfig $namingConfig  -suffix 'dbw'
+$functionName           = Get-ResourceName -namingConfig $namingConfig  -suffix 'func'
+$iotHubName             = Get-ResourceName -namingConfig $namingConfig  -suffix 'iot'
+$sqlServerName          = Get-ResourceName -namingConfig $namingConfig  -suffix 'sql'
+$sqlServerName          = Get-ResourceName -namingConfig $namingConfig  -suffix 'sql'
+$dataLakeName           = Get-ResourceName -namingConfig $namingConfig  -suffix 'dls'
+$mlWorkspaceName        = Get-ResourceName -namingConfig $namingConfig  -suffix 'mlw'
+
 # Write setup
 
 Write-Host "**********************************************************************" -ForegroundColor White
@@ -119,6 +115,8 @@ Write-Host "* Databricks workspace             : $databricksName" -ForegroundCol
 Write-Host "* Function app                     : $functionName" -ForegroundColor White
 Write-Host "* IoT Hub                          : $iotHubName" -ForegroundColor White
 Write-Host "* SQL server                       : $sqlServerName" -ForegroundColor White
+Write-Host "* Data Lake                        : $dataLakeName" -ForegroundColor White
+Write-Host "* Maschine Learning workspace      : $mlWorkspaceName" -ForegroundColor White
 Write-Host "**********************************************************************" -ForegroundColor White
 
 $clientIdName = Get-SpnClientIdName -environmentName $namingConfig.environmentName -systemAbbreviation $namingConfig.systemAbbreviation -serviceAbbreviation $namingConfig.serviceAbbreviation
@@ -128,15 +126,15 @@ $clientId = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $clien
 $objectId = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $objectIdName
 $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $clientSecretName
 
-#############################################################################################
-# Provision Azure Container Registry
-#############################################################################################
+# #############################################################################################
+# # Provision Azure Container Registry
+# #############################################################################################
 & "$PSScriptRoot\..\acr\deploy.ps1" -resourceGroupName $resourceGroupName -registryName $registryName -resourceTags $resourceTags
 
-#############################################################################################
-# Provision Azure App Service Plan
-#############################################################################################
-& "$PSScriptRoot\..\appservice\deploy.ps1" -resourceGroupName $resourceGroupName -appServicePlanName $appServicePlanName -resourceTags $resourceTags
+# #############################################################################################
+# # Provision Azure App Service Plan
+# #############################################################################################
+# & "$PSScriptRoot\..\appservice\deploy.ps1" -resourceGroupName $resourceGroupName -appServicePlanName $appServicePlanName -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Log Analytics and Application Insights
@@ -145,54 +143,67 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
  $logAnalyticsId = Get-LogAnalyticsId -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
  $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
 
-#############################################################################################
-# Provision Azure Kubernetes Cluster (AKS)
-#############################################################################################
-& "$PSScriptRoot\..\aks\deploy.ps1" -resourceGroupName $resourceGroupName `
--environmentName $namingConfig.environmentName -systemName $namingConfig.systemName `
--aksClusterName $aksClusterName -logAnalyticsId $logAnalyticsId -registryName $registryName `
--clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) -resourceTags $resourceTags
+# #############################################################################################
+# # Provision Azure Kubernetes Cluster (AKS)
+# #############################################################################################
+# & "$PSScriptRoot\..\aks\deploy.ps1" -resourceGroupName $resourceGroupName `
+# -environmentName $namingConfig.environmentName -systemName $namingConfig.systemName `
+# -aksClusterName $aksClusterName -logAnalyticsId $logAnalyticsId -registryName $registryName `
+# -clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) -resourceTags $resourceTags
 
-#############################################################################################
-# Provision Cosmos Db account
-#############################################################################################
-& "$PSScriptRoot\..\cosmosdb\deploy.ps1" -resourceGroupName $resourceGroupName -cosmosAccountName $cosmosAccountName -resourceTags $resourceTags
+# #############################################################################################
+# # Provision Cosmos Db account
+# #############################################################################################
+# & "$PSScriptRoot\..\cosmosdb\deploy.ps1" -resourceGroupName $resourceGroupName -cosmosAccountName $cosmosAccountName -resourceTags $resourceTags
 
-#############################################################################################
-# Provision Storage Account
-#############################################################################################
+# #############################################################################################
+# # Provision Storage Account
+# #############################################################################################
 & "$PSScriptRoot\..\storage\deploy.ps1" -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -resourceTags $resourceTags
 
-#############################################################################################
-# Provision Event Hubs
-#############################################################################################
-& "$PSScriptRoot\..\eventhubs\deploy.ps1" -resourceGroupName $resourceGroupName -eventHubNamespaceName $eventHubNamespaceName -storageAccountName $storageAccountName -resourceTags $resourceTags
+# #############################################################################################
+# # Provision Event Hubs
+# #############################################################################################
+# & "$PSScriptRoot\..\eventhubs\deploy.ps1" -resourceGroupName $resourceGroupName -eventHubNamespaceName $eventHubNamespaceName -storageAccountName $storageAccountName -resourceTags $resourceTags
+
+# #############################################################################################
+# # Provision Databricks
+# #############################################################################################
+# & "$PSScriptRoot\..\databricks\deploy.ps1" -tenantId $tenantId -resourceGroupName $resourceGroupName `
+# -databricksName $databricksName -objectId $objectId -logAnalyticsId $logAnalyticsId -logAnalyticsKey $logAnalyticsKey `
+# -clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) `
+#  -resourceTags $resourceTags
+
+# #############################################################################################
+# # Provision function app
+# #############################################################################################
+# & "$PSScriptRoot\..\functionapp\deploy.ps1" -resourceGroupName $resourceGroupName `
+# -functionName $functionName -storageAccountName $storageAccountName -insightsName $insightsName  `
+# -appServicePlanName $appServicePlanName -keyVaultName $keyVaultName -resourceTags $resourceTags
+
+# #############################################################################################
+# # Provision IoTHub
+# #############################################################################################
+# & "$PSScriptRoot\..\iot\deploy.ps1" -resourceGroupName $resourceGroupName `
+# -iotHubName $iotHubName -iotHubSasPolicyNameWebApi 'webapiService' -iotHubSasPolicyNameFunctionApp 'functionAppService' `
+# -iotHubProcessorConsumerGroupName 'processorfunction' -resourceTags $resourceTags
+
+# #############################################################################################
+# # Provision SQL server
+# #############################################################################################
+# & "$PSScriptRoot\..\sql\deploy.ps1" -resourceGroupName $resourceGroupName `
+# -sqlServerName $sqlServerName -dbName 'sqldb' -keyVaultName $keyVaultName `
+# -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Databricks
+# Provision Data Lake
 #############################################################################################
-& "$PSScriptRoot\..\databricks\deploy.ps1" -tenantId $tenantId -resourceGroupName $resourceGroupName `
--databricksName $databricksName -objectId $objectId -logAnalyticsId $logAnalyticsId -logAnalyticsKey $logAnalyticsKey `
--clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) `
- -resourceTags $resourceTags
+& "$PSScriptRoot\..\datalake\deploy.ps1" -resourceGroupName $resourceGroupName -storageAccountName $dataLakeName -resourceTags $resourceTags
 
 #############################################################################################
-# Provision function app
+# Provision Maschine Learning workspace
 #############################################################################################
-& "$PSScriptRoot\..\functionapp\deploy.ps1" -resourceGroupName $resourceGroupName `
--functionName $functionName -storageAccountName $storageAccountName -insightsName $insightsName  `
--appServicePlanName $appServicePlanName -keyVaultName $keyVaultName -resourceTags $resourceTags
-
-#############################################################################################
-# Provision IoTHub
-#############################################################################################
-& "$PSScriptRoot\..\iot\deploy.ps1" -resourceGroupName $resourceGroupName `
--iotHubName $iotHubName -iotHubSasPolicyNameWebApi 'webapiService' -iotHubSasPolicyNameFunctionApp 'functionAppService' `
--iotHubProcessorConsumerGroupName 'processorfunction' -resourceTags $resourceTags
-
-#############################################################################################
-# Provision SQL server
-#############################################################################################
-& "$PSScriptRoot\..\sql\deploy.ps1" -resourceGroupName $resourceGroupName `
--sqlServerName $sqlServerName -dbName 'sqldb' -keyVaultName $keyVaultName `
+& "$PSScriptRoot\..\ml\deploy.ps1" -resourceGroupName $resourceGroupName `
+-mlWorkspaceName $mlWorkspaceName -dataLakeName $storageAccountName `
+-insightsName $insightsName -keyVaultName $keyVaultName -registryName $registryName `
 -resourceTags $resourceTags

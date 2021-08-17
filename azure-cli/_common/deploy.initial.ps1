@@ -39,15 +39,7 @@ param (
   $location = "westeurope",
 
   [Parameter(Mandatory = $true)]
-  [ValidateNotNullOrEmpty()]
-  [PSCustomObject] $namingConfig = @(
-    environmentName = 'xxx'
-    companyAbbreviation = 'xxx'
-    systemName = 'xxx'
-    systemAbbreviation = 'xxx'
-    serviceName = 'xxx'
-    serviceAbbreviation = 'xxx'
-  ),
+  [NamingConfig] $namingConfig,
 
   [Parameter(Mandatory = $false)]
   [string[]] $resourceTags = @()
@@ -72,10 +64,10 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 #############################################################################################
 
 $envResourceGroupName   = Get-ResourceGroupName -systemName $namingConfig.systemName -environmentName $namingConfig.environmentName
-$envKeyVaultName        = Get-ResourceName -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix "kv"
+$envKeyVaultName        = Get-ResourceName -namingConfig $namingConfig -environmentName $true -suffix 'kv'
 
 $resourceGroupName      = Get-ResourceGroupName -serviceName $namingConfig.serviceName -systemName $namingConfig.systemName -environmentName $namingConfig.environmentName
-$keyVaultName           = Get-ResourceName -serviceAbbreviation $namingConfig.serviceAbbreviation -companyAbbreviation $namingConfig.companyAbbreviation -systemAbbreviation $namingConfig.systemAbbreviation -environmentName $namingConfig.environmentName -suffix 'kv'
+$keyVaultName           = Get-ResourceName -namingConfig $namingConfig -suffix 'kv'
 
 # Write setup
 

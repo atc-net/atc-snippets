@@ -1,0 +1,7 @@
+name: xxxxdevxxmlw
+location: westeurope
+description: Description of my workspace
+storage_account: "/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourceGroups/xx-DEV-xx/providers/Microsoft.Storage/storageAccounts/xxxxdevxxst"
+container_registry: "/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourceGroups/xx-DEV-xx/providers/Microsoft.ContainerRegistry/registries/xxxxdevxxcr"
+key_vault: "/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourceGroups/xx-DEV-xx/providers/Microsoft.KeyVault/vaults/xxxxdevxxkv"
+application_insights: "/subscriptions/dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a/resourceGroups/xx-DEV-xx/providers/microsoft.insights/components/xxxxdevxxappi"

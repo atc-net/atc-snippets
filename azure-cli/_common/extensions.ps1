@@ -36,6 +36,12 @@ $output = az extension add `
 
 Throw-WhenError -output $output
 
+$output = az extension add `
+  --name ml `
+  --yes
+
+Throw-WhenError -output $output
+
 # TO-BE-SORTED:
 # -------------
 

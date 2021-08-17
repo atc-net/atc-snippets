@@ -17,11 +17,14 @@
   .PARAMETER databricksName
   Specifies the name of the Databricks workspace
 
-   .PARAMETER clientId
-  Specifies the name of the Databricks workspace
+  .PARAMETER tenantId
+  Specifies the tenant id
 
-   .PARAMETER clientSecret
-  Specifies the object id for the Service Principle
+  .PARAMETER clientId
+   Specifies the client id for the Service Principle
+
+  .PARAMETER clientSecret
+  Specifies the client secret for the Service Principle
 
    .PARAMETER objectId
   Specifies the object id for the Service Principle
