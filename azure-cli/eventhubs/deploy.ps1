@@ -117,7 +117,7 @@ foreach ($eventHubListener in $eventHubListeners) {
 
 Write-Host "  Creating sender authorization rule" -ForegroundColor DarkYellow
 $output = az eventhubs namespace authorization-rule create `
-  --name sender `
+  --name Sender `
   --resource-group $resourceGroupName `
   --namespace-name $eventHubNamespaceName `
   --rights Send
@@ -145,6 +145,16 @@ foreach ($eventHubName in $eventHubNames) {
     --blob-container $dataCaptureContainer `
     --archive-name-format "$dataFolder/{Namespace}/{EventHub}/y={Year}/m={Month}/d={Day}/h={Hour}/{Year}_{Month}_{Day}_{Hour}_{Minute}_{Second}_{PartitionId}" `
     --skip-empty-archives true
+
+  Throw-WhenError -output $output
+
+  Write-Host "  Creating sender & listen authorization rule for event hub $($eventHubName)" -ForegroundColor DarkYellow
+  $output = az eventhubs eventhub authorization-rule create `
+    --name SendListen `
+    --eventhub-name $eventHubName `
+    --resource-group $resourceGroupName `
+    --namespace-name $eventHubNamespaceName `
+    --rights Send Listen
 
   Throw-WhenError -output $output
 }

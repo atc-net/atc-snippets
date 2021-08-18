@@ -96,6 +96,7 @@ $dataLakeName           = Get-ResourceName -namingConfig $namingConfig  -suffix 
 $mlWorkspaceName        = Get-ResourceName -namingConfig $namingConfig  -suffix 'mlw'
 $signalRName            = Get-ResourceName -namingConfig $namingConfig  -suffix 'sigr'
 $synapseWorkspaceName   = Get-ResourceName -namingConfig $namingConfig  -suffix 'syn'
+$timeseriesinsightsName = Get-ResourceName -namingConfig $namingConfig  -suffix 'tsi'
 
 # Write setup
 
@@ -121,6 +122,7 @@ Write-Host "* Data Lake                        : $dataLakeName" -ForegroundColor
 Write-Host "* Maschine Learning workspace      : $mlWorkspaceName" -ForegroundColor White
 Write-Host "* SignalR                          : $signalRName" -ForegroundColor White
 Write-Host "* Synapse workspace                : $synapseWorkspaceName" -ForegroundColor White
+Write-Host "* Time Series Insights             : $timeseriesinsightsName" -ForegroundColor White
 Write-Host "**********************************************************************" -ForegroundColor White
 
 $clientIdName = Get-SpnClientIdName -environmentName $namingConfig.environmentName -systemAbbreviation $namingConfig.systemAbbreviation -serviceAbbreviation $namingConfig.serviceAbbreviation
@@ -165,10 +167,10 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 # #############################################################################################
 # & "$PSScriptRoot\..\storage\deploy.ps1" -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -resourceTags $resourceTags
 
-# #############################################################################################
-# # Provision Event Hubs
-# #############################################################################################
-# & "$PSScriptRoot\..\eventhubs\deploy.ps1" -resourceGroupName $resourceGroupName -eventHubNamespaceName $eventHubNamespaceName -storageAccountName $storageAccountName -resourceTags $resourceTags
+#############################################################################################
+# Provision Event Hubs
+#############################################################################################
+& "$PSScriptRoot\..\eventhubs\deploy.ps1" -resourceGroupName $resourceGroupName -eventHubNamespaceName $eventHubNamespaceName -storageAccountName $storageAccountName -resourceTags $resourceTags
 
 # #############################################################################################
 # # Provision Databricks
@@ -223,3 +225,10 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 # & "$PSScriptRoot\..\synapse\deploy.ps1" -resourceGroupName $resourceGroupName `
 # -synapseWorkspaceName $synapseWorkspaceName -storageAccountName $dataLakeName -keyVaultName $keyVaultName `
 # -resourceTags $resourceTags
+
+#############################################################################################
+# Time Series Insights
+#############################################################################################
+& "$PSScriptRoot\..\tsi\deploy.ps1" -resourceGroupName $resourceGroupName `
+-timeseriesinsightsName $timeseriesinsightsName -storageAccountName $dataLakeName `
+-eventHubNamespaceName $eventHubNamespaceName -resourceTags $resourceTags
