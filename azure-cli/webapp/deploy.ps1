@@ -1,9 +1,8 @@
 <#
   .SYNOPSIS
-  Deploys Azure Container Registry instance
-
+  Deploys Azure App Service instance
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Container Registry instance using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys an Azure App Service instance using the CLI tool to a resource group in the relevant environment.
 
   .PARAMETER environmentType
   Specifies the environment type. Staging (DevTest) or production

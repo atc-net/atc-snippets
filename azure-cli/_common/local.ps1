@@ -13,9 +13,6 @@ Write-Host "Initialize local deployment" -ForegroundColor Blue
 
 # import utility functions
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
-
-$subscriptionId = "dc3d8eca-b703-4ec2-bc85-4c8e2cf6262a"
-
 . "$PSScriptRoot\..\account\set_loginaccount.ps1"
 
 Set-LoginAccount -subscriptionId $subscriptionId
@@ -38,6 +35,6 @@ $resourceTags = @(
   "Source=https://repo_url"
 )
 
-#& "$PSScriptRoot\deploy.initial.ps1" -environmentType $environmentType -namingConfig $namingConfig -resourceTags $resourceTags
+& "$PSScriptRoot\deploy.initial.ps1" -environmentType $environmentType -namingConfig $namingConfig -resourceTags $resourceTags
 & "$PSScriptRoot\deploy.ps1" -tenantId $tenantId -environmentType $environmentType -namingConfig $namingConfig -resourceTags $resourceTags
 
