@@ -97,6 +97,7 @@ $mlWorkspaceName        = Get-ResourceName -namingConfig $namingConfig  -suffix 
 $signalRName            = Get-ResourceName -namingConfig $namingConfig  -suffix 'sigr'
 $synapseWorkspaceName   = Get-ResourceName -namingConfig $namingConfig  -suffix 'syn'
 $timeseriesinsightsName = Get-ResourceName -namingConfig $namingConfig  -suffix 'tsi'
+$apiName                = Get-ResourceName -namingConfig $namingConfig  -suffix 'app'
 
 # Write setup
 
@@ -123,6 +124,7 @@ Write-Host "* Maschine Learning workspace      : $mlWorkspaceName" -ForegroundCo
 Write-Host "* SignalR                          : $signalRName" -ForegroundColor White
 Write-Host "* Synapse workspace                : $synapseWorkspaceName" -ForegroundColor White
 Write-Host "* Time Series Insights             : $timeseriesinsightsName" -ForegroundColor White
+Write-Host "* Web App                          : $apiName" -ForegroundColor White
 Write-Host "**********************************************************************" -ForegroundColor White
 
 $clientIdName = Get-SpnClientIdName -environmentName $namingConfig.environmentName -systemAbbreviation $namingConfig.systemAbbreviation -serviceAbbreviation $namingConfig.serviceAbbreviation
@@ -137,10 +139,10 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 # #############################################################################################
 # & "$PSScriptRoot\..\acr\deploy.ps1" -resourceGroupName $resourceGroupName -registryName $registryName -resourceTags $resourceTags
 
-# #############################################################################################
-# # Provision Azure App Service Plan
-# #############################################################################################
-# & "$PSScriptRoot\..\appservice\deploy.ps1" -resourceGroupName $resourceGroupName -appServicePlanName $appServicePlanName -resourceTags $resourceTags
+#############################################################################################
+# Provision Azure App Service Plan
+#############################################################################################
+& "$PSScriptRoot\..\appservice\deploy.ps1" -resourceGroupName $resourceGroupName -appServicePlanName $appServicePlanName -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Log Analytics and Application Insights
@@ -167,10 +169,10 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 # #############################################################################################
 # & "$PSScriptRoot\..\storage\deploy.ps1" -resourceGroupName $resourceGroupName -storageAccountName $storageAccountName -resourceTags $resourceTags
 
-#############################################################################################
-# Provision Event Hubs
-#############################################################################################
-& "$PSScriptRoot\..\eventhubs\deploy.ps1" -resourceGroupName $resourceGroupName -eventHubNamespaceName $eventHubNamespaceName -storageAccountName $storageAccountName -resourceTags $resourceTags
+# #############################################################################################
+# # Provision Event Hubs
+# #############################################################################################
+# & "$PSScriptRoot\..\eventhubs\deploy.ps1" -resourceGroupName $resourceGroupName -eventHubNamespaceName $eventHubNamespaceName -storageAccountName $storageAccountName -resourceTags $resourceTags
 
 # #############################################################################################
 # # Provision Databricks
@@ -226,9 +228,16 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 # -synapseWorkspaceName $synapseWorkspaceName -storageAccountName $dataLakeName -keyVaultName $keyVaultName `
 # -resourceTags $resourceTags
 
+# #############################################################################################
+# # Time Series Insights
+# #############################################################################################
+# & "$PSScriptRoot\..\tsi\deploy.ps1" -resourceGroupName $resourceGroupName `
+# -timeseriesinsightsName $timeseriesinsightsName -storageAccountName $dataLakeName `
+# -eventHubNamespaceName $eventHubNamespaceName -resourceTags $resourceTags
+
 #############################################################################################
-# Time Series Insights
+# Provision function app api
 #############################################################################################
-& "$PSScriptRoot\..\tsi\deploy.ps1" -resourceGroupName $resourceGroupName `
--timeseriesinsightsName $timeseriesinsightsName -storageAccountName $dataLakeName `
--eventHubNamespaceName $eventHubNamespaceName -resourceTags $resourceTags
+& "$PSScriptRoot\..\webapp\deploy.ps1" -resourceGroupName $resourceGroupName `
+-environmentName $namingConfig.EnvironmentName -apiName $apiName -insightsName $insightsName  `
+-appServicePlanName $appServicePlanName -keyVaultName $keyVaultName -resourceTags $resourceTags
