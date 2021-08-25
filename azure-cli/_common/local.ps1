@@ -17,10 +17,12 @@ Write-Host "Initialize local deployment" -ForegroundColor Blue
 
 Set-LoginAccount -subscriptionId $subscriptionId
 
-$environmentType = "DevTest"
+$environmentConfig = [EnvironmentConfig]::new()
+$environmentConfig.EnvironmentName = "Dev"
+$environmentConfig.EnvironmentType = "DevTest"
+$environmentConfig.Location = "westeurope"
 
 $namingConfig = [NamingConfig]::new()
-$namingConfig.EnvironmentName = "Dev"
 $namingConfig.CompanyAbbreviation = "xx"
 $namingConfig.SystemName = "xx"
 $namingConfig.SystemAbbreviation = "xx"
@@ -35,6 +37,6 @@ $resourceTags = @(
   "Source=https://repo_url"
 )
 
-& "$PSScriptRoot\deploy.initial.ps1" -environmentType $environmentType -namingConfig $namingConfig -resourceTags $resourceTags
-& "$PSScriptRoot\deploy.ps1" -tenantId $tenantId -environmentType $environmentType -namingConfig $namingConfig -resourceTags $resourceTags
+& "$PSScriptRoot\deploy.initial.ps1" -environmentConfig $environmentConfig -namingConfig $namingConfig -resourceTags $resourceTags
+& "$PSScriptRoot\deploy.ps1" -tenantId $tenantId -environmentConfig $environmentConfig -namingConfig $namingConfig -resourceTags $resourceTags
 

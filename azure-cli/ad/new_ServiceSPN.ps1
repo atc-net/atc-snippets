@@ -16,24 +16,10 @@ function New-ServiceSPN {
     $envKeyVaultName,
 
     [Parameter(Mandatory = $true)]
-    [string]
-    $environmentName,
+    [EnvironmentConfig] $environmentConfig,
 
     [Parameter(Mandatory = $true)]
-    [string]
-    $systemAbbreviation,
-
-    [Parameter(Mandatory = $true)]
-    [string]
-    $systemName,
-
-    [Parameter(Mandatory = $true)]
-    [string]
-    $serviceAbbreviation,
-
-    [Parameter(Mandatory = $true)]
-    [string]
-    $serviceName,
+    [NamingConfig] $namingConfig,
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
@@ -47,16 +33,14 @@ function New-ServiceSPN {
   $spnAppIdentityId = Get-AppIdentityUri `
     -type "spn" `
     -companyHostName $companyHostName `
-    -systemAbbreviation $systemAbbreviation `
-    -environmentName $environmentName `
-    -serviceAbbreviation $serviceAbbreviation `
+    -environmentConfig $environmentConfig `
+    -namingConfig $namingConfig `
     -serviceInstance $serviceInstance
 
   $spnAppIdentityName = Get-AppIdentityDisplayName `
     -type "spn" `
-    -systemName $systemName `
-    -environmentName $environmentName `
-    -serviceName $serviceName `
+    -environmentConfig $environmentConfig `
+    -namingConfig $namingConfig `
     -serviceInstance $serviceInstance
 
   Write-Host "Creating SPN Registration" -ForegroundColor DarkGreen
@@ -75,21 +59,18 @@ function New-ServiceSPN {
   $null = az ad sp create --id $clientId
 
   $clientIdName = Get-SpnClientIdName `
-    -environmentName $environmentName `
-    -systemAbbreviation $systemAbbreviation `
-    -serviceAbbreviation $serviceAbbreviation `
+    -environmentConfig $environmentConfig `
+    -namingConfig $namingConfig `
     -serviceInstance $serviceInstance
 
   $objectIdName = Get-SpnObjectIdName `
-    -environmentName $environmentName `
-    -systemAbbreviation $systemAbbreviation `
-    -serviceAbbreviation $serviceAbbreviation `
+    -environmentConfig $environmentConfig `
+    -namingConfig $namingConfig `
     -serviceInstance $serviceInstance
 
   $clientSecretName = Get-SpnClientSecretName `
-    -environmentName $environmentName `
-    -systemAbbreviation $systemAbbreviation `
-    -serviceAbbreviation $serviceAbbreviation `
+    -environmentConfig $environmentConfig `
+    -namingConfig $namingConfig `
     -serviceInstance $serviceInstance
 
   Set-KeyVaultSecretPlain `

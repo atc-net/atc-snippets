@@ -1,7 +1,22 @@
+class EnvironmentConfig {
+  [ValidateNotNullOrEmpty()]
+  [string]
+  $EnvironmentName
+
+  [Parameter(Mandatory = $false)]
+  [ValidateNotNullOrEmpty()]
+  [ValidateSet('DevTest', 'Production')]
+  [string]
+  $EnvironmentType = "DevTest"
+
+  [Parameter(Mandatory = $false)]
+  [ValidateNotNullOrEmpty()]
+  [string]
+  $Location = "westeurope"
+}
+
 class NamingConfig
 {
-    # Optionally, add attributes to prevent invalid values
-    [ValidateNotNullOrEmpty()][string]$EnvironmentName
     [ValidateNotNullOrEmpty()][string]$CompanyAbbreviation
     [ValidateNotNullOrEmpty()][string]$SystemName
     [ValidateNotNullOrEmpty()][string]$SystemAbbreviation
@@ -36,18 +51,22 @@ function Get-ResourceGroupName {
 function Get-ResourceName {
   param (
     [Parameter(Mandatory = $true)]
+    [EnvironmentConfig] $environmentConfig,
+
+    [Parameter(Mandatory = $true)]
     [NamingConfig] $namingConfig,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [bool]
     $environmentName = $false,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [string]
     $suffix = ""
   )
- 
-  return $namingConfig.companyAbbreviation.ToLower() + $namingConfig.systemAbbreviation.ToLower() + $namingConfig.environmentName.ToLower() +  $(if (-not $environmentName) { $namingConfig.serviceAbbreviation.ToLower() }) + $suffix.ToLower()
+
+  return $namingConfig.CompanyAbbreviation.ToLower() + $namingConfig.SystemAbbreviation.ToLower() + $environmentConfig.EnvironmentName.ToLower() `
+  + $(if (-not $environmentName) { $namingConfig.ServiceAbbreviation.ToLower() }) + $suffix.ToLower()
 }
 
 function Get-AppIdentityUri {
@@ -63,19 +82,11 @@ function Get-AppIdentityUri {
     [string]
     $companyHostName,
 
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $systemAbbreviation,
+    [Parameter(Mandatory = $true)]
+    [EnvironmentConfig] $environmentConfig,
 
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $environmentName,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $serviceAbbreviation,
+    [Parameter(Mandatory = $true)]
+    [NamingConfig] $namingConfig,
 
     [Parameter(Mandatory=$false)]
     [string]
@@ -86,7 +97,8 @@ function Get-AppIdentityUri {
     $serviceInstance = "/" + $serviceInstance.ToLower()
   }
 
-  return $type + "://" + $systemAbbreviation.ToLower() + "." + $companyHostName.ToLower() + "/" + $environmentName.ToLower() + "/" + $serviceAbbreviation.ToLower() + $serviceInstance
+  return $type + "://" + $namingConfig.SystemAbbreviation.ToLower() + "." + $companyHostName.ToLower() + "/" `
+  + $environmentConfig.EnvironmentName.ToLower() + "/" + $namingConfig.ServiceAbbreviation.ToLower() + $serviceInstance
 }
 
 function Get-AppIdentityDisplayName {
@@ -97,19 +109,11 @@ function Get-AppIdentityDisplayName {
     [string]
     $type,
 
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $systemName,
+    [Parameter(Mandatory = $true)]
+    [EnvironmentConfig] $environmentConfig,
 
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $environmentName,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $serviceName,
+    [Parameter(Mandatory = $true)]
+    [NamingConfig] $namingConfig,
 
     [Parameter(Mandatory=$false)]
     [string]
@@ -120,24 +124,16 @@ function Get-AppIdentityDisplayName {
     $serviceInstance = "-" + $serviceInstance.ToLower()
   }
 
-  return $systemName + "-" + $environmentName + "-" + $serviceName + $serviceInstance + " (" + $type.ToUpper() + ")"
+  return $namingConfig.SystemName + "-" + $environmentConfig.EnvironmentName + "-" + $namingConfig.ServiceName + $serviceInstance + " (" + $type.ToUpper() + ")"
 }
 
 function Get-SpnClientIdName {
   param (
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $environmentName,
+    [Parameter(Mandatory = $true)]
+    [EnvironmentConfig] $environmentConfig,
 
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $systemAbbreviation,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $serviceAbbreviation,
+    [Parameter(Mandatory = $true)]
+    [NamingConfig] $namingConfig,
 
     [Parameter(Mandatory=$false)]
     [string]
@@ -148,24 +144,17 @@ function Get-SpnClientIdName {
     $serviceInstance = "-" + $serviceInstance.ToLower()
   }
 
-  return $systemAbbreviation.ToLower() + "-" + $environmentName.ToLower() + "-" + $serviceAbbreviation.ToLower() + $serviceInstance + "-clientid"
+  return $namingConfig.SystemAbbreviation.ToLower() + "-" + $environmentConfig.EnvironmentName.ToLower() `
+  + "-" + $namingConfig.ServiceAbbreviation.ToLower() + $serviceInstance + "-clientid"
 }
 
 function Get-SpnObjectIdName {
   param (
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $environmentName,
+    [Parameter(Mandatory = $true)]
+    [EnvironmentConfig] $environmentConfig,
 
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $systemAbbreviation,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $serviceAbbreviation,
+    [Parameter(Mandatory = $true)]
+    [NamingConfig] $namingConfig,
 
     [Parameter(Mandatory=$false)]
     [string]
@@ -176,24 +165,17 @@ function Get-SpnObjectIdName {
     $serviceInstance = "-" + $serviceInstance.ToLower()
   }
 
-  return $systemAbbreviation.ToLower() + "-" + $environmentName.ToLower() + "-" + $serviceAbbreviation.ToLower() + $serviceInstance + "-objectid"
+  return $namingConfig.SystemAbbreviation.ToLower() + "-" + $environmentConfig.EnvironmentName.ToLower()  `
+  + "-" + $namingConfig.ServiceAbbreviation.ToLower() + $serviceInstance + "-objectid"
 }
 
 function Get-SpnClientSecretName {
   param (
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $environmentName,
+    [Parameter(Mandatory = $true)]
+    [EnvironmentConfig] $environmentConfig,
 
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $systemAbbreviation,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $serviceAbbreviation,
+    [Parameter(Mandatory = $true)]
+    [NamingConfig] $namingConfig,
 
     [Parameter(Mandatory=$false)]
     [string]
@@ -204,5 +186,6 @@ function Get-SpnClientSecretName {
     $serviceInstance = "-" + $serviceInstance.ToLower()
   }
 
-  return $systemAbbreviation.ToLower() + "-" + $environmentName.ToLower() + "-" + $serviceAbbreviation.ToLower() + $serviceInstance + "-secret"
+  return $namingConfig.SystemAbbreviation.ToLower() + "-" + $environmentConfig.EnvironmentName.ToLower() `
+  + "-" + $namingConfig.ServiceAbbreviation.ToLower() + $serviceInstance + "-secret"
 }

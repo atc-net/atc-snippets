@@ -14,16 +14,10 @@ function Set-KeyVaultSPNPolicy {
     $resourceGroupName,
 
     [Parameter(Mandatory = $true)]
-    [string]
-    $environmentName,
+    [EnvironmentConfig] $environmentConfig,
 
     [Parameter(Mandatory = $true)]
-    [string]
-    $systemAbbreviation,
-
-    [Parameter(Mandatory = $true)]
-    [string]
-    $serviceAbbreviation,
+    [NamingConfig] $namingConfig,
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
@@ -32,9 +26,8 @@ function Set-KeyVaultSPNPolicy {
   )
 
   $clientIdName = Get-SpnClientIdName `
-    -environmentName $environmentName `
-    -systemAbbreviation $systemAbbreviation `
-    -serviceAbbreviation $serviceAbbreviation `
+    -environmentConfig $environmentConfig `
+    -namingConfig $namingConfig `
     -serviceInstance $serviceInstance
 
     Write-Host "  Querying $clientIdName secret" -ForegroundColor DarkYellow

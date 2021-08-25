@@ -5,11 +5,8 @@
   .DESCRIPTION
   The deploy.ps1 script deploys Azure service using the CLI tool to a resource group in the relevant environment.
 
-  .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
-
-  .PARAMETER location
-  Specifies the location where the services are deployed. Default is West Europe
+  .PARAMETER environmentConfig
+  Specifies the environment configuration
 
   .PARAMETER namingConfig
   Specifies the configuration element used to build the resource names for the resource group and the services
@@ -22,24 +19,13 @@
 
   .OUTPUTS
   None. Udeploy.ps1 does not generate any output.
-
-  .EXAMPLE
-  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -namingConfig [PSCustomObject]@{companyAbbreviation = "xxx" systemName = "xxx" systemAbbreviation  = "xxx" serviceName = "xxx" serviceAbbreviation = "xxx"}
 #>
 param (
   [Parameter(Mandatory = $false)]
   [string] $tenantId,
 
-  [Parameter(Mandatory = $false)]
-  [ValidateNotNullOrEmpty()]
-  [ValidateSet('DevTest', 'Production')]
-  [string]
-  $environmentType = "DevTest",
-
-  [Parameter(Mandatory = $false)]
-  [ValidateNotNullOrEmpty()]
-  [string]
-  $location = "westeurope",
+  [Parameter(Mandatory = $true)]
+  [EnvironmentConfig] $environmentConfig,
 
   [Parameter(Mandatory = $true)]
   [NamingConfig] $namingConfig,
@@ -72,38 +58,38 @@ if (!$tenantId) {
 #############################################################################################
 
 # Environment Resource Names
-$envResourceGroupName   = Get-ResourceGroupName -systemName $namingConfig.systemName -environmentName $namingConfig.environmentName
-$envKeyVaultName        = Get-ResourceName -namingConfig $namingConfig -environmentName $true -suffix 'kv'
+$envResourceGroupName   = Get-ResourceGroupName -systemName $namingConfig.SystemName -environmentName $environmentConfig.EnvironmentName
+$envKeyVaultName        = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig -environmentName $true
 
 # Resource Names
 # Microsoft recommended abbreviations https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations
-$resourceGroupName      = Get-ResourceGroupName -serviceName $namingConfig.serviceName -systemName $namingConfig.systemName -environmentName $namingConfig.environmentName
-$keyVaultName           = Get-ResourceName -namingConfig $namingConfig -suffix 'kv'
-$registryName           = Get-ResourceName -namingConfig $namingConfig  -suffix 'cr'
-$appServicePlanName     = Get-ResourceName -namingConfig $namingConfig  -suffix 'plan'
-$aksClusterName         = Get-ResourceName -namingConfig $namingConfig  -suffix 'aks'
-$logAnalyticsName       = Get-ResourceName -namingConfig $namingConfig  -suffix 'log'
-$insightsName           = Get-ResourceName -namingConfig $namingConfig  -suffix 'appi'
-$cosmosAccountName      = Get-ResourceName -namingConfig $namingConfig  -suffix 'cosmos'
-$storageAccountName     = Get-ResourceName -namingConfig $namingConfig  -suffix 'st'
-$eventHubNamespaceName  = Get-ResourceName -namingConfig $namingConfig  -suffix 'evhns'
-$databricksName         = Get-ResourceName -namingConfig $namingConfig  -suffix 'dbw'
-$functionName           = Get-ResourceName -namingConfig $namingConfig  -suffix 'func'
-$iotHubName             = Get-ResourceName -namingConfig $namingConfig  -suffix 'iot'
-$sqlServerName          = Get-ResourceName -namingConfig $namingConfig  -suffix 'sql'
-$sqlServerName          = Get-ResourceName -namingConfig $namingConfig  -suffix 'sql'
-$dataLakeName           = Get-ResourceName -namingConfig $namingConfig  -suffix 'dls'
-$mlWorkspaceName        = Get-ResourceName -namingConfig $namingConfig  -suffix 'mlw'
-$signalRName            = Get-ResourceName -namingConfig $namingConfig  -suffix 'sigr'
-$synapseWorkspaceName   = Get-ResourceName -namingConfig $namingConfig  -suffix 'syn'
-$timeseriesinsightsName = Get-ResourceName -namingConfig $namingConfig  -suffix 'tsi'
-$apiName                = Get-ResourceName -namingConfig $namingConfig  -suffix 'app'
-$serviceBusName         = Get-ResourceName -namingConfig $namingConfig  -suffix 'sb'
+$resourceGroupName      = Get-ResourceGroupName -serviceName $namingConfig.ServiceName -systemName $namingConfig.SystemName -environmentName $environmentConfig.EnvironmentName
+$keyVaultName           = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$registryName           = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$appServicePlanName     = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$aksClusterName         = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$logAnalyticsName       = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$insightsName           = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$cosmosAccountName      = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$storageAccountName     = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$eventHubNamespaceName  = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$databricksName         = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$functionName           = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig -suffix 'func'
+$iotHubName             = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$sqlServerName          = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$sqlServerName          = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$dataLakeName           = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$mlWorkspaceName        = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$signalRName            = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$synapseWorkspaceName   = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$timeseriesinsightsName = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$apiName                = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig -suffix 'app'
+$serviceBusName         = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
 
 # Write setup
 
 Write-Host "**********************************************************************" -ForegroundColor White
-Write-Host "* Environment name                 : $($namingConfig.environmentName)" -ForegroundColor White
+Write-Host "* Environment name                 : $($environmentConfig.environmentName)" -ForegroundColor White
 Write-Host "* Env. resource group name         : $envResourceGroupName" -ForegroundColor White
 Write-Host "* Env. key vault                   : $envKeyVaultName" -ForegroundColor White
 Write-Host "* Resource group name              : $resourceGroupName" -ForegroundColor White
@@ -129,9 +115,9 @@ Write-Host "* Web App                          : $apiName" -ForegroundColor Whit
 Write-Host "* Service Bus Namespace            : $serviceBusName" -ForegroundColor White
 Write-Host "**********************************************************************" -ForegroundColor White
 
-$clientIdName = Get-SpnClientIdName -environmentName $namingConfig.environmentName -systemAbbreviation $namingConfig.systemAbbreviation -serviceAbbreviation $namingConfig.serviceAbbreviation
-$objectIdName = Get-SpnObjectIdName -environmentName $namingConfig.environmentName -systemAbbreviation $namingConfig.systemAbbreviation -serviceAbbreviation $namingConfig.serviceAbbreviation
-$clientSecretName = Get-SpnClientSecretName -environmentName $namingConfig.environmentName -systemAbbreviation $namingConfig.systemAbbreviation -serviceAbbreviation $namingConfig.serviceAbbreviation
+$clientIdName = Get-SpnClientIdName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$objectIdName = Get-SpnObjectIdName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$clientSecretName = Get-SpnClientSecretName -environmentConfig $environmentConfig -namingConfig $namingConfig
 $clientId = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $clientIdName
 $objectId = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $objectIdName
 $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $clientSecretName
@@ -148,7 +134,7 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 -appServicePlanName $appServicePlanName -resourceTags $resourceTags
 
 ############################################################################################
-Provision Log Analytics and Application Insights
+# Provision Log Analytics and Application Insights
 ############################################################################################
 & "$PSScriptRoot\..\monitor\deploy.ps1" -resourceGroupName $resourceGroupName `
 -logAnalyticsName $logAnalyticsName -insightsNam $insightsName -resourceTags $resourceTags
@@ -160,7 +146,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 # Provision Azure Kubernetes Cluster (AKS)
 #############################################################################################
 & "$PSScriptRoot\..\aks\deploy.ps1" -resourceGroupName $resourceGroupName `
--environmentName $namingConfig.environmentName -systemName $namingConfig.systemName `
+-environmentName $environmentConfig.environmentName -systemName $namingConfig.systemName `
 -aksClusterName $aksClusterName -logAnalyticsId $logAnalyticsId -registryName $registryName `
 -clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) -resourceTags $resourceTags
 
@@ -250,7 +236,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 # Provision function app api
 #############################################################################################
 & "$PSScriptRoot\..\webapp\deploy.ps1" -resourceGroupName $resourceGroupName `
--environmentName $namingConfig.EnvironmentName -apiName $apiName -insightsName $insightsName  `
+-environmentName $environmentConfig.EnvironmentName -apiName $apiName -insightsName $insightsName  `
 -appServicePlanName $appServicePlanName -keyVaultName $keyVaultName -resourceTags $resourceTags
 
 ############################################################################################
