@@ -14,8 +14,8 @@
   .PARAMETER resourceGroupName
   Specifies the name of the resource group
 
-  .PARAMETER storageAccountName
-  Specifies the name of the Storage Account
+  .PARAMETER dataLakeName
+  Specifies the name of the data lake
 
   .PARAMETER resourceTags
   Specifies the tag elements that will be used to tag the deployed services
@@ -27,7 +27,7 @@
   None. deploy.ps1 does not generate any output.
 
   .EXAMPLE
-  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -registryName xxxxxxdevxxxcr
+  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -dataLakeName xxxxxxdevxxxdl
 #>
 param (
   [Parameter(Mandatory = $false)]
@@ -49,7 +49,7 @@ param (
   [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
-  $storageAccountName,
+  $dataLakeName,
 
   [Parameter(Mandatory = $false)]
   [string[]] $resourceTags = @()
@@ -59,7 +59,8 @@ param (
 # Resource naming section
 #############################################################################################
 
-$dataLakeContainers    = @(
+$dataLakeFilesystems = @(
+  "landingzone",
   "intermediate",
   "delivery"
 )
@@ -71,7 +72,7 @@ Write-Host "Provision Azure Data Lake" -ForegroundColor DarkGreen
 
 Write-Host "  Creating Azure Data Lake" -ForegroundColor DarkYellow
 
-$datalake = az storage account create --name $storageAccountName `
+$datalake = az storage account create --name $dataLakeName `
     --resource-group $resourceGroupName `
     --location $location --sku Standard_LRS `
     --kind StorageV2 --hns true `
@@ -79,6 +80,11 @@ $datalake = az storage account create --name $storageAccountName `
 
 Throw-WhenError -output $datalake
 
-foreach ($containerName in $dataLakeContainers) {
-    az storage fs create -n $containerName --account-name $storageAccountName
+foreach ($fs in $dataLakeFilesystems) {
+    $exists = az storage fs exists -n $fs --account-name $dataLakeName --query exists
+    if ($exists -eq "true") {
+      Write-Host "Filesystem: $fs already exist, will not recreate..."
+    } else {
+      az storage fs create -n $fs --account-name $dataLakeName
+    }
 }
