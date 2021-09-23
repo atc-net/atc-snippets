@@ -1,4 +1,4 @@
-function Get-CosmosConnectionstring {
+function Get-CosmosConnectionString {
     param(
         [Parameter(Mandatory = $true)]
         [string]

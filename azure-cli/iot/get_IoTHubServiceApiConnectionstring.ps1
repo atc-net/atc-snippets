@@ -1,4 +1,4 @@
-function Get-IoTHubServiceApiConnectionstring{
+function Get-IoTHubServiceApiConnectionString{
     param (
       [Parameter(Mandatory=$true)]
       [string]
