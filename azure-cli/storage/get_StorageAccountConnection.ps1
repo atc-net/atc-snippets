@@ -1,4 +1,4 @@
-function Get-StorageAccountConnection {
+function Get-StorageConnectionString {
     param (
         [Parameter(Mandatory = $true)]
         [string]
@@ -8,12 +8,16 @@ function Get-StorageAccountConnection {
         [string]
         $resourceGroup
     )
-    Write-Host "Get Storage Account connection string for $storageAccountName" -ForegroundColor DarkYellow
-    $storageAccountConnection = az storage account show-connection-string `
+
+    Write-Host "  Get Storage Account connection string for $storageAccountName" -ForegroundColor DarkYellow
+
+    $storageAccountConnectionString = az storage account show-connection-string `
         --name $storageAccountName `
         --resource-group $resourceGroupName `
+        --query connectionString `
         --output tsv
 
-    return $storageAccountConnection
+    Throw-WhenError -output $storageAccountConnectionString
 
+    return $storageAccountConnectionString
 }
