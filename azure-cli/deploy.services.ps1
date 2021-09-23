@@ -42,14 +42,14 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 # import utility functions
 . "$PSScriptRoot\utilities\deploy.utilities.ps1"
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
-. "$PSScriptRoot\..\monitor\get_LogAnalyticsId.ps1"
-. "$PSScriptRoot\..\monitor\get_LogAnalyticsKey.ps1"
-. "$PSScriptRoot\..\keyvault\get_KeyVaultSecret.ps1"
-. "$PSScriptRoot\..\storage\get_StorageAccountKey.ps1"
-. "$PSScriptRoot\..\iot\add_IotHubToDataLakeRoutingEndpoint.ps1"
-. "$PSScriptRoot\..\iot\get_IoTHubServiceFunctionEventHubEndpointConnection.ps1"
-. "$PSScriptRoot\..\cosmosdb\get_CosmosConnectionString.ps1"
-. "$PSScriptRoot\..\signalr\get_SignalRConnectionString.ps1"
+. "$PSScriptRoot\monitor\get_LogAnalyticsId.ps1"
+. "$PSScriptRoot\monitor\get_LogAnalyticsKey.ps1"
+. "$PSScriptRoot\keyvault\get_KeyVaultSecret.ps1"
+. "$PSScriptRoot\storage\get_StorageAccountKey.ps1"
+. "$PSScriptRoot\iot\add_IotHubToDataLakeRoutingEndpoint.ps1"
+. "$PSScriptRoot\iot\get_IoTHubServiceFunctionEventHubEndpointConnection.ps1"
+. "$PSScriptRoot\cosmosdb\get_CosmosConnectionString.ps1"
+. "$PSScriptRoot\signalr\get_SignalRConnectionString.ps1"
 
 # Install required extensions
 . "$PSScriptRoot\extensions.ps1"
@@ -128,7 +128,7 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 #############################################################################################
 # Provision Azure Container Registry
 #############################################################################################
-& "$PSScriptRoot\..\acr\deploy.ps1" `
+& "$PSScriptRoot\acr\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -registryName $registryName `
   -resourceTags $resourceTags
@@ -136,7 +136,7 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 #############################################################################################
 # Provision Azure App Service Plan
 #############################################################################################
-& "$PSScriptRoot\..\appservice\deploy.ps1" `
+& "$PSScriptRoot\appservice\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -appServicePlanName $appServicePlanName `
   -resourceTags $resourceTags
@@ -144,7 +144,7 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 ############################################################################################
 # Provision Log Analytics and Application Insights
 ############################################################################################
-& "$PSScriptRoot\..\monitor\deploy.ps1" `
+& "$PSScriptRoot\monitor\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -logAnalyticsName $logAnalyticsName `
   -insightsName $insightsName `
@@ -156,7 +156,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision Azure Kubernetes Cluster (AKS)
 #############################################################################################
-& "$PSScriptRoot\..\aks\deploy.ps1" `
+& "$PSScriptRoot\aks\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -environmentName $environmentConfig.environmentName `
   -systemName $namingConfig.systemName `
@@ -170,7 +170,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision Cosmos Db account
 #############################################################################################
-& "$PSScriptRoot\..\cosmosdb\deploy.ps1" `
+& "$PSScriptRoot\cosmosdb\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -cosmosAccountName $cosmosAccountName `
   -resourceTags $resourceTags
@@ -178,7 +178,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision Storage Account
 #############################################################################################
-& "$PSScriptRoot\..\storage\deploy.ps1" `
+& "$PSScriptRoot\storage\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -storageAccountName $storageAccountName `
   -resourceTags $resourceTags
@@ -186,7 +186,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision Event Hubs
 #############################################################################################
-& "$PSScriptRoot\..\eventhubs\deploy.ps1" `
+& "$PSScriptRoot\eventhubs\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -eventHubNamespaceName $eventHubNamespaceName `
   -storageAccountName $storageAccountName `
@@ -195,7 +195,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision Databricks
 #############################################################################################
-& "$PSScriptRoot\..\databricks\deploy.ps1" `
+& "$PSScriptRoot\databricks\deploy.ps1" `
   -tenantId $tenantId `
   -resourceGroupName $resourceGroupName `
   -databricksName $databricksName `
@@ -208,7 +208,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision function app
 #############################################################################################
-& "$PSScriptRoot\..\functionapp\deploy.ps1" `
+& "$PSScriptRoot\functionapp\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -functionName $functionName `
   -storageAccountName $storageAccountName `
@@ -220,7 +220,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision IoTHub
 #############################################################################################
-& "$PSScriptRoot\..\iot\deploy.ps1" `
+& "$PSScriptRoot\iot\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -iotHubName $iotHubName `
   -iotHubSasPolicyNameWebApi 'webapiService' `
@@ -231,7 +231,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision SQL server
 #############################################################################################
-& "$PSScriptRoot\..\sql\deploy.ps1" `
+& "$PSScriptRoot\sql\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -sqlServerName $sqlServerName `
   -dbName 'sqldb' `
@@ -241,7 +241,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision Data Lake
 #############################################################################################
-& "$PSScriptRoot\..\datalake\deploy.ps1" `
+& "$PSScriptRoot\datalake\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -dataLakeName $dataLakeName `
   -resourceTags $resourceTags
@@ -249,7 +249,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision Machine Learning workspace
 #############################################################################################
-& "$PSScriptRoot\..\ml\deploy.ps1" `
+& "$PSScriptRoot\ml\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -mlWorkspaceName $mlWorkspaceName `
   -dataLakeName $storageAccountName `
@@ -261,7 +261,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision SignalR
 #############################################################################################
-& "$PSScriptRoot\..\signalR\deploy.ps1" `
+& "$PSScriptRoot\signalR\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -signalRName $signalRName `
   -serviceMode 'Default' `
@@ -270,7 +270,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision Synapse workspace
 #############################################################################################
-& "$PSScriptRoot\..\synapse\deploy.ps1" `
+& "$PSScriptRoot\synapse\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -synapseWorkspaceName $synapseWorkspaceName `
   -storageAccountName $dataLakeName `
@@ -280,7 +280,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Time Series Insights
 #############################################################################################
-& "$PSScriptRoot\..\tsi\deploy.ps1" `
+& "$PSScriptRoot\tsi\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -timeseriesinsightsName $timeseriesinsightsName `
   -storageAccountName $dataLakeName `
@@ -290,7 +290,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision function app api
 #############################################################################################
-& "$PSScriptRoot\..\webapp\deploy.ps1" `
+& "$PSScriptRoot\webapp\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -environmentName $environmentConfig.EnvironmentName `
   -apiName $apiName `
@@ -302,7 +302,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision Service Bus namespace
 #############################################################################################
-& "$PSScriptRoot\..\servicebus\deploy.ps1" `
+& "$PSScriptRoot\servicebus\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
   -serviceBusName $serviceBusName `
   -logAnalyticsId $logAnalyticsId `

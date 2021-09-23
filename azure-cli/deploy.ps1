@@ -43,7 +43,7 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 
 # import utility functions
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
-. "$PSScriptRoot\..\account\set_loginaccount.ps1"
+. "$PSScriptRoot\account\set_loginaccount.ps1"
 
 Set-LoginAccount -subscriptionId $subscriptionId
 

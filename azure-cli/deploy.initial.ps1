@@ -39,8 +39,8 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 # import utility functions
 . "$PSScriptRoot\utilities\deploy.utilities.ps1"
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
-. "$PSScriptRoot\..\ad\new_ServiceSPN.ps1"
-. "$PSScriptRoot\..\keyvault\set_KeyVaultSPNPolicy.ps1"
+. "$PSScriptRoot\ad\new_ServiceSPN.ps1"
+. "$PSScriptRoot\keyvault\set_KeyVaultSPNPolicy.ps1"
 
 # Install required extensions
 . "$PSScriptRoot\extensions.ps1"
@@ -64,15 +64,15 @@ Write-Host "********************************************************************
 # Provision Resource Groups
 #############################################################################################
 Write-Host "Provisioning resource groups" -ForegroundColor DarkGreen
-& "$PSScriptRoot\..\group\deploy.ps1" -resourceGroupName $envResourceGroupName -resourceTags $resourceTags
-& "$PSScriptRoot\..\group\deploy.ps1" -resourceGroupName $resourceGroupName -resourceTags $resourceTags
+& "$PSScriptRoot\group\deploy.ps1" -resourceGroupName $envResourceGroupName -resourceTags $resourceTags
+& "$PSScriptRoot\group\deploy.ps1" -resourceGroupName $resourceGroupName -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Key Vaults
 #############################################################################################
 Write-Host "Provisioning Key Vaults" -ForegroundColor DarkGreen
-& "$PSScriptRoot\..\keyvault\deploy.ps1" -resourceGroupName $envResourceGroupName -keyVaultName $envKeyVaultName -resourceTags $resourceTags
-& "$PSScriptRoot\..\keyvault\deploy.ps1" -resourceGroupName $resourceGroupName -keyVaultName $keyVaultName -resourceTags $resourceTags
+& "$PSScriptRoot\keyvault\deploy.ps1" -resourceGroupName $envResourceGroupName -keyVaultName $envKeyVaultName -resourceTags $resourceTags
+& "$PSScriptRoot\keyvault\deploy.ps1" -resourceGroupName $resourceGroupName -keyVaultName $keyVaultName -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Service Principels
