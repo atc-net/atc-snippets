@@ -9,7 +9,7 @@ function Get-ApplicationInsightsId {
     $resourceGroup
   )
 
-  Write-Host "Get application insight id" -ForegroundColor DarkYellow
+  Write-Host "  Get application insight id" -ForegroundColor DarkYellow
   $appInsightId = az monitor app-insights component show `
     --app $name `
     --resource-group $resourceGroup `

@@ -3,10 +3,10 @@
   Deploys Azure Time Series Insights instance
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Time Series Insights instance using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys an Azure Time Series Insights instance using Azure CLI to a resource group in the relevant environment.
 
   .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
+  Specifies the environment type. Staging (DevTest) or Production
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
@@ -33,7 +33,7 @@
   None. deploy.ps1 does not generate any output.
 
   .EXAMPLE
-  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -registryName xxxxxxdevxxxcr
+  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -timeseriesinsightsName xxxxxxdevxxxtsi
 #>
 param (
   [Parameter(Mandatory = $false)]
@@ -70,6 +70,7 @@ param (
   [Parameter(Mandatory = $false)]
   [string[]] $resourceTags = @()
 )
+
 #############################################################################################
 # Configure names and options
 #############################################################################################
@@ -88,7 +89,6 @@ $eventHubName = "xxxEvents"
 Write-Host "Provision TimeSeriesInsights" -ForegroundColor DarkGreen
 
 Write-Host "  Provision TimeSeriesInsights Environment" -ForegroundColor DarkYellow
-
 $output = az tsi environment gen2 create `
     --environment-name $timeseriesinsightsName `
     --resource-group $resourceGroupName `

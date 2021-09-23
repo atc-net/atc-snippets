@@ -3,10 +3,10 @@
   Deploys Azure Container Registry instance
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Container Registry instance using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys an Azure Container Registry instance using Azure CLI to a resource group in the relevant environment.
 
   .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
+  Specifies the environment type. Staging (DevTest) or Production
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
@@ -61,7 +61,6 @@ param (
 Write-Host "Provision Azure Container Registry" -ForegroundColor DarkGreen
 
 Write-Host "  Creating Azure Container Registry" -ForegroundColor DarkYellow
-
 $containerRegistryLoginServer = az acr create `
   --resource-group $resourceGroupName `
   --name $registryName `

@@ -3,10 +3,10 @@
   Deploys Azure Machine Learning workspace instance
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Machine Learning workspace instance using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys an Azure Machine Learning workspace instance using Azure CLI to a resource group in the relevant environment.
 
   .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
+  Specifies the environment type. Staging (DevTest) or Production
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
@@ -119,6 +119,9 @@ application_insights: $($insightsId)"
 
 Set-Content -Path "$PSScriptRoot\workspace.yml" -Value $workspaceDef
 
-$output = az ml workspace create -w $mlWorkspaceName -g $resourceGroupName --file "$PSScriptRoot\workspace.yml"
+$output = az ml workspace create `
+  -w $mlWorkspaceName `
+  -g $resourceGroupName `
+  --file "$PSScriptRoot\workspace.yml"
 
 Throw-WhenError -output $output

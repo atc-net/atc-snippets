@@ -1,9 +1,9 @@
 <#
   .SYNOPSIS
-  Deploys Azure services with the Azure CLI tool
+  Deploys Azure services with Azure CLI
 
   .DESCRIPTION
-  The deploy.ps1 script deploys Azure service using the CLI tool to a resource group in the relevant environment.
+  The deploy.services.ps1 script deploys Azure service using the CLI tool to a resource group in the relevant environment.
 
   .PARAMETER environmentConfig
   Specifies the environment configuration
@@ -15,10 +15,10 @@
   Specifies the tag elements that will be used to tag the deployed services
 
   .INPUTS
-  None. You cannot pipe objects to deploy.ps1.
+  None. You cannot pipe objects to deploy.services.ps1.
 
   .OUTPUTS
-  None. deploy.ps1 does not generate any output.
+  None. deploy.services.ps1 does not generate any output.
 #>
 param (
   [Parameter(Mandatory = $false)]
@@ -61,7 +61,6 @@ if (!$tenantId) {
 #############################################################################################
 # Resource naming section
 #############################################################################################
-
 # Environment Resource Names
 $envResourceGroupName   = Get-ResourceGroupName -systemName $namingConfig.SystemName -environmentName $environmentConfig.EnvironmentName
 $envKeyVaultName        = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig -environmentName $true
@@ -82,7 +81,7 @@ $functionName           = Get-ResourceName -environmentConfig $environmentConfig
 $iotHubName             = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
 $sqlServerName          = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
 $sqlServerName          = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
-$dataLakeName           = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig -suffix 'dl'
+$dataLakeName           = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig -suffix 'dls'
 $mlWorkspaceName        = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
 $signalRName            = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
 $synapseWorkspaceName   = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
@@ -129,19 +128,27 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 #############################################################################################
 # Provision Azure Container Registry
 #############################################################################################
-& "$PSScriptRoot\..\acr\deploy.ps1" -resourceGroupName $resourceGroupName -registryName $registryName -resourceTags $resourceTags
+& "$PSScriptRoot\..\acr\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -registryName $registryName `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Azure App Service Plan
 #############################################################################################
-& "$PSScriptRoot\..\appservice\deploy.ps1" -resourceGroupName $resourceGroupName `
--appServicePlanName $appServicePlanName -resourceTags $resourceTags
+& "$PSScriptRoot\..\appservice\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -appServicePlanName $appServicePlanName `
+  -resourceTags $resourceTags
 
 ############################################################################################
 # Provision Log Analytics and Application Insights
 ############################################################################################
-& "$PSScriptRoot\..\monitor\deploy.ps1" -resourceGroupName $resourceGroupName `
--logAnalyticsName $logAnalyticsName -insightsNam $insightsName -resourceTags $resourceTags
+& "$PSScriptRoot\..\monitor\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -logAnalyticsName $logAnalyticsName `
+  -insightsName $insightsName `
+  -resourceTags $resourceTags
 
 $logAnalyticsId = Get-LogAnalyticsId -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
 $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
@@ -149,102 +156,154 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 # Provision Azure Kubernetes Cluster (AKS)
 #############################################################################################
-& "$PSScriptRoot\..\aks\deploy.ps1" -resourceGroupName $resourceGroupName `
--environmentName $environmentConfig.environmentName -systemName $namingConfig.systemName `
--aksClusterName $aksClusterName -logAnalyticsId $logAnalyticsId -registryName $registryName `
--clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) -resourceTags $resourceTags
+& "$PSScriptRoot\..\aks\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -environmentName $environmentConfig.environmentName `
+  -systemName $namingConfig.systemName `
+  -aksClusterName $aksClusterName `
+  -logAnalyticsId $logAnalyticsId `
+  -registryName $registryName `
+  -clientId $clientId `
+  -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Cosmos Db account
 #############################################################################################
-& "$PSScriptRoot\..\cosmosdb\deploy.ps1" -resourceGroupName $resourceGroupName `
--cosmosAccountName $cosmosAccountName -resourceTags $resourceTags
+& "$PSScriptRoot\..\cosmosdb\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -cosmosAccountName $cosmosAccountName `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Storage Account
 #############################################################################################
-& "$PSScriptRoot\..\storage\deploy.ps1" -resourceGroupName $resourceGroupName `
--storageAccountName $storageAccountName -resourceTags $resourceTags
+& "$PSScriptRoot\..\storage\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -storageAccountName $storageAccountName `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Event Hubs
 #############################################################################################
-& "$PSScriptRoot\..\eventhubs\deploy.ps1" -resourceGroupName $resourceGroupName `
--eventHubNamespaceName $eventHubNamespaceName -storageAccountName $storageAccountName -resourceTags $resourceTags
+& "$PSScriptRoot\..\eventhubs\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -eventHubNamespaceName $eventHubNamespaceName `
+  -storageAccountName $storageAccountName `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Databricks
 #############################################################################################
-& "$PSScriptRoot\..\databricks\deploy.ps1" -tenantId $tenantId -resourceGroupName $resourceGroupName `
--databricksName $databricksName -objectId $objectId -logAnalyticsId $logAnalyticsId -logAnalyticsKey $logAnalyticsKey `
--clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) `
- -resourceTags $resourceTags
+& "$PSScriptRoot\..\databricks\deploy.ps1" `
+  -tenantId $tenantId `
+  -resourceGroupName $resourceGroupName `
+  -databricksName $databricksName `
+  -objectId $objectId `
+  -logAnalyticsId $logAnalyticsId `
+  -logAnalyticsKey $logAnalyticsKey `
+  -clientId $clientId -clientSecret (ConvertTo-SecureString $clientSecret -AsPlainText -Force) `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Provision function app
 #############################################################################################
-& "$PSScriptRoot\..\functionapp\deploy.ps1" -resourceGroupName $resourceGroupName `
--functionName $functionName -storageAccountName $storageAccountName -insightsName $insightsName  `
--appServicePlanName $appServicePlanName -keyVaultName $keyVaultName -resourceTags $resourceTags
+& "$PSScriptRoot\..\functionapp\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -functionName $functionName `
+  -storageAccountName $storageAccountName `
+  -insightsName $insightsName  `
+  -appServicePlanName $appServicePlanName `
+  -keyVaultName $keyVaultName `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Provision IoTHub
 #############################################################################################
-& "$PSScriptRoot\..\iot\deploy.ps1" -resourceGroupName $resourceGroupName `
--iotHubName $iotHubName -iotHubSasPolicyNameWebApi 'webapiService' `
--iotHubSasPolicyNameFunctionApp 'functionAppService' `
--iotHubProcessorConsumerGroupName 'processorfunction' -resourceTags $resourceTags
+& "$PSScriptRoot\..\iot\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -iotHubName $iotHubName `
+  -iotHubSasPolicyNameWebApi 'webapiService' `
+  -iotHubSasPolicyNameFunctionApp 'functionAppService' `
+  -iotHubProcessorConsumerGroupName 'processorfunction' `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Provision SQL server
 #############################################################################################
-& "$PSScriptRoot\..\sql\deploy.ps1" -resourceGroupName $resourceGroupName `
--sqlServerName $sqlServerName -dbName 'sqldb' -keyVaultName $keyVaultName `
--resourceTags $resourceTags
+& "$PSScriptRoot\..\sql\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -sqlServerName $sqlServerName `
+  -dbName 'sqldb' `
+  -keyVaultName $keyVaultName `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Data Lake
 #############################################################################################
-& "$PSScriptRoot\..\datalake\deploy.ps1" -resourceGroupName $resourceGroupName `
--dataLakeName $dataLakeName -resourceTags $resourceTags
+& "$PSScriptRoot\..\datalake\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -dataLakeName $dataLakeName `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Machine Learning workspace
 #############################################################################################
-& "$PSScriptRoot\..\ml\deploy.ps1" -resourceGroupName $resourceGroupName `
--mlWorkspaceName $mlWorkspaceName -dataLakeName $storageAccountName `
--insightsName $insightsName -keyVaultName $keyVaultName -registryName $registryName `
--resourceTags $resourceTags
+& "$PSScriptRoot\..\ml\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -mlWorkspaceName $mlWorkspaceName `
+  -dataLakeName $storageAccountName `
+  -insightsName $insightsName `
+  -keyVaultName $keyVaultName `
+  -registryName $registryName `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Provision SignalR
 #############################################################################################
-& "$PSScriptRoot\..\signalR\deploy.ps1" -resourceGroupName $resourceGroupName `
--signalRName $signalRName -serviceMode 'Default' -resourceTags $resourceTags
+& "$PSScriptRoot\..\signalR\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -signalRName $signalRName `
+  -serviceMode 'Default' `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Provision Synapse workspace
 #############################################################################################
-& "$PSScriptRoot\..\synapse\deploy.ps1" -resourceGroupName $resourceGroupName `
--synapseWorkspaceName $synapseWorkspaceName -storageAccountName $dataLakeName -keyVaultName $keyVaultName `
--resourceTags $resourceTags
+& "$PSScriptRoot\..\synapse\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -synapseWorkspaceName $synapseWorkspaceName `
+  -storageAccountName $dataLakeName `
+  -keyVaultName $keyVaultName `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Time Series Insights
 #############################################################################################
-& "$PSScriptRoot\..\tsi\deploy.ps1" -resourceGroupName $resourceGroupName `
--timeseriesinsightsName $timeseriesinsightsName -storageAccountName $dataLakeName `
--eventHubNamespaceName $eventHubNamespaceName -resourceTags $resourceTags
+& "$PSScriptRoot\..\tsi\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -timeseriesinsightsName $timeseriesinsightsName `
+  -storageAccountName $dataLakeName `
+  -eventHubNamespaceName $eventHubNamespaceName `
+  -resourceTags $resourceTags
 
 #############################################################################################
 # Provision function app api
 #############################################################################################
-& "$PSScriptRoot\..\webapp\deploy.ps1" -resourceGroupName $resourceGroupName `
--environmentName $environmentConfig.EnvironmentName -apiName $apiName -insightsName $insightsName  `
--appServicePlanName $appServicePlanName -keyVaultName $keyVaultName -resourceTags $resourceTags
+& "$PSScriptRoot\..\webapp\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -environmentName $environmentConfig.EnvironmentName `
+  -apiName $apiName `
+  -insightsName $insightsName  `
+  -appServicePlanName $appServicePlanName `
+  -keyVaultName $keyVaultName `
+  -resourceTags $resourceTags
 
-############################################################################################
-Provision Service Bus namespace
-############################################################################################
-& "$PSScriptRoot\..\servicebus\deploy.ps1" -resourceGroupName $resourceGroupName `
--serviceBusName $serviceBusName -logAnalyticsId $logAnalyticsId -resourceTags $resourceTags`
+#############################################################################################
+# Provision Service Bus namespace
+#############################################################################################
+& "$PSScriptRoot\..\servicebus\deploy.ps1" `
+  -resourceGroupName $resourceGroupName `
+  -serviceBusName $serviceBusName `
+  -logAnalyticsId $logAnalyticsId `
+  -resourceTags $resourceTags`

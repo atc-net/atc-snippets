@@ -3,10 +3,10 @@
   Deploys Event Hub namespace and Event Hub
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Event Hub namespace and Event Hub using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys an Event Hub namespace and Event Hub using Azure CLI to a resource group in the relevant environment.
 
   .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
+  Specifies the environment type. Staging (DevTest) or Production
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
@@ -30,7 +30,7 @@
   None. deploy.ps1 does not generate any output.
 
   .EXAMPLE
-  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -registryName xxxxxxdevxxxcr
+  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -eventHubNamespaceName xxxxxxdevxxxevhns
 #>
 param (
   [Parameter(Mandatory = $false)]

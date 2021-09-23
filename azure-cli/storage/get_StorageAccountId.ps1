@@ -8,6 +8,7 @@ function Get-StorageAccountId {
       [string]
       $resourceGroupName
     )
+
     Write-Host "  Get storage account id" -ForegroundColor DarkYellow
     $storageAccountId = az storage account show `
       --name $storageAccountName `
@@ -17,4 +18,4 @@ function Get-StorageAccountId {
     Throw-WhenError -output $storageAccountId
 
     return $storageAccountId
-  }
+}

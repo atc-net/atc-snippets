@@ -10,7 +10,6 @@ function Get-StorageConnectionString {
     )
 
     Write-Host "  Get Storage Account connection string for $storageAccountName" -ForegroundColor DarkYellow
-
     $storageAccountConnectionString = az storage account show-connection-string `
         --name $storageAccountName `
         --resource-group $resourceGroupName `

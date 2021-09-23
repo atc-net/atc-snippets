@@ -8,7 +8,7 @@ function Get-SignalRConnectionString {
         $signalRName
     )
 
-    Write-Host "Getting SignalR account key" -ForegroundColor DarkYellow
+    Write-Host "  Getting SignalR account key" -ForegroundColor DarkYellow
     $signalRKey = az signalr key list `
         --name $signalRName `
         --resource-group $resourceGroupName `

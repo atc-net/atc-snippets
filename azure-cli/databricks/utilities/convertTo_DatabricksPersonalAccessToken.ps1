@@ -20,7 +20,7 @@ function ConvertTo-DatabricksPersonalAccessToken {
       'Authorization' = "Bearer $bearerToken"
     }
 
-    $request = @{ 
+    $request = @{
       comment = "SPN Token"
     }
 
@@ -35,4 +35,4 @@ function ConvertTo-DatabricksPersonalAccessToken {
       -Form $request
 
     return $pat.token_value
-  }
+}

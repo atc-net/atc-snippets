@@ -25,7 +25,6 @@ function New-Vnet {
         --resource-group $ResourceGroup `
         --query "[?name=='$name']"
 
-
     if ($output -eq "[]") {
         #  Subnet not created, lets create it
         Write-Host "  Creating vnet" -ForegroundColor DarkYellow
@@ -39,7 +38,6 @@ function New-Vnet {
         Throw-WhenError -output $output
 
     } else {
-
         #   Vnet already exist, lets check if namespace is correct addressspace
         $outputJson = $output | ConvertFrom-Json
         $addressspace = $outputJson.addressSpace

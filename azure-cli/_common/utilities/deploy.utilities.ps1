@@ -1,5 +1,4 @@
 function Throw-WhenError {
-
   param (
     [string]
     $output
@@ -13,7 +12,6 @@ function Throw-WhenError {
 }
 
 function ConvertTo-PlainText {
-
   param (
     [Parameter(Mandatory=$true)]
     [securestring]
@@ -24,7 +22,6 @@ function ConvertTo-PlainText {
 }
 
 function ConvertTo-Base64String {
-
   param (
     [Parameter(ValueFromPipeline, Mandatory=$true)]
     [string]

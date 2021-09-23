@@ -3,10 +3,10 @@
   Deploys Azure Digital Twins
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Digital Twins using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys an Azure Digital Twins using Azure CLI to a resource group in the relevant environment.
 
   .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
+  Specifies the environment type. Staging (DevTest) or Production
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
@@ -154,5 +154,3 @@ $output = az dt route create `
     --filter "type = 'Microsoft.DigitalTwins.Twin.Update'"
 
 Throw-WhenError -output $output
-
-

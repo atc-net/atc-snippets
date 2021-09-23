@@ -1,5 +1,4 @@
 function Get-SqlConnectionString {
-
     param (
       [Parameter(Mandatory=$true)]
       [string]
@@ -27,4 +26,4 @@ function Get-SqlConnectionString {
       + ";Password=" `
       + $password `
       + ";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-  }
+}

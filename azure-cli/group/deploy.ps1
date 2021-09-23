@@ -3,10 +3,7 @@
   Deploys Azure resource group
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure resource group using the CLI tool.
-
-  .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
+  The deploy.ps1 script deploys an Azure resource group using Azure CLI.
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe

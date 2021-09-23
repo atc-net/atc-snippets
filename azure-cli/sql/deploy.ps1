@@ -3,10 +3,10 @@
   Deploys Azure SQL server instance
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure SQL server instance using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys an Azure SQL server instance using Azure CLI to a resource group in the relevant environment.
 
   .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
+  Specifies the environment type. Staging (DevTest) or Production
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
@@ -91,9 +91,9 @@ $sqlDatabases = @(
 #############################################################################################
 # Configure key vault secrets
 #############################################################################################
-Write-Host "  Configure key vault secrets " -ForegroundColor DarkGreen
+Write-Host "Configure key vault secrets " -ForegroundColor DarkGreen
 
-Write-Host "    Querying SqlServerPassword secret" -ForegroundColor DarkYellow
+Write-Host "  Querying SqlServerPassword secret" -ForegroundColor DarkYellow
 $sqlServerPassword = az keyvault secret show `
   --name 'SqlServerPassword' `
   --vault-name $keyVaultName `
@@ -101,7 +101,7 @@ $sqlServerPassword = az keyvault secret show `
   --output tsv
 
 if (!$?) {
-  Write-Host "    Creating SqlServerPassword secret" -ForegroundColor DarkYellow
+  Write-Host "  Creating SqlServerPassword secret" -ForegroundColor DarkYellow
   $sqlServerPassword = Get-NewPassword
   $output = az keyvault secret set `
     --vault-name $keyVaultName `
@@ -110,7 +110,7 @@ if (!$?) {
 
   Throw-WhenError -output $output
 } else {
-  Write-Host "    SqlServerPassword already exists, skipping creation" -ForegroundColor DarkYellow
+  Write-Host "  SqlServerPassword already exists, skipping creation" -ForegroundColor DarkYellow
 }
 
 # Add Passwords for each db user on each database to key vault
@@ -121,7 +121,7 @@ foreach ($sqlDatabase in $sqlDatabases) {
     $username = $sqlDatabaseUser.Name
     $passwordName = ($username + "Password")
 
-    Write-Host "    Querying $passwordName secret" -ForegroundColor DarkYellow
+    Write-Host "  Querying $passwordName secret" -ForegroundColor DarkYellow
     $password = az keyvault secret show `
       --name $passwordName `
       --vault-name $keyVaultName `
@@ -129,7 +129,7 @@ foreach ($sqlDatabase in $sqlDatabases) {
       --output tsv
 
     if ($LastExitCode -gt 0) {
-      Write-Host "    Creating $passwordName secret" -ForegroundColor DarkYellow
+      Write-Host "  Creating $passwordName secret" -ForegroundColor DarkYellow
       $password = Get-NewPassword
       $output = az keyvault secret set `
         --vault-name $keyVaultName `
@@ -139,7 +139,7 @@ foreach ($sqlDatabase in $sqlDatabases) {
       Throw-WhenError -output $output
 
     } else {
-      Write-Host "    $passwordName already exists, skipping creation" -ForegroundColor DarkYellow
+      Write-Host "  $passwordName already exists, skipping creation" -ForegroundColor DarkYellow
     }
 
     $sqlDatabaseUser.Password = $password
@@ -154,7 +154,7 @@ foreach ($sqlDatabase in $sqlDatabases) {
   $sqlDatabaseName = $sqlDatabase.Name
   $sqlConnectionName = $sqlDatabase.ConnnectionName
 
-  Write-Host "    Querying $sqlArea SqlConnection secret" -ForegroundColor DarkYellow
+  Write-Host "  Querying $sqlArea SqlConnection secret" -ForegroundColor DarkYellow
   $sqlConnectionString = Get-SqlConnectionString `
     -server $sqlServerName `
     -database $sqlDatabaseName `
@@ -173,7 +173,7 @@ foreach ($sqlDatabase in $sqlDatabases) {
     --output tsv
 
   if ($sqlConnectionString -ne $output) {
-    Write-Host "    Creating $sqlArea SqlConnection secret" -ForegroundColor DarkYellow
+    Write-Host "  Creating $sqlArea SqlConnection secret" -ForegroundColor DarkYellow
     $output = az keyvault secret set `
       --vault-name $keyVaultName `
       --name $sqlConnectionName `
@@ -181,14 +181,14 @@ foreach ($sqlDatabase in $sqlDatabases) {
 
     Throw-WhenError -output $output
   } else {
-    Write-Host "    $sqlArea SqlConnection already exists, skipping creation" -ForegroundColor DarkYellow
+    Write-Host "  $sqlArea SqlConnection already exists, skipping creation" -ForegroundColor DarkYellow
   }
 }
 
 #############################################################################################
 # Provision sql server resource
 #############################################################################################
-Write-Host "  Creating sql server" -ForegroundColor DarkGreen
+Write-Host " Creating sql server" -ForegroundColor DarkGreen
 $output = az sql server create `
   --name $sqlServerName `
   --location $location `
@@ -198,7 +198,7 @@ $output = az sql server create `
 
 Throw-WhenError -output $output
 
-Write-Host "    Tagging sql server" -ForegroundColor DarkYellow
+Write-Host "  Tagging sql server" -ForegroundColor DarkYellow
 $output = az resource tag `
   --resource-type "Microsoft.Sql/servers" `
   --name $sqlServerName `
@@ -207,7 +207,7 @@ $output = az resource tag `
 
 Throw-WhenError -output $output
 
-Write-Host "    Configuring sql server firewall rules" -ForegroundColor DarkYellow
+Write-Host "  Configuring sql server firewall rules" -ForegroundColor DarkYellow
 $output = az sql server firewall-rule create `
   --server $sqlServerName.ToLower() `
   --resource-group $resourceGroupName `
@@ -217,11 +217,10 @@ $output = az sql server firewall-rule create `
 
 Throw-WhenError -output $output
 
-
 #############################################################################################
 # Provision sql database logins
 #############################################################################################
-Write-Host "  Provision sql logins" -ForegroundColor DarkGreen
+Write-Host " Provision sql logins" -ForegroundColor DarkGreen
 
 $sqlServerInstance = $sqlServerName + ".database.windows.net"
 
@@ -235,7 +234,7 @@ foreach ($sqlDatabase in $sqlDatabases) {
 
     $queryVariables = "Username=$username","Password=$password"
 
-    Write-Host "    Creating database login for $username" -ForegroundColor DarkYellow
+    Write-Host "  Creating database login for $username" -ForegroundColor DarkYellow
     Invoke-Sqlcmd -ServerInstance $sqlServerInstance `
       -Database master `
       -Username $sqlServerUserName `
@@ -249,7 +248,7 @@ foreach ($sqlDatabase in $sqlDatabases) {
 #############################################################################################
 # Provision sql database resource
 #############################################################################################
-Write-Host "  Provision sql databases with users" -ForegroundColor DarkGreen
+Write-Host "Provision sql databases with users" -ForegroundColor DarkGreen
 
 # Add users for each database
 foreach ($sqlDatabase in $sqlDatabases) {
@@ -258,7 +257,7 @@ foreach ($sqlDatabase in $sqlDatabases) {
   $sqlDatabaseUsers = $sqlDatabase.Users
   $sqlDatabaseSpec = $sqlDatabase.Spec
 
-  Write-Host "    Creating $sqlArea sql database" -ForegroundColor DarkYellow
+  Write-Host "  Creating $sqlArea sql database" -ForegroundColor DarkYellow
   $output = ProvisionSqlDb `
     -resourceGroupName $resourceGroupName `
     -sqlServerName $sqlServerName `
@@ -276,7 +275,7 @@ foreach ($sqlDatabase in $sqlDatabases) {
 
     $queryVariables = "Username=$username","ReadRights=$ReadRights","WriteRights=$WriteRights","CreateRights=$CreateRights","ExecRights=$ExecRights"
 
-    Write-Host "      Creating $username on $sqlArea sql database" -ForegroundColor DarkYellow
+    Write-Host "  Creating $username on $sqlArea sql database" -ForegroundColor DarkYellow
     Invoke-Sqlcmd -ServerInstance $sqlServerInstance `
       -Database $sqlDatabaseName `
       -Username $sqlServerUserName `

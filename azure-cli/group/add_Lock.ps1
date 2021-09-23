@@ -11,6 +11,11 @@ function Add-Lock {
         $lockName
     )
 
-    $resourceLock = az lock create --name $lockName --lock-type CanNotDelete --resource-group $resourceGroupName --output tsv
+    $resourceLock = az lock create `
+        --name $lockName `
+        --lock-type CanNotDelete `
+        --resource-group $resourceGroupName `
+        --output tsv
+
     Throw-WhenError -output $resourceLock
 }

@@ -1,24 +1,24 @@
 function New-Subnet {
     param (
-      [Parameter(Mandatory=$true)]
-      [ValidateNotNullOrEmpty()]
-      [string]
-      $vnetname,
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $vnetname,
 
-      [Parameter(Mandatory=$true)]
-      [ValidateNotNullOrEmpty()]
-      [string]
-      $subnetname,
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $subnetname,
 
-      [Parameter(Mandatory=$true)]
-      [ValidateNotNullOrEmpty()]
-      [string]
-      $resourceGroupName,
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $resourceGroupName,
 
-      [Parameter(Mandatory=$true)]
-      [ValidateNotNullOrEmpty()]
-      [string]
-      $addressPrefix
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $addressPrefix
     )
 
     $output = az network vnet subnet list `
@@ -38,7 +38,6 @@ function New-Subnet {
         Throw-WhenError -output $output
 
     } else {
-
         #   Subnet already exist, lets check if namespace is correct
         $outputJson = $output | ConvertFrom-Json
         if ($outputJson.addressPrefix -ne $addressPrefix) {

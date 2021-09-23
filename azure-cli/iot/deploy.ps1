@@ -3,10 +3,10 @@
   Deploys Azure Container Registry instance
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Container Registry instance using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys an IoT Hub instance using Azure CLI to a resource group in the relevant environment.
 
   .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
+  Specifies the environment type. Staging (DevTest) or Production
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
@@ -14,7 +14,7 @@
   .PARAMETER resourceGroupName
   Specifies the name of the resource group
 
-  .PARAMETER registryName
+  .PARAMETER iotHubName
   Specifies the name of the Container Registry
 
   .PARAMETER resourceTags
@@ -27,7 +27,7 @@
   None. deploy.ps1 does not generate any output.
 
   .EXAMPLE
-  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -registryName xxxxxxdevxxxcr
+  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -iotHubName xxxxxxdevxxiot
 #>
 param (
   [Parameter(Mandatory = $false)]

@@ -1,9 +1,9 @@
 <#
   .SYNOPSIS
-  Deploys Azure resource groups and key vaults with the Azure CLI tool
+  Deploys Azure resource groups and key vaults with Azure CLI
 
   .DESCRIPTION
-  The deploy.ps1 script deploys Azure resource groups and key vaults for an application with an environment resource group and a service recource group
+  The deploy.initial.ps1 script deploys Azure resource groups and key vaults for an application with an environment resource group and a service recource group
 
   .PARAMETER environmentConfig
   Specifies the environment configuration
@@ -15,13 +15,12 @@
   Specifies the tag elements that will be used to tag the deployed services
 
   .INPUTS
-  None. You cannot pipe objects to deploy.ps1.
+  None. You cannot pipe objects to deploy.initial.ps1.
 
   .OUTPUTS
-  None. deploy.ps1 does not generate any output.
+  None. deploy.initial.ps1 does not generate any output.
 #>
 param (
-
   [Parameter(Mandatory = $true)]
   [EnvironmentConfig] $environmentConfig,
 
@@ -33,7 +32,7 @@ param (
 )
 
 #############################################################################################
-# Configure names and options
+# Import utility functions and extensions
 #############################################################################################
 Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 
@@ -49,14 +48,11 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 #############################################################################################
 # Resource naming section
 #############################################################################################
-
 $envResourceGroupName   = Get-ResourceGroupName -systemName $namingConfig.SystemName -environmentName $environmentConfig.EnvironmentName
 $envKeyVaultName        = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig -environmentName $true
 
 $resourceGroupName      = Get-ResourceGroupName -serviceName $namingConfig.ServiceName -systemName $namingConfig.SystemName -environmentName $environmentConfig.EnvironmentName
 $keyVaultName           = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
-
-# Write setup
 
 Write-Host "**********************************************************************" -ForegroundColor White
 Write-Host "* Environment name                 : $($environmentConfig.EnvironmentName)" -ForegroundColor White
@@ -65,27 +61,30 @@ Write-Host "* Resource group name              : $resourceGroupName" -Foreground
 Write-Host "**********************************************************************" -ForegroundColor White
 
 #############################################################################################
-# Provision resource groups
+# Provision Resource Groups
 #############################################################################################
-
+Write-Host "Provisioning resource groups" -ForegroundColor DarkGreen
 & "$PSScriptRoot\..\group\deploy.ps1" -resourceGroupName $envResourceGroupName -resourceTags $resourceTags
 & "$PSScriptRoot\..\group\deploy.ps1" -resourceGroupName $resourceGroupName -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Azure Key Vaults
+# Provision Key Vaults
 #############################################################################################
+Write-Host "Provisioning Key Vaults" -ForegroundColor DarkGreen
 & "$PSScriptRoot\..\keyvault\deploy.ps1" -resourceGroupName $envResourceGroupName -keyVaultName $envKeyVaultName -resourceTags $resourceTags
 & "$PSScriptRoot\..\keyvault\deploy.ps1" -resourceGroupName $resourceGroupName -keyVaultName $keyVaultName -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Service Principles
+# Provision Service Principels
 #############################################################################################
-# Create service priniple and save info to environment key vault
+Write-Host "Provisioning Service Principels" -ForegroundColor DarkGreen
+
+Write-Host "  Create service principle and save info to environment key vault" -ForegroundColor DarkYellow
 New-ServiceSPN -companyHostName "company.com" -envResourceGroupName $envResourceGroupName -envKeyVaultName $envKeyVaultName `
 -environmentConfig $environmentConfig `
 -namingConfig $namingConfig
 
-# Grant access to SPN to the service key vault
+Write-Host "  Grant SPN access to the service key vault" -ForegroundColor DarkYellow
 Set-KeyVaultSPNPolicy -resourceGroupName $resourceGroupName -envKeyVaultName $envKeyVaultName -keyVaultName $keyVaultName `
 -environmentConfig $environmentConfig `
 -namingConfig $namingConfig

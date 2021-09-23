@@ -3,10 +3,10 @@
   Deploys Azure Kubernetes Cluster (AKS)
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Kubernetes Cluster using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys an Azure Kubernetes Cluster using Azure CLI to a resource group in the relevant environment.
 
   .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
+  Specifies the environment type. Staging (DevTest) or Production
 
   .PARAMETER environmentName
   Specifies the environment name. E.g. Dev, Test etc.
@@ -138,14 +138,12 @@ Throw-WhenError -output $output
 
 $aksId = $(az aks show -n $aksClusterName -g $resourceGroupName -o tsv --query id)
 
-
 #############################################################################################
 # Connect resources with Azure Monitor
 #############################################################################################
 Write-Host "Connect resources with Azure Monitor" -ForegroundColor DarkGreen
 
 Write-Host "  Creating Diagnostic Setting for AKS" -ForegroundColor DarkYellow
-
 $aksMonitorLogging = Get-Content "$PSScriptRoot/aksmonitorlogging.json" -Raw
 $aksMonitorLogging = $aksMonitorLogging -replace '\s+', '' -replace '"', '\"'
 
@@ -153,11 +151,11 @@ $aksMonitorMetrics = Get-Content "$PSScriptRoot/aksmonitormetrics.json" -Raw
 $aksMonitorMetrics = $aksMonitorMetrics -replace '\s+', '' -replace '"', '\"'
 
 $output = az monitor diagnostic-settings create `
---resource $aksId `
---name "AksToMonitorDiagnostics" `
---workspace $logAnalyticsId `
---resource-group $resourceGroupName `
---logs $aksMonitorLogging `
---metrics $aksMonitorMetrics
+  --resource $aksId `
+  --name "AksToMonitorDiagnostics" `
+  --workspace $logAnalyticsId `
+  --resource-group $resourceGroupName `
+  --logs $aksMonitorLogging `
+  --metrics $aksMonitorMetrics
 
 Throw-WhenError -output $output

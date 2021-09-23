@@ -34,5 +34,6 @@ function Get-OAuthToken {
 
   $url = "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
   $response = Invoke-RestMethod $url -Method 'POST' -Headers $headers -Body $body
+
   return $response.access_token
 }

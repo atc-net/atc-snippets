@@ -8,7 +8,7 @@ function Get-CosmosConnectionString {
         $cosmosAccountName
     )
 
-    Write-Host "Getting Cosmos account key" -ForegroundColor DarkYellow
+    Write-Host "  Getting Cosmos account key" -ForegroundColor DarkYellow
     $cosmosKey = az cosmosdb keys list `
         --name $cosmosAccountName `
         --resource-group $resourceGroupName `

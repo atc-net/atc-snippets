@@ -2,10 +2,10 @@
   .SYNOPSIS
   Deploys Azure App Service instance
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure App Service instance using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys an Azure App Service instance using Azure CLI to a resource group in the relevant environment.
 
   .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
+  Specifies the environment type. Staging (DevTest) or Production
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
@@ -79,6 +79,7 @@ param (
   [Parameter(Mandatory = $false)]
   [string[]] $resourceTags = @()
 )
+
 #############################################################################################
 # Configure names and options
 #############################################################################################

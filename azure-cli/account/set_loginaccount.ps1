@@ -6,11 +6,11 @@ function Set-LoginAccount {
         $subscriptionId
     )
 
-    if ((Test-Path env:servicePrincipalId)) { 
+    if ((Test-Path env:servicePrincipalId)) {
         Write-Host "Logged in through DevOps AZ CLI" -ForegroundColor White
     } else {
         az login --allow-no-subscriptions
     }
-    
+
     az account set --subscription $subscriptionId
 }

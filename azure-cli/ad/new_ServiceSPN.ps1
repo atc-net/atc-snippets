@@ -49,7 +49,7 @@ function New-ServiceSPN {
     --identifier-uris $spnAppIdentityId `
     --query appId
 
-   $objectId = az ad sp  show --id $clientId --query objectId --out tsv
+   $objectId = az ad sp show --id $clientId --query objectId --out tsv
 
   Write-Host "  Generating SPN secret (Client App ID: $clientId)" -ForegroundColor DarkYellow
   $clientSecret = az ad app credential reset --id $clientId --query password

@@ -9,7 +9,7 @@ function Get-KeyVaultId {
     $resourceGroup
   )
 
-  Write-Host "Get key vault id" -ForegroundColor DarkYellow
+  Write-Host "  Get key vault id" -ForegroundColor DarkYellow
   $kvId = az keyvault show `
     --name $name `
     --resource-group $resourceGroup `

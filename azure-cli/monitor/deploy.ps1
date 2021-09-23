@@ -3,10 +3,10 @@
   Deploys a log analytics workspace and application insights
 
   .DESCRIPTION
-  The deploy.ps1 script deploys a log analytics workspace and application insights using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys a log analytics workspace and application insights using Azure CLI to a resource group in the relevant environment.
 
   .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
+  Specifies the environment type. Staging (DevTest) or Production
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
@@ -28,9 +28,6 @@
 
   .OUTPUTS
   None. deploy.ps1 does not generate any output.
-
-  .EXAMPLE
-  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -registryName xxxxxxdevxxxcr
 #>
 param (
   [Parameter(Mandatory = $false)]
@@ -90,4 +87,5 @@ $output = az monitor app-insights component create `
   --application-type web `
   --kind web `
   --tags $resourceTags
+
 Throw-WhenError -output $output

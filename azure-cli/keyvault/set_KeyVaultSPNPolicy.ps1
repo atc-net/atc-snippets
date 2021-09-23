@@ -1,5 +1,4 @@
 function Set-KeyVaultSPNPolicy {
-
   param (
     [Parameter(Mandatory = $true)]
     [string]
@@ -47,4 +46,4 @@ function Set-KeyVaultSPNPolicy {
       --secret-permissions list get set
 
     Throw-WhenError -output $output
-  }
+}

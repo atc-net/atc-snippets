@@ -3,10 +3,10 @@
   Deploys Azure Synapse instance
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Synapse instance using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys an Azure Synapse instance using Azure CLI to a resource group in the relevant environment.
 
   .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
+  Specifies the environment type. Staging (DevTest) or Production
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
@@ -67,6 +67,7 @@ param (
     [Parameter(Mandatory = $false)]
     [string[]] $resourceTags = @()
 )
+
 #############################################################################################
 # Configure names and options
 #############################################################################################
@@ -84,9 +85,9 @@ $storageContainer = "synapse"
 #############################################################################################
 # Configure key vault secrets
 #############################################################################################
-Write-Host "  Configure key vault secrets " -ForegroundColor DarkGreen
+Write-Host "Configure key vault secrets " -ForegroundColor DarkGreen
 
-Write-Host "    Querying SynapseServerPassword secret" -ForegroundColor DarkYellow
+Write-Host "  Querying SynapseServerPassword secret" -ForegroundColor DarkYellow
 $synapseServerPassword = az keyvault secret show `
   --name 'SynapseServerPassword' `
   --vault-name $keyVaultName `
@@ -94,7 +95,7 @@ $synapseServerPassword = az keyvault secret show `
   --output tsv
 
 if (!$?) {
-  Write-Host "    Creating SynapseServerPassword secret" -ForegroundColor DarkYellow
+  Write-Host "  Creating SynapseServerPassword secret" -ForegroundColor DarkYellow
   $synapseServerPassword = Get-NewPassword
   $output = az keyvault secret set `
     --vault-name $keyVaultName `
@@ -103,13 +104,13 @@ if (!$?) {
 
   Throw-WhenError -output $output
 } else {
-  Write-Host "    SynapseServerPassword already exists, skipping creation" -ForegroundColor DarkYellow
+  Write-Host "  SynapseServerPassword already exists, skipping creation" -ForegroundColor DarkYellow
 }
 
 #############################################################################################
 # Provision Synapse Workspace
 #############################################################################################
-Write-Host "  Creating data lake container" -ForegroundColor DarkYellow
+Write-Host "Creating data lake container" -ForegroundColor DarkGreen
 az storage fs create -n $storageContainer --account-name $storageAccountName
 
 Write-Host "  Creating synapse workspace" -ForegroundColor DarkYellow

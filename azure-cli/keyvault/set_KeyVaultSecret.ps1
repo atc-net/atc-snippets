@@ -28,7 +28,6 @@ function Set-KeyVaultSecret {
 }
 
 function Set-KeyVaultSecretPlain {
-
   param (
     [Parameter(Mandatory=$true)]
     [string]

@@ -1,4 +1,3 @@
-# Install required extensions
 Write-Host "  Installing required extensions" -ForegroundColor DarkYellow
 $output = az extension add `
   --name application-insights `
@@ -41,20 +40,3 @@ $output = az extension add `
   --yes
 
 Throw-WhenError -output $output
-
-# TO-BE-SORTED:
-# -------------
-
-# datafactory
-
-# kusto
-
-# scheduled-query
-
-# aks-preview
-
-# mixed-reality
-
-# webpubsub
-
-# azure-devops

@@ -3,10 +3,10 @@
   Deploys Azure Key Vault
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Key Vault using the CLI tool to a resource group in the relevant environment.
+  The deploy.ps1 script deploys an Azure Key Vault using Azure CLI to a resource group in the relevant environment.
 
   .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or production
+  Specifies the environment type. Staging (DevTest) or Production
 
   .PARAMETER environmentName
   Specifies the environment name. E.g. Dev, Test etc.

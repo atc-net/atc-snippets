@@ -5,8 +5,13 @@ function Get-IotHubEventhubCompatibleEndpoint
     [string]
     $iotHubName
   )
-  
-  $endpoint = az iot hub connection-string show -n $iotHubName --default-eventhub --policy-name iothubowner --query connectionString --output tsv
+
+  $endpoint = az iot hub connection-string show `
+    -n $iotHubName `
+    --default-eventhub `
+    --policy-name iothubowner `
+    --query connectionString `
+    --output tsv
 
   Throw-WhenError -output $endpoint
 
