@@ -13,6 +13,7 @@ function Get-IoTHubServiceFunctionEventHubEndpointConnection
       [string]
       $sasPolicyPrimaryFunctionKey
     )
+
     Write-Host "  Query for IoTHub EventHub Endpoint" -ForegroundColor DarkYellow
     $iotHubEventHubEndpoint = az iot hub show `
       --name $iotHubName `
@@ -22,4 +23,4 @@ function Get-IoTHubServiceFunctionEventHubEndpointConnection
     Throw-WhenError -output $iotHubEventHubEndpoint
 
     return "Endpoint=" + $iotHubEventHubEndpoint + ";SharedAccessKeyName=" + $iotHubSasPolicyNameFunctionApp + ";SharedAccessKey=" + $sasPolicyPrimaryFunctionKey + ";EntityPath=" + $iotHubName;
-  }
+}
