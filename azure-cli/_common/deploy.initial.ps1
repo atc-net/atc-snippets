@@ -18,7 +18,7 @@
   None. You cannot pipe objects to deploy.ps1.
 
   .OUTPUTS
-  None. Udeploy.ps1 does not generate any output.
+  None. deploy.ps1 does not generate any output.
 #>
 param (
 
