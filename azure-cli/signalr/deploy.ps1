@@ -48,6 +48,11 @@ param (
   [string]
   $signalRName,
 
+  [Parameter(Mandatory = $true)]
+  [ValidateSet('Default', 'Serverless', 'Classic')]
+  [string]
+  $serviceMode = "Default",
+
   [Parameter(Mandatory = $false)]
   [string[]] $resourceTags = @()
 )
@@ -65,6 +70,6 @@ $output = az signalr create `
   --sku Standard_S1 `
   --unit-count 1 `
   --allowed-origins * `
-  --service-mode Default
+  --service-mode $serviceMode
 
 Throw-WhenError -output $output
