@@ -103,7 +103,7 @@ function New-DatabricksJob {
     email_notifications = @{ }
   }
 
-  $emailRecipient = @("dataplatform-alerts@clever.dk", "clever-data-alerts-aaaadxfpywv7a62wu445f4rltq@delegate-talk.slack.com")
+  $emailRecipient = @("email1@customer.com", "email2@customer.com")
   if (($environmentType -eq "Production")) {
     if ($emailNotificationOnStart) {
       $job.email_notifications.on_start = $emailRecipient
@@ -128,7 +128,7 @@ function New-DatabricksJob {
       }
     },
     @{
-      egg = "dbfs:/databricks/clever/clever.dataplatform.egg"
+      egg = "dbfs:/databricks/customer/customer.dataplatform.egg"
     },
     @{
       pypi = @{
