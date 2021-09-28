@@ -86,6 +86,7 @@ $output = az monitor app-insights component create `
   --resource-group $resourceGroupName `
   --application-type web `
   --kind web `
+  --workspace $logAnalyticsId `
   --tags $resourceTags
 
 Throw-WhenError -output $output
