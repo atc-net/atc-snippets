@@ -1,0 +1,58 @@
+
+$registryName = $companyAbbreviation.ToLower() + $systemAbbreviation.ToLower()
+$registryUrl = "https://" + $registryName + ".azurecr.io/v1/"
+$serviceConnectionName = $systemName + "-" + $serviceName
+
+
+Write-Host "  Configure Azure DevOps extension" -ForegroundColor DarkYellow
+az devops configure --defaults `
+  project="XXXX" `
+  organization="https://repo_url"
+
+
+
+#############################################################################################
+# Provision Azure DevOps Service Connection to Azure Container Registry
+#############################################################################################
+
+Write-Host "Provision Azure DevOps Service Connection" -ForegroundColor DarkGreen
+
+Write-Host "  Check for existing Service Connection"  -ForegroundColor DarkYellow
+$id = az devops service-endpoint list --query "[?name == '$serviceConnectionName'] | [0].id"
+if (![string]::IsNullOrEmpty($id)) {
+  Write-Host "  Deleting existing Service Connection" -ForegroundColor DarkYellow
+  az devops service-endpoint delete --id $id --yes
+}
+
+Write-Host "  Login into Azure Container Registry" -ForegroundColor DarkYellow
+$output = az acr login --name $registryName
+Throw-WhenError -output $output
+
+Write-Host "  Get Credentials for Azure Container Registry" -ForegroundColor DarkYellow
+$credentials = az acr credential show --name $registryName | ConvertFrom-Json
+Throw-WhenError -output $credentials
+
+Write-Host "  Create Service Connection" -ForegroundColor DarkYellow
+@{
+  authorization = @{
+    parameters = @{
+      registry = $registryUrl
+      username = $credentials.username
+      password = $credentials.passwords[0].value
+    }
+    scheme = "UsernamePassword"
+  }
+  data = @{
+    registrytype = "Others"
+  }
+  name = $serviceConnectionName
+  type = "dockerregistry"
+  registry = $registryUrl
+} | ConvertTo-Json -Compress `
+  | Out-File ./request.json -Encoding ascii
+
+az devops service-endpoint create `
+  --service-endpoint-configuration ./request.json `
+  --encoding ascii
+
+Remove-Item ./request.json

@@ -9,7 +9,7 @@ function Get-ApplicationInsightsInstrumentationKey {
     $resourceGroup
   )
 
-  Write-Host "Get instrumentation key" -ForegroundColor DarkYellow
+  Write-Host "  Get instrumentation key" -ForegroundColor DarkYellow
   $instrumentationKey = az monitor app-insights component show `
     --app $name `
     --resource-group $resourceGroup `

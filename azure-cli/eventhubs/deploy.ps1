@@ -1,3 +1,37 @@
+<#
+  .SYNOPSIS
+  Deploys Event Hub namespace and Event Hub
+
+  .DESCRIPTION
+  The deploy.ps1 script deploys an Event Hub namespace and Event Hub using Azure CLI to a resource group in the relevant environment.
+
+  .PARAMETER environmentType
+  Specifies the environment type. Staging (DevTest) or Production
+
+  .PARAMETER location
+  Specifies the location where the services are deployed. Default is West Europe
+
+  .PARAMETER resourceGroupName
+  Specifies the name of the resource group
+
+  .PARAMETER eventHubNamespaceName
+  Specifies the name of the event hub namespace
+
+  .PARAMETER storageAccountName
+  Specifies the name of the storage account
+
+  .PARAMETER resourceTags
+  Specifies the tag elements that will be used to tag the deployed services
+
+  .INPUTS
+  None. You cannot pipe objects to deploy.ps1.
+
+  .OUTPUTS
+  None. deploy.ps1 does not generate any output.
+
+  .EXAMPLE
+  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -eventHubNamespaceName xxxxxxdevxxxevhns
+#>
 param (
   [Parameter(Mandatory = $false)]
   [ValidateNotNullOrEmpty()]
@@ -5,68 +39,41 @@ param (
   [string]
   $environmentType = "DevTest",
 
+  [Parameter(Mandatory = $false)]
+  [ValidateNotNullOrEmpty()]
+  [string]
+  $location = "westeurope",
+
   [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
-  $environmentName
+  $resourceGroupName,
+
+  [Parameter(Mandatory = $true)]
+  [ValidateNotNullOrEmpty()]
+  [string]
+  $eventHubNamespaceName,
+
+  [Parameter(Mandatory = $true)]
+  [ValidateNotNullOrEmpty()]
+  [string]
+  $storageAccountName,
+
+  [Parameter(Mandatory = $false)]
+  [string[]] $resourceTags = @()
 )
 
 #############################################################################################
 # Configure names and options
 #############################################################################################
-Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 
 # import utility functions
-. ".\deploy.utilities.ps1"
-. ".\deploy.naming.ps1"
-
-# Install required extensions
-Write-Host "  Installing required extensions" -ForegroundColor DarkYellow
-$output = az extension add `
-  --name application-insights `
-  --yes
-
-Throw-WhenError -output $output
-
-$output = az extension add `
-  --name storage-preview `
-  --yes
-
-Throw-WhenError -output $output
-
-# Naming rule configurations
-$companyAbbreviation = "xxx"
-$systemName          = "xxx"
-$systemAbbreviation  = "xxx"
-$serviceName         = "xxx"
-$serviceAbbreviation = "xxx"
-
-# Location
-$location = "westeurope"
-
-# Resource tags
-$resourceTags = @(
-  "Owner=Auto Deployed",
-  "System=$systemName",
-  "Environment=$environmentName",
-  "Service=$serviceName",
-  "Source=https://repo_url"
-)
+. "$PSScriptRoot\..\storage\get_StorageAccountId.ps1"
 
 #############################################################################################
 # Resource naming section
 #############################################################################################
 
-# Environment Resource Names
-$envResourceGroupName   = Get-ResourceGroupName -systemName $systemName -environmentName $environmentName
-$envResourceName        = Get-ResourceName -companyAbbreviation $companyAbbreviation -systemAbbreviation $systemAbbreviation -environmentName $environmentName
-
-# Resource Names
-$resourceGroupName      = Get-ResourceGroupName -serviceName $serviceName -systemName $systemName -environmentName $environmentName
-$resourceName           = Get-ResourceName -serviceAbbreviation $serviceAbbreviation -companyAbbreviation $companyAbbreviation -systemAbbreviation $systemAbbreviation -environmentName $environmentName
-
-$storageAccountName     = $resourceName
-$eventHubNamespaceName  = $resourceName
 $eventHubNames = @(
   "xxxEvents",
   "yyyEvents"
@@ -83,65 +90,12 @@ $eventHubConsumerGroups = @(
 
 $dataCaptureContainer = 'landingzone'
 
-# Write setup
-
-Write-Host "**********************************************************************" -ForegroundColor White
-Write-Host "* Environment name                 : $environmentName" -ForegroundColor White
-Write-Host "* Env. resource group name         : $envResourceGroupName" -ForegroundColor White
-Write-Host "* Resource group name              : $resourceGroupName" -ForegroundColor White
-Write-Host "* Storage Account name                  : $storageAccountName" -ForegroundColor White
-for ($i = 0; $i -lt $eventHubNames.Count; $i++) {
-  Write-Host "* EventHub name $($i+1)                       : $($eventHubNames[$i])" -ForegroundColor White
-}
-for ($i = 0; $i -lt $eventHubListeners.Count; $i++) {
-  Write-Host "* EventHub listener $($i+1)                   : $($eventHubListeners[$i])" -ForegroundColor White
-}
-$i = 1
-foreach ($eventHubConsumerGroup in $eventHubConsumerGroups) {
-  Write-Host "* EventHub consumer group $i             : $($eventHubConsumerGroup.Name)" -ForegroundColor White
-  $i++
-}
-Write-Host "**********************************************************************" -ForegroundColor White
-
-#############################################################################################
-# Provision resource group
-#############################################################################################
-Write-Host "Provision resource group" -ForegroundColor DarkGreen
-
-Write-Host "  Creating resource group" -ForegroundColor DarkYellow
-$output = az group create `
-  --name $resourceGroupName `
-  --location $location `
-  --tags $resourceTags
-
-Throw-WhenError -output $output
-
-#############################################################################################
-# Provision storage account
-#############################################################################################
-Write-Host "Provision storage account" -ForegroundColor DarkGreen
-
-Write-Host "  Creating storage account" -ForegroundColor DarkYellow
-$storageAccountId = az storage account create `
-  --name $storageAccountName `
-  --location $location `
-  --resource-group $resourceGroupName `
-  --encryption-service 'blob' `
-  --encryption-service 'file' `
-  --sku 'Standard_LRS' `
-  --https-only 'true' `
-  --kind 'StorageV2' `
-  --tags $resourceTags `
-  --query id
-
-Throw-WhenError -output $storageAccountId
-
 #############################################################################################
 # Provision Event Hub namespace
 #############################################################################################
 Write-Host "Provision event hub namespace" -ForegroundColor DarkGreen
 
-Write-Host "  Creating event hub namespace" -ForegroundColor DarkYellow
+Write-Host "  Creating event hub namespace $eventHubNamespaceName" -ForegroundColor DarkYellow
 $output = az eventhubs namespace create `
   --name $eventHubNamespaceName `
   --resource-group $resourceGroupName `
@@ -163,7 +117,7 @@ foreach ($eventHubListener in $eventHubListeners) {
 
 Write-Host "  Creating sender authorization rule" -ForegroundColor DarkYellow
 $output = az eventhubs namespace authorization-rule create `
-  --name sender `
+  --name Sender `
   --resource-group $resourceGroupName `
   --namespace-name $eventHubNamespaceName `
   --rights Send
@@ -187,10 +141,20 @@ foreach ($eventHubName in $eventHubNames) {
     --capture-interval 300 `
     --capture-size-limit 314572800 `
     --destination-name 'EventHubArchive.AzureBlockBlob' `
-    --storage-account $storageAccountId `
+    --storage-account (Get-StorageAccountId -storageAccountName $storageAccountName -resourceGroup $resourceGroupName) `
     --blob-container $dataCaptureContainer `
     --archive-name-format "$dataFolder/{Namespace}/{EventHub}/y={Year}/m={Month}/d={Day}/h={Hour}/{Year}_{Month}_{Day}_{Hour}_{Minute}_{Second}_{PartitionId}" `
     --skip-empty-archives true
+
+  Throw-WhenError -output $output
+
+  Write-Host "  Creating sender & listen authorization rule for event hub $($eventHubName)" -ForegroundColor DarkYellow
+  $output = az eventhubs eventhub authorization-rule create `
+    --name SendListen `
+    --eventhub-name $eventHubName `
+    --resource-group $resourceGroupName `
+    --namespace-name $eventHubNamespaceName `
+    --rights Send Listen
 
   Throw-WhenError -output $output
 }
