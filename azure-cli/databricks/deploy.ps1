@@ -122,7 +122,7 @@ If ($dbWorkspace.Count -eq 0) {
   Write-Host "  Deploying Databricks template" -ForegroundColor DarkYellow
   $output = az deployment group create `
     --resource-group $resourceGroupName `
-    --template-file "$PSScriptRoot\arm-templates\databricks-workspace.json" `
+    --template-file "databricks/arm-templates/databricks-workspace.json" `
     --parameters workspaceName=$databricksName
 
   Throw-WhenError -output $output
