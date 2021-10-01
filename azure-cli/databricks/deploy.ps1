@@ -205,7 +205,7 @@ Enable-SparkMonitoringToLogAnalytics `
 Write-Host "  Setting up pyodbc driver" -ForegroundColor DarkYellow
 
 dbfs mkdirs dbfs:/databricks/drivers
-dbfs cp --overwrite "$PSScriptRoot\utilities\drivers\msodbcsql17_17.7.2.1-1_amd64.deb" dbfs:/databricks/drivers/msodbcsql17_amd64.deb
+dbfs cp --overwrite (Resolve-Path -Relative "$PSScriptRoot\utilities\drivers\msodbcsql17_17.7.2.1-1_amd64.deb") dbfs:/databricks/drivers/msodbcsql17_amd64.deb
 
 Set-DatabricksGlobalInitScript `
   -workspaceUrl $workspaceUrl `
