@@ -3,10 +3,7 @@
   Deploys Azure Cosmos database
 
   .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Cosmos database instance using Azure CLI to a resource group in the relevant environment.
-
-  .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or Production
+  The deploy.ps1 script deploys an Azure Cosmos database account using Azure CLI to a resource group in the relevant environment.
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
@@ -27,15 +24,9 @@
   None. deploy.ps1 does not generate any output.
 
   .EXAMPLE
-  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -cosmosAccountName xxxxxxdevxxxcosmos
+  PS> .\deploy.ps1 -resourceGroupName xxx-DEV-xxx -cosmosAccountName xxxxxxdevxxxcosmos
 #>
 param (
-  [Parameter(Mandatory = $false)]
-  [ValidateNotNullOrEmpty()]
-  [ValidateSet('DevTest', 'Production')]
-  [string]
-  $environmentType = "DevTest",
-
   [Parameter(Mandatory = $false)]
   [ValidateNotNullOrEmpty()]
   [string]

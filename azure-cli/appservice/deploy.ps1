@@ -8,9 +8,6 @@
   .PARAMETER environmentType
   Specifies the environment type. Staging (DevTest) or Production
 
-  .PARAMETER environmentName
-  Specifies the environment name. E.g. Dev, Test etc.
-
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
 

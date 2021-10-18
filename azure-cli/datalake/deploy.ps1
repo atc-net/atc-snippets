@@ -5,9 +5,6 @@
   .DESCRIPTION
   The deploy.ps1 script deploys an Azure Data Lake using Azure CLI to a resource group in the relevant environment.
 
-  .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or Production
-
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
 
@@ -27,15 +24,9 @@
   None. deploy.ps1 does not generate any output.
 
   .EXAMPLE
-  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -dataLakeName xxxxxxdevxxxdls
+  PS> .\deploy.ps1 -resourceGroupName xxx-DEV-xxx -dataLakeName xxxxxxdevxxxdls
 #>
 param (
-  [Parameter(Mandatory = $false)]
-  [ValidateNotNullOrEmpty()]
-  [ValidateSet('DevTest', 'Production')]
-  [string]
-  $environmentType = "DevTest",
-
   [Parameter(Mandatory = $false)]
   [ValidateNotNullOrEmpty()]
   [string]
@@ -72,10 +63,13 @@ Write-Host "Provision Azure Data Lake" -ForegroundColor DarkGreen
 
 Write-Host "  Creating Azure Data Lake" -ForegroundColor DarkYellow
 
-$datalake = az storage account create --name $dataLakeName `
+$datalake = az storage account create `
+  --name $dataLakeName `
   --resource-group $resourceGroupName `
-  --location $location --sku Standard_LRS `
-  --kind StorageV2 --hns true `
+  --location $location `
+  --sku Standard_LRS `
+  --kind StorageV2 `
+  --hns true `
   --output tsv
 
 Throw-WhenError -output $datalake
