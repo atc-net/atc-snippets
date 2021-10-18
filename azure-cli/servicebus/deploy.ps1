@@ -5,9 +5,6 @@
   .DESCRIPTION
   The deploy.ps1 script deploys an Azure Service Bus Namespace instance using Azure CLI to a resource group in the relevant environment.
 
-  .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or Production
-
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
 
@@ -30,12 +27,6 @@
   None. deploy.ps1 does not generate any output.
 #>
 param (
-  [Parameter(Mandatory = $false)]
-  [ValidateNotNullOrEmpty()]
-  [ValidateSet('DevTest', 'Production')]
-  [string]
-  $environmentType = "DevTest",
-
   [Parameter(Mandatory = $false)]
   [ValidateNotNullOrEmpty()]
   [string]

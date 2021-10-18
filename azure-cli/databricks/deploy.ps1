@@ -5,9 +5,6 @@
   .DESCRIPTION
   The deploy.ps1 script deploys an Azure Databricks instance using Azure CLI to a resource group in the relevant environment.
 
-  .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or Production
-
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
 
@@ -21,18 +18,18 @@
   Specifies the tenant id
 
   .PARAMETER clientId
-   Specifies the client id for the Service Principle
+  Specifies the client id for the Service Principle
 
   .PARAMETER clientSecret
   Specifies the client secret for the Service Principle
 
-   .PARAMETER objectId
+  .PARAMETER objectId
   Specifies the object id for the Service Principle
 
   .PARAMETER logAnalyticsId
   Specifies the id for the log analytics workspace
 
-   .PARAMETER logAnalyticsKey
+  .PARAMETER logAnalyticsKey
   Specifies the primary for the log analytics workspace
 
   .PARAMETER resourceTags
@@ -45,12 +42,6 @@
   None. deploy.ps1 does not generate any output.
 #>
 param (
-  [Parameter(Mandatory = $false)]
-  [ValidateNotNullOrEmpty()]
-  [ValidateSet('DevTest', 'Production')]
-  [string]
-  $environmentType = "DevTest",
-
   [Parameter(Mandatory = $false)]
   [ValidateNotNullOrEmpty()]
   [string]
@@ -108,6 +99,7 @@ param (
 . "$PSScriptRoot\utilities\set_DatabricksGlobalInitScript.ps1"
 
 $subscriptionId = az account show --query id
+
 Throw-WhenError -output $subscriptionId
 
 ###############################################################################################

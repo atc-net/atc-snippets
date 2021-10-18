@@ -32,20 +32,13 @@ param (
 
   [ValidateNotNullOrEmpty()]
   [string]
-  $environmentName = "Dev",
-
-  [ValidateNotNullOrEmpty()]
-  [string]
-  $subscriptionId
+  $environmentName = "Dev"
 )
 
 Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 
 # import utility functions
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
-. "$PSScriptRoot\account\set_loginaccount.ps1"
-
-Set-LoginAccount -subscriptionId $subscriptionId
 
 $environmentConfig = [EnvironmentConfig]::new()
 $environmentConfig.EnvironmentName = $environmentName
@@ -68,7 +61,7 @@ $resourceTags = @(
 )
 
 & "$PSScriptRoot\deploy.initial.ps1" -environmentConfig $environmentConfig -namingConfig $namingConfig -resourceTags $resourceTags
-& "$PSScriptRoot\deploy.services.ps1" -tenantId $tenantId -environmentConfig $environmentConfig -namingConfig $namingConfig -resourceTags $resourceTags -subscriptionId $subscriptionId -sendGridApiKey $sendGridApiKey
+& "$PSScriptRoot\deploy.services.ps1" -environmentConfig $environmentConfig -namingConfig $namingConfig -resourceTags $resourceTags -subscriptionId $subscriptionId -sendGridApiKey $sendGridApiKey
 
 if ($?) {
   Write-Host "Deployment successful" -ForegroundColor Green

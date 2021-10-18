@@ -21,9 +21,6 @@
   None. deploy.services.ps1 does not generate any output.
 #>
 param (
-  [Parameter(Mandatory = $false)]
-  [string] $tenantId,
-
   [Parameter(Mandatory = $true)]
   [EnvironmentConfig] $environmentConfig,
 
@@ -54,9 +51,7 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 # Install required extensions
 . "$PSScriptRoot\extensions.ps1"
 
-if (!$tenantId) {
-  $tenantId = (az account show --query tenantId).Replace('"','')
-}
+$tenantId = (az account show --query tenantId).Replace('"','')
 
 #############################################################################################
 # Resource naming section
@@ -158,8 +153,6 @@ $logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -reso
 #############################################################################################
 & "$PSScriptRoot\aks\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
-  -environmentName $environmentConfig.environmentName `
-  -systemName $namingConfig.systemName `
   -aksClusterName $aksClusterName `
   -logAnalyticsId $logAnalyticsId `
   -registryName $registryName `

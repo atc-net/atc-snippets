@@ -5,14 +5,8 @@
   .DESCRIPTION
   The deploy.ps1 script deploys an Azure Kubernetes Cluster using Azure CLI to a resource group in the relevant environment.
 
-  .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or Production
-
   .PARAMETER environmentName
   Specifies the environment name. E.g. Dev, Test etc.
-
-  .PARAMETER systemName
-  Specifies the system name
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
@@ -20,7 +14,7 @@
   .PARAMETER resourceGroupName
   Specifies the name of the resource group
 
-    .PARAMETER logAnalyticsId
+  .PARAMETER logAnalyticsId
   Specifies the id of the Log Analytics workspace
 
   .PARAMETER aksClusterName
@@ -32,7 +26,7 @@
   .PARAMETER clientId
   Specifies the id of the service principle
 
-    .PARAMETER clientSecret
+  .PARAMETER clientSecret
   Specifies the secret for the service principle
 
   .PARAMETER resourceTags
@@ -46,20 +40,6 @@
 
 #>
 param (
-  [Parameter(Mandatory = $false)]
-  [ValidateNotNullOrEmpty()]
-  [ValidateSet('DevTest', 'Production')]
-  [string]
-  $environmentType = "DevTest",
-
-  [Parameter(Mandatory = $true)]
-  [string]
-  $environmentName,
-
-  [Parameter(Mandatory = $true)]
-  [string]
-  $systemName,
-
   [Parameter(Mandatory = $false)]
   [ValidateNotNullOrEmpty()]
   [string]
@@ -122,9 +102,7 @@ $output = az aks create `
   --no-ssh-key `
   --service-principal $clientId `
   --client-secret (ConvertTo-PlainText $clientSecret) `
-  --tags `
-    Env=$environmentName `
-    System=$systemName
+  --tags $resourceTags `
 
 Throw-WhenError -output $output
 

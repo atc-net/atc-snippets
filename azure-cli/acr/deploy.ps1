@@ -5,14 +5,11 @@
   .DESCRIPTION
   The deploy.ps1 script deploys an Azure Container Registry instance using Azure CLI to a resource group in the relevant environment.
 
-  .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or Production
+  .PARAMETER resourceGroupName
+  Specifies the name of the resource group
 
   .PARAMETER location
   Specifies the location where the services are deployed. Default is West Europe
-
-  .PARAMETER resourceGroupName
-  Specifies the name of the resource group
 
   .PARAMETER registryName
   Specifies the name of the Container Registry
@@ -27,24 +24,18 @@
   None. deploy.ps1 does not generate any output.
 
   .EXAMPLE
-  PS> .\deploy.ps1 -environmentType DevTest -environmentName Dev -resourceGroupName xxx-DEV-xxx -registryName xxxxxxdevxxxcr
+  PS> .\deploy.ps1 -resourceGroupName xxx-DEV-xxx -registryName xxxxxxdevxxxcr
 #>
 param (
-  [Parameter(Mandatory = $false)]
+  [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
-  [ValidateSet('DevTest', 'Production')]
   [string]
-  $environmentType = "DevTest",
+  $resourceGroupName,
 
   [Parameter(Mandatory = $false)]
   [ValidateNotNullOrEmpty()]
   [string]
   $location = "westeurope",
-
-  [Parameter(Mandatory = $true)]
-  [ValidateNotNullOrEmpty()]
-  [string]
-  $resourceGroupName,
 
   [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
@@ -63,6 +54,7 @@ Write-Host "Provision Azure Container Registry" -ForegroundColor DarkGreen
 Write-Host "  Creating Azure Container Registry" -ForegroundColor DarkYellow
 $containerRegistryLoginServer = az acr create `
   --resource-group $resourceGroupName `
+  --location $location `
   --name $registryName `
   --sku Standard `
   --admin-enabled `

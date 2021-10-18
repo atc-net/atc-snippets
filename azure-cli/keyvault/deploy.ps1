@@ -23,7 +23,7 @@
   .PARAMETER resourceTags
   Specifies the tag elements that will be used to tag the deployed services
 
-   .PARAMETER developerIdentities
+  .PARAMETER developerIdentities
   Object IDs from Azure AD to grant access for developers to read key vault in Development/Dev environments. This should be replaced with a single Azure AD group where these identities/users a added
 
   .INPUTS
