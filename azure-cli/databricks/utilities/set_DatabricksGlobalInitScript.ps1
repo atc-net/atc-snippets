@@ -1,21 +1,21 @@
 function Set-DatabricksGlobalInitScript {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $workspaceUrl,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $bearerToken,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $initScriptName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $initScriptContent
@@ -50,10 +50,10 @@ function Set-DatabricksGlobalInitScript {
 
   $base64 = ConvertTo-Base64String $initScriptContent
   $request = @{
-    name = $initScriptName
-    script = $base64
+    name     = $initScriptName
+    script   = $base64
     position = 0
-    enabled = "true"
+    enabled  = "true"
   }
 
   Write-Host "  Creating new global init script called $initScriptName" -ForegroundColor DarkYellow

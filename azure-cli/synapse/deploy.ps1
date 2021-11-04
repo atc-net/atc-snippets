@@ -30,33 +30,33 @@
   None. deploy.ps1 does not generate any output.
 #>
 param (
-    [Parameter(Mandatory = $false)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $location = "westeurope",
+  [Parameter(Mandatory = $false)]
+  [ValidateNotNullOrEmpty()]
+  [string]
+  $location = "westeurope",
 
-    [Parameter(Mandatory = $true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $resourceGroupName,
+  [Parameter(Mandatory = $true)]
+  [ValidateNotNullOrEmpty()]
+  [string]
+  $resourceGroupName,
 
-    [Parameter(Mandatory = $true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $synapseWorkspaceName,
+  [Parameter(Mandatory = $true)]
+  [ValidateNotNullOrEmpty()]
+  [string]
+  $synapseWorkspaceName,
 
-    [Parameter(Mandatory = $true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $storageAccountName,
+  [Parameter(Mandatory = $true)]
+  [ValidateNotNullOrEmpty()]
+  [string]
+  $storageAccountName,
 
-    [Parameter(Mandatory = $true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $keyVaultName,
+  [Parameter(Mandatory = $true)]
+  [ValidateNotNullOrEmpty()]
+  [string]
+  $keyVaultName,
 
-    [Parameter(Mandatory = $false)]
-    [string[]] $resourceTags = @()
+  [Parameter(Mandatory = $false)]
+  [string[]] $resourceTags = @()
 )
 
 #############################################################################################
@@ -94,7 +94,8 @@ if (!$?) {
     --value $synapseServerPassword
 
   Throw-WhenError -output $output
-} else {
+}
+else {
   Write-Host "  SynapseServerPassword already exists, skipping creation" -ForegroundColor DarkYellow
 }
 
@@ -107,13 +108,13 @@ az storage fs create -n $storageContainer --account-name $storageAccountName
 Write-Host "  Creating synapse workspace" -ForegroundColor DarkYellow
 
 az synapse workspace create `
-    --name $synapseWorkspaceName `
-    --resource-group $resourceGroupName `
-    --storage-account $storageAccountName `
-    --file-system $storageContainer `
-    --sql-admin-login-user $synapseAdminLoginUser `
-    --sql-admin-login-password $synapseServerPassword `
-    --location $location
+  --name $synapseWorkspaceName `
+  --resource-group $resourceGroupName `
+  --storage-account $storageAccountName `
+  --file-system $storageContainer `
+  --sql-admin-login-user $synapseAdminLoginUser `
+  --sql-admin-login-password $synapseServerPassword `
+  --location $location
 
 #############################################################################################
 # Provision Synapse SQL Pool
@@ -121,7 +122,7 @@ az synapse workspace create `
 Write-Host "Provision Synapse SQL Pool" -ForegroundColor DarkGreen
 
 az synapse sql pool create `
-   --resource-group $resourceGroupName `
-   --name sqlpool `
-   --performance-level "DW1000c" `
-   --workspace-name $synapseWorkspaceName
+  --resource-group $resourceGroupName `
+  --name sqlpool `
+  --performance-level "DW1000c" `
+  --workspace-name $synapseWorkspaceName

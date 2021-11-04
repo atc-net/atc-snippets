@@ -4,8 +4,7 @@ function Throw-WhenError {
     $output
   )
 
-  if ($LastExitCode -gt 0)
-  {
+  if ($LastExitCode -gt 0) {
     Write-Error $output
     throw
   }
@@ -13,7 +12,7 @@ function Throw-WhenError {
 
 function ConvertTo-PlainText {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [securestring]
     $secret
   )
@@ -23,7 +22,7 @@ function ConvertTo-PlainText {
 
 function ConvertTo-Base64String {
   param (
-    [Parameter(ValueFromPipeline, Mandatory=$true)]
+    [Parameter(ValueFromPipeline, Mandatory = $true)]
     [string]
     $text
   )

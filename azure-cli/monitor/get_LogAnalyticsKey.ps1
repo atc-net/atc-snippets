@@ -1,10 +1,10 @@
 function Get-LogAnalyticsKey {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $logAnalyticsName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $resourceGroup
   )

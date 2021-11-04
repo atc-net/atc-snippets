@@ -1,14 +1,14 @@
-function Get-IoTHubServiceApiConnectionString{
+function Get-IoTHubServiceApiConnectionString {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $iotHubName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $iotHubSasPolicyNameWebApi,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $resourceGroupName
   )
@@ -16,11 +16,11 @@ function Get-IoTHubServiceApiConnectionString{
   Write-Host "  Query for IoTHub SasPolicy" -ForegroundColor DarkYellow
 
   $sasPolicyPrimaryApiKey = az iot hub policy show `
-  --hub-name $iotHubName `
-  --name $iotHubSasPolicyNameWebApi `
-  --resource-group $resourceGroupName `
-  --query primaryKey `
-  --output tsv
+    --hub-name $iotHubName `
+    --name $iotHubSasPolicyNameWebApi `
+    --resource-group $resourceGroupName `
+    --query primaryKey `
+    --output tsv
 
   Throw-WhenError -output $sasPolicyPrimaryApiKey
 

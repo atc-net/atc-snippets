@@ -29,19 +29,19 @@ function Set-KeyVaultSecret {
 
 function Set-KeyVaultSecretPlain {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $keyVaultName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $resourceGroupName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $secretName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $secretPlain
@@ -59,7 +59,8 @@ function Set-KeyVaultSecretPlain {
 
     Throw-WhenError -output $output
 
-  } else {
+  }
+  else {
     Write-Host "  $secretName already exists, skipping creation" -ForegroundColor DarkYellow
   }
 }

@@ -1,26 +1,26 @@
-function Add-DataLakeRoutingEndpoint{
+function Add-DataLakeRoutingEndpoint {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $iotHubName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $subscriptionId,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $storageConnectionString,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $resourceGroup
   )
 
   $routeExist = az iot hub route test -g $resourceGroup `
-      --hub-name $iotHubName `
-      --route-name data-lake-routing `
-      --query result
+    --hub-name $iotHubName `
+    --route-name data-lake-routing `
+    --query result
 
   if ($routeExist) {
     Write-Host "  Deleting old IoTHub to data lake route" -ForegroundColor DarkYellow
@@ -66,7 +66,8 @@ function Add-DataLakeRoutingEndpoint{
 
     Throw-WhenError $output
 
-  } else {
+  }
+  else {
     Write-Host "  Adding IoTHub to data lake routing" -ForegroundColor DarkYellow
 
     Write-Host "  Creating IoTHub to data lake routing-endpoint." -ForegroundColor DarkYellow

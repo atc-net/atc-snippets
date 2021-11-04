@@ -73,10 +73,10 @@ Write-Host "Provision Azure SQL server" -ForegroundColor DarkGreen
 #############################################################################################
 
 $sqlServerUserName = 'sqlsrvadmin'
-$defaultDbSpecs = @{edition = "Standard";  serviceObjective = "s0";  maxDataSize = 250GB;  zoneRedundant = $False}
-$readUser = @{Name = "ReadDbUser"; Password = ""; Read = $True; Write = $False; Create = $False; Exec = $False}
+$defaultDbSpecs = @{edition = "Standard"; serviceObjective = "s0"; maxDataSize = 250GB; zoneRedundant = $False }
+$readUser = @{Name = "ReadDbUser"; Password = ""; Read = $True; Write = $False; Create = $False; Exec = $False }
 $sqlDatabases = @(
-  @{ Area = 'Default';  Name = $dbName;   ConnnectionName = 'DefaultSqlConnection';   Users = @($readUser);  Spec = $defaultDbSpecs}
+  @{ Area = 'Default'; Name = $dbName; ConnnectionName = 'DefaultSqlConnection'; Users = @($readUser); Spec = $defaultDbSpecs }
 )
 
 #############################################################################################
@@ -100,7 +100,8 @@ if (!$?) {
     --value $sqlServerPassword
 
   Throw-WhenError -output $output
-} else {
+}
+else {
   Write-Host "  SqlServerPassword already exists, skipping creation" -ForegroundColor DarkYellow
 }
 
@@ -129,7 +130,8 @@ foreach ($sqlDatabase in $sqlDatabases) {
 
       Throw-WhenError -output $output
 
-    } else {
+    }
+    else {
       Write-Host "  $passwordName already exists, skipping creation" -ForegroundColor DarkYellow
     }
 
@@ -152,9 +154,8 @@ foreach ($sqlDatabase in $sqlDatabases) {
     -user $sqlServerUserName `
     -password $sqlServerPassword
 
-  if($sqlArea -eq "Default")
-  {
-      $defaultDbConnectionString = $sqlConnectionString
+  if ($sqlArea -eq "Default") {
+    $defaultDbConnectionString = $sqlConnectionString
   }
 
   $output = az keyvault secret show `
@@ -171,7 +172,8 @@ foreach ($sqlDatabase in $sqlDatabases) {
       --value $sqlConnectionString
 
     Throw-WhenError -output $output
-  } else {
+  }
+  else {
     Write-Host "  $sqlArea SqlConnection already exists, skipping creation" -ForegroundColor DarkYellow
   }
 }
@@ -223,7 +225,7 @@ foreach ($sqlDatabase in $sqlDatabases) {
     $username = $sqlDatabaseUser.Name
     $password = $sqlDatabaseUser.Password
 
-    $queryVariables = "Username=$username","Password=$password"
+    $queryVariables = "Username=$username", "Password=$password"
 
     Write-Host "  Creating database login for $username" -ForegroundColor DarkYellow
     Invoke-Sqlcmd -ServerInstance $sqlServerInstance `
@@ -264,7 +266,7 @@ foreach ($sqlDatabase in $sqlDatabases) {
     $CreateRights = $sqlDatabaseUser.Create
     $ExecRights = $sqlDatabaseUser.Exec
 
-    $queryVariables = "Username=$username","ReadRights=$ReadRights","WriteRights=$WriteRights","CreateRights=$CreateRights","ExecRights=$ExecRights"
+    $queryVariables = "Username=$username", "ReadRights=$ReadRights", "WriteRights=$WriteRights", "CreateRights=$CreateRights", "ExecRights=$ExecRights"
 
     Write-Host "  Creating $username on $sqlArea sql database" -ForegroundColor DarkYellow
     Invoke-Sqlcmd -ServerInstance $sqlServerInstance `
