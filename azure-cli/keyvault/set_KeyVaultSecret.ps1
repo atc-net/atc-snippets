@@ -47,20 +47,53 @@ function Set-KeyVaultSecretPlain {
     $secretPlain
   )
 
-  $output = Get-KeyVaultSecret -keyVaultName $keyVaultName -secretName $secretName
+  . "$PSScriptRoot\get_KeyVaultSecret.ps1"
+  . "$PSScriptRoot\recoverKeyVaultSecret.ps1"
+  . "$PSScriptRoot\verifyKeyVaultSecret.ps1"
 
-  if ($secretPlain -ne $output) {
+  Write-Host "  Setting $secretName secret" -ForegroundColor DarkYellow
 
-    Write-Host "  Creating $secretName secret" -ForegroundColor DarkYellow
-    $output = az keyvault secret set `
-      --vault-name $keyVaultName `
-      --name $secretName `
-      --value $secretPlain
+  $alreadySet = VerifyKeyVaultSecret `
+    -keyVaultName $keyVaultName `
+    -secretName $secretName `
+    -secretPlain $secretPlain
 
-    Throw-WhenError -output $output
-
+  if ($alreadySet) {
+    Write-Host "  $secretName already has correct value" -ForegroundColor DarkYellow
+    return
   }
-  else {
-    Write-Host "  $secretName already exists, skipping creation" -ForegroundColor DarkYellow
+
+  # The loop below handles a number of different edge cases
+  # that can occur when a secret has been soft deleted, and must first
+  # be recovered before an new secret value can be written to it.
+  while ($true) {
+    $err = $( $output = az keyvault secret set `
+        --vault-name $keyVaultName `
+        --name $secretName `
+        --value $secretPlain ) 2>&1
+
+    if ($err) {
+      if ($err -like "*Secret $secretName is currently in a deleted but recoverable state, and its name cannot be reused; in this state, the secret can only be recovered or purged.*") {
+        Write-Host "  Secret was soft-deleted. Recovering $secretName secret" -ForegroundColor DarkYellow
+
+        $output = RecoverKeyVaultSecret `
+          -keyVaultName $keyVaultName `
+          -secretName $secretName
+
+        Throw-WhenError -output $err
+
+        if ($secretPlain -eq $output) {
+          Write-Host "  Recovered $secretName secret has correct value" -ForegroundColor DarkYellow
+          break
+        }
+      }
+      else {
+        Throw-WhenError -output $err
+      }
+    }
+    else {
+      Write-Host "  $secretName secret set" -ForegroundColor DarkYellow
+      break
+    }
   }
 }
