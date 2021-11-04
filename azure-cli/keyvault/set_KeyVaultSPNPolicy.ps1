@@ -29,21 +29,21 @@ function Set-KeyVaultSPNPolicy {
     -namingConfig $namingConfig `
     -serviceInstance $serviceInstance
 
-    Write-Host "  Querying $clientIdName secret" -ForegroundColor DarkYellow
-    $clientId = az keyvault secret show `
+  Write-Host "  Querying $clientIdName secret" -ForegroundColor DarkYellow
+  $clientId = az keyvault secret show `
     --name $clientIdName `
     --vault-name $envKeyVaultName `
     --query value `
     --output tsv
 
-    Throw-WhenError -output $clientId
+  Throw-WhenError -output $clientId
 
-    Write-Host "  Grant access to the spn $clientId" -ForegroundColor DarkYellow
-    $output = az keyvault set-policy `
-      --name $keyVaultName `
-      --resource-group $resourceGroupName `
-      --spn $clientId `
-      --secret-permissions list get set
+  Write-Host "  Grant access to the spn $clientId" -ForegroundColor DarkYellow
+  $output = az keyvault set-policy `
+    --name $keyVaultName `
+    --resource-group $resourceGroupName `
+    --spn $clientId `
+    --secret-permissions list get set
 
-    Throw-WhenError -output $output
+  Throw-WhenError -output $output
 }

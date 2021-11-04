@@ -106,14 +106,14 @@ Write-Host "Provision function app" -ForegroundColor DarkGreen
 
 Write-Host "  Creating function app" -ForegroundColor DarkYellow
 $output = az functionapp create `
---name $functionName `
---resource-group $resourceGroupName `
---storage-account $storageAccountId `
---app-insights-key $instrumentationKey `
---plan $appServicePlanId `
---runtime dotnet `
---functions-version 3 `
---tags $resourceTags
+  --name $functionName `
+  --resource-group $resourceGroupName `
+  --storage-account $storageAccountId `
+  --app-insights-key $instrumentationKey `
+  --plan $appServicePlanId `
+  --runtime dotnet `
+  --functions-version 3 `
+  --tags $resourceTags
 
 Throw-WhenError -output $output
 
@@ -148,7 +148,7 @@ $output = az functionapp config appsettings set `
   --name $functionName `
   --resource-group $resourceGroupName `
   --settings `
-    FunctionOptions__EnvironmentName=$environmentName `
-    FunctionOptions__EnvironmentType=$environmentType
+  FunctionOptions__EnvironmentName=$environmentName `
+  FunctionOptions__EnvironmentType=$environmentType
 
 Throw-WhenError -output $output

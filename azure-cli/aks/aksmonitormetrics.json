@@ -3,8 +3,8 @@
     "category": "AllMetrics",
     "enabled": true,
     "retentionPolicy": {
-    "days": 0,
-    "enabled": false
+      "days": 0,
+      "enabled": false
     },
     "timeGrain": null
   }

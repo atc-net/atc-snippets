@@ -1,26 +1,26 @@
 function Set-DatabricksSpnAdminUser {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $tenantId,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $clientId,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [securestring]
     $clientSecret,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $workspaceUrl,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $resourceId
@@ -45,8 +45,8 @@ function Set-DatabricksSpnAdminUser {
   # See https://docs.microsoft.com/en-us/azure/databricks/dev-tools/api/latest/aad/service-prin-aad-token#admin-user-login
 
   $headers = @{
-    'Authorization' = "Bearer $bearerToken"
-    'X-Databricks-Azure-SP-Management-Token' = $managementToken
+    'Authorization'                            = "Bearer $bearerToken"
+    'X-Databricks-Azure-SP-Management-Token'   = $managementToken
     'X-Databricks-Azure-Workspace-Resource-Id' = $resourceId
   }
 

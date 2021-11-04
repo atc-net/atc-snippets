@@ -1,10 +1,10 @@
 function Get-ApplicationInsightsId {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $name,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $resourceGroup
   )

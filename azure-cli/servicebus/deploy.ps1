@@ -42,7 +42,7 @@ param (
   [string]
   $serviceBusName,
 
-  [Parameter(Mandatory=$true)]
+  [Parameter(Mandatory = $true)]
   [string]
   $logAnalyticsId,
 
@@ -68,25 +68,24 @@ Throw-WhenError -output $serviceBusId
 
 Write-Host "  Configuring Send/Listen access policy" -ForegroundColor DarkYellow
 $output = az servicebus namespace authorization-rule create `
-	--resource-group $resourceGroupName `
-	--namespace-name $serviceBusName `
-	--name 'SendListenAccessKey' `
-	--rights Listen Send
+  --resource-group $resourceGroupName `
+  --namespace-name $serviceBusName `
+  --name 'SendListenAccessKey' `
+  --rights Listen Send
 
 Throw-WhenError -output $output
 
 Write-Host "  Provision Service Bus Topics" -ForegroundColor DarkYellow
 Foreach ($topic in @(
-	'events'
-	))
-{
-	Write-Host "    Provisioning topic $topic" -ForegroundColor DarkYellow
-	$output = az servicebus topic create `
-		--resource-group $resourceGroupName `
-		--namespace-name $serviceBusName `
-		--name $topic
+    'events'
+  )) {
+  Write-Host "    Provisioning topic $topic" -ForegroundColor DarkYellow
+  $output = az servicebus topic create `
+    --resource-group $resourceGroupName `
+    --namespace-name $serviceBusName `
+    --name $topic
 
-	Throw-WhenError -output $output
+  Throw-WhenError -output $output
 }
 
 Write-Host "  Creating Diagnostic Settings for all logs and metrics" -ForegroundColor DarkYellow

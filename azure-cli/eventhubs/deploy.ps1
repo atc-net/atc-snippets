@@ -74,8 +74,8 @@ $eventHubListeners = @(
 
 # Max 50 characters for Name - since consumergroup names can only be of this size!
 $eventHubConsumerGroups = @(
-  @{ EventHub = 'xxxEvents';          Name = 'Ingestion' },
-  @{ EventHub = 'yyyEvents';          Name = 'Ingestion' }
+  @{ EventHub = 'xxxEvents'; Name = 'Ingestion' },
+  @{ EventHub = 'yyyEvents'; Name = 'Ingestion' }
 )
 
 $dataCaptureContainer = 'landingzone'
@@ -151,15 +151,15 @@ foreach ($eventHubName in $eventHubNames) {
 
 Write-Host "  Creating consumer groups for eventhubs in namespace $eventHubNamespaceName" -ForegroundColor DarkYellow
 foreach ($eventHubConsumerGroup in $eventHubConsumerGroups) {
-    $consumerGroupName = $eventHubConsumerGroup.Name
-    $eventHubName = $eventHubConsumerGroup.EventHub
+  $consumerGroupName = $eventHubConsumerGroup.Name
+  $eventHubName = $eventHubConsumerGroup.EventHub
 
-    Write-Host "  Create consumer-group $consumerGroupName on eventhub $eventHubName" -ForegroundColor DarkYellow
-    $output = az eventhubs eventhub consumer-group create `
-      --eventhub-name $eventHubName `
-      --resource-group $resourceGroupName `
-      --namespace-name $eventHubNamespaceName `
-      --name $consumerGroupName
+  Write-Host "  Create consumer-group $consumerGroupName on eventhub $eventHubName" -ForegroundColor DarkYellow
+  $output = az eventhubs eventhub consumer-group create `
+    --eventhub-name $eventHubName `
+    --resource-group $resourceGroupName `
+    --namespace-name $eventHubNamespaceName `
+    --name $consumerGroupName
 
-    Throw-WhenError -output $output
+  Throw-WhenError -output $output
 }

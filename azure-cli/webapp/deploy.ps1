@@ -109,10 +109,10 @@ Throw-WhenError -output $output
 
 Write-Host "  Configure web app" -ForegroundColor DarkYellow
 $output = az webapp config set `
- --name $apiName `
- --resource-group $resourceGroupName `
- --min-tls-version '1.2' `
- --use-32bit-worker-process false
+  --name $apiName `
+  --resource-group $resourceGroupName `
+  --min-tls-version '1.2' `
+  --use-32bit-worker-process false
 
 Throw-WhenError -output $output
 
@@ -134,13 +134,13 @@ Throw-WhenError -output $output
 
 Write-Host "  Apply web app settings" -ForegroundColor DarkYellow
 $output = az webapp config appsettings set `
- --name $apiName `
- --resource-group $resourceGroupName `
- --settings `
-   ApplicationInsights__InstrumentationKey=$instrumentationKey `
-   APPINSIGHTS_INSTRUMENTATIONKEY=$instrumentationKey `
-   ServiceOptions__EnvironmentName=$environmentName `
-   ServiceOptions__EnvironmentType=$environmentType
+  --name $apiName `
+  --resource-group $resourceGroupName `
+  --settings `
+  ApplicationInsights__InstrumentationKey=$instrumentationKey `
+  APPINSIGHTS_INSTRUMENTATIONKEY=$instrumentationKey `
+  ServiceOptions__EnvironmentName=$environmentName `
+  ServiceOptions__EnvironmentType=$environmentType
 
 Throw-WhenError -output $output
 

@@ -1,15 +1,14 @@
-function Get-IoTHubServiceFunctionEventHubEndpointConnection
-{
+function Get-IoTHubServiceFunctionEventHubEndpointConnection {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $iotHubName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $iotHubSasPolicyNameFunctionApp,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $sasPolicyPrimaryFunctionKey
   )

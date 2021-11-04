@@ -1,6 +1,6 @@
 function New-DatabricksJob {
   param (
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [ValidateSet('DevTest', 'Production')]
     [string]
@@ -16,7 +16,7 @@ function New-DatabricksJob {
     [string]
     $notebookPath,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [object]
     $notebookParameters,
 
@@ -148,19 +148,20 @@ function New-DatabricksJob {
 
   if ($clusterId) {
     $job.existing_cluster_id = $clusterId
-  } else {
+  }
+  else {
     $job.new_cluster = @{
-      spark_version         = $sparkVersion
-      spark_env_vars        = $pysparkEnvironmentVariables
-      spark_conf = @{
-        "spark.sql.streaming.schemaInference" = $true;
-        "spark.databricks.delta.preview.enabled" = $true;
+      spark_version  = $sparkVersion
+      spark_env_vars = $pysparkEnvironmentVariables
+      spark_conf     = @{
+        "spark.sql.streaming.schemaInference"             = $true;
+        "spark.databricks.delta.preview.enabled"          = $true;
         "spark.databricks.delta.schema.autoMerge.enabled" = $true;
-        "spark.databricks.io.cache.enabled" = $true;
+        "spark.databricks.io.cache.enabled"               = $true;
       }
-      custom_tags = @{
-        "JobName"          = $name
-        "Notebook"         = $notebookPath
+      custom_tags    = @{
+        "JobName"  = $name
+        "Notebook" = $notebookPath
       }
     }
 
@@ -173,15 +174,17 @@ function New-DatabricksJob {
         min_workers = $minWorkers
         max_workers = $maxWorkers
       }
-    } else {
+    }
+    else {
       $job.new_cluster.num_workers = $numberOfWorkers
     }
 
     if ($clusterPoolId) {
-      $job.new_cluster.instance_pool_id      = $clusterPoolId
-    } else {
-      $job.new_cluster.node_type_id          = $clusterNodeType
-      $job.new_cluster.enable_elastic_disk   = $enableElasticDisk
+      $job.new_cluster.instance_pool_id = $clusterPoolId
+    }
+    else {
+      $job.new_cluster.node_type_id = $clusterNodeType
+      $job.new_cluster.enable_elastic_disk = $enableElasticDisk
     }
   }
 
@@ -294,7 +297,7 @@ function Reset-DatabricksJobsByName {
   Write-Host $message
 
   foreach ($job in $list.jobs) {
-    if($job.settings.name -in $jobArray) {
+    if ($job.settings.name -in $jobArray) {
       $message = "  Deleting Job: " + $job.settings.name + " (ID=" + $job.job_id + ")"
       Write-Host $message
 
@@ -369,24 +372,24 @@ function New-DatabricksCluster {
     init_scripts            = @()
     spark_env_vars          = $pysparkEnvironmentVariables + $environmentVariables
     spark_conf              = @{
-      "spark.sql.streaming.schemaInference"    = $true;
-      "spark.databricks.delta.preview.enabled" = $true;
+      "spark.sql.streaming.schemaInference"             = $true;
+      "spark.databricks.delta.preview.enabled"          = $true;
       "spark.databricks.delta.schema.autoMerge.enabled" = $true;
-      "spark.databricks.io.cache.enabled" = $true;
+      "spark.databricks.io.cache.enabled"               = $true;
     }
     custom_tags             = @{}
     autoscale               = @{
-      min_workers           = $minWorkers
-      max_workers           = $maxWorkers
+      min_workers = $minWorkers
+      max_workers = $maxWorkers
     }
   }
 
   if ($highConcurrency) {
     $cluster.spark_conf = @{
-      "spark.databricks.cluster.profile" = "serverless"
+      "spark.databricks.cluster.profile"       = "serverless"
       "spark.databricks.repl.allowedLanguages" = "sql,python,r"
     }
-    $cluster.custom_tags = @{ 
+    $cluster.custom_tags = @{
       ResourceClass = "Serverless"
     }
   }
@@ -472,12 +475,12 @@ function New-DatabricksLibrary {
 
 function Revoke-DatabricksPersonalAccessTokens {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $workspaceUrl,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $bearerToken
@@ -512,17 +515,17 @@ function Revoke-DatabricksPersonalAccessTokens {
 
 function Revoke-DatabricksSpnAdminUser {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $workspaceUrl,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $bearerToken,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $clientId
@@ -597,12 +600,12 @@ function New-DatabricksInstancePool {
   )
 
   $pool = @{
-    instance_pool_name = $name
-    node_type_id = $clusterNodeType
+    instance_pool_name                    = $name
+    node_type_id                          = $clusterNodeType
     idle_instance_autotermination_minutes = $autoTerminationMinutes
-    min_idle_instances = $minIdleInstances
-    max_capacity = $maxCapacity
-    preloaded_spark_versions = @($sparkVersion)
+    min_idle_instances                    = $minIdleInstances
+    max_capacity                          = $maxCapacity
+    preloaded_spark_versions              = @($sparkVersion)
   }
 
   Set-Content ./pool.json ($pool | ConvertTo-Json)
@@ -770,107 +773,104 @@ function Copy-DatabricksSecrets {
 
 function ClusterUpdateRequired {
   param (
-      [Parameter(Mandatory = $true)]
-      [ValidateNotNullOrEmpty()]
-      [hashtable]
-      $newSettings,
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [hashtable]
+    $newSettings,
 
-      [Parameter(Mandatory = $true)]
-      [ValidateNotNullOrEmpty()]
-      [PSCustomObject]
-      $currentSettings
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [PSCustomObject]
+    $currentSettings
   )
 
   $attributesToCheck = @("cluster_name", "spark_version", "node_type_id", "driver_node_type_id", "autotermination_minutes", "enable_elastic_disk", "spark_env_vars", "spark_conf", "custom_tags", "autoscale", "init_scripts")
 
   foreach ($h in $attributesToCheck) {
-      $newValue = $newSettings.Item($h)
-      $currentValue = $currentSettings.$h
+    $newValue = $newSettings.Item($h)
+    $currentValue = $currentSettings.$h
 
-      if(($newValue.GetType().Name -eq "Hashtable")) {
-          foreach ($k in $newValue.Keys) {
-              if($newValue.Item($k) -ne $currentValue.$k) {
-                  Write-Host "New Setting {$h} {$k}: ${newValue}: ${currentValue}"
-                  return $true
-              }
-          }
-      } else {
-          if($newValue -ne $currentValue) {
-              Write-Host "New Setting {$h}: ${newValue}: ${currentValue}"
-              return $true
-          }
+    if (($newValue.GetType().Name -eq "Hashtable")) {
+      foreach ($k in $newValue.Keys) {
+        if ($newValue.Item($k) -ne $currentValue.$k) {
+          Write-Host "New Setting {$h} {$k}: ${newValue}: ${currentValue}"
+          return $true
+        }
       }
+    }
+    else {
+      if ($newValue -ne $currentValue) {
+        Write-Host "New Setting {$h}: ${newValue}: ${currentValue}"
+        return $true
+      }
+    }
   }
   return $false
 }
 
-function Set-DatabricksPermission
-{
-    param (
-        [parameter(Mandatory=$false)]
-        [string]$BearerToken,
+function Set-DatabricksPermission {
+  param (
+    [parameter(Mandatory = $false)]
+    [string]$BearerToken,
 
-        [parameter(Mandatory=$false)]
-        [string]$Region,
+    [parameter(Mandatory = $false)]
+    [string]$Region,
 
-        [parameter(Mandatory=$true)]
-        [string]$Principal,
+    [parameter(Mandatory = $true)]
+    [string]$Principal,
 
-        [parameter(Mandatory=$false)]
-        [ValidateSet('user_name','group_name','service_principal_name')]
-        [string]$PrincipalType = 'user_name',
+    [parameter(Mandatory = $false)]
+    [ValidateSet('user_name', 'group_name', 'service_principal_name')]
+    [string]$PrincipalType = 'user_name',
 
-        [Parameter(Mandatory=$true)]
-        [string]$PermissionLevel,
+    [Parameter(Mandatory = $true)]
+    [string]$PermissionLevel,
 
-        [Parameter(Mandatory=$true)]
-        [ValidateSet('jobs','clusters','instance-pools', 'secretScopes')]
-        [string]$DatabricksObjectType,
+    [Parameter(Mandatory = $true)]
+    [ValidateSet('jobs', 'clusters', 'instance-pools', 'secretScopes')]
+    [string]$DatabricksObjectType,
 
-        [Parameter(Mandatory=$true)]
-        [string]$DatabricksObjectId
-    )
+    [Parameter(Mandatory = $true)]
+    [string]$DatabricksObjectId
+  )
 
-    $Headers = @{"Authorization"="Bearer $BearerToken"}
+  $Headers = @{"Authorization" = "Bearer $BearerToken" }
 
-    if ($DatabricksObjectType -eq "secretScope"){
-        $URI = "https://$Region.azuredatabricks.net/api/2.0/secrets/acls/put"
-        $Body = @{scope=$DatabricksObjectId; principal=$Principal; permission=$PermissionLevel} | ConvertTo-Json -Depth 10
-        try{
-            Write-Verbose $Body
-            $Response = Invoke-RestMethod -Method POST -Body $Body -Uri $URI -Headers $Headers
-        }
-        catch{
-            $err = $_.ErrorDetails.Message
-            if ($err.Contains('exists'))
-            {
-                Write-Verbose $err
-            }
-            else
-            {
-                throw $err
-            }
-        }
-        return $Response
+  if ($DatabricksObjectType -eq "secretScope") {
+    $URI = "https://$Region.azuredatabricks.net/api/2.0/secrets/acls/put"
+    $Body = @{scope = $DatabricksObjectId; principal = $Principal; permission = $PermissionLevel } | ConvertTo-Json -Depth 10
+    try {
+      Write-Verbose $Body
+      $Response = Invoke-RestMethod -Method POST -Body $Body -Uri $URI -Headers $Headers
     }
-    else {
-        $BasePath = "https://$Region.azuredatabricks.net/api/2.0/preview"
-        $URI =  "$BasePath/permissions/$DatabricksObjectType" + "/$DatabricksObjectId"
-
-        switch ($PrincipalType)
-        {
-            "user_name" {$acl = @(@{"user_name"= $Principal; "permission_level"=$PermissionLevel})} 
-            "group_name" {$acl = @(@{"group_name"= $Principal; "permission_level"=$PermissionLevel})} 
-            "service_principal_name" {$acl = @(@{"service_principal_name"= $Principal; "permission_level"=$PermissionLevel})} 
-        }
-
-        $Body = @{"access_control_list"= $acl} | ConvertTo-Json -Depth 10
-
-        Write-Verbose $Body
-        $Response = Invoke-RestMethod -Method "Patch" -Body $Body -Uri $URI -Headers $Headers
+    catch {
+      $err = $_.ErrorDetails.Message
+      if ($err.Contains('exists')) {
+        Write-Verbose $err
+      }
+      else {
+        throw $err
+      }
     }
-
     return $Response
+  }
+  else {
+    $BasePath = "https://$Region.azuredatabricks.net/api/2.0/preview"
+    $URI = "$BasePath/permissions/$DatabricksObjectType" + "/$DatabricksObjectId"
+
+    switch ($PrincipalType) {
+      "user_name" { $acl = @(@{"user_name" = $Principal; "permission_level" = $PermissionLevel }) }
+      "group_name" { $acl = @(@{"group_name" = $Principal; "permission_level" = $PermissionLevel }) }
+      "service_principal_name" { $acl = @(@{"service_principal_name" = $Principal; "permission_level" = $PermissionLevel }) }
+    }
+
+    $Body = @{"access_control_list" = $acl } | ConvertTo-Json -Depth 10
+
+    Write-Verbose $Body
+    $Response = Invoke-RestMethod -Method "Patch" -Body $Body -Uri $URI -Headers $Headers
+  }
+
+  return $Response
 }
 
 function Get-ClusterPoolName-Compute {
