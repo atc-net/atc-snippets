@@ -55,7 +55,7 @@ $namingConfig.ServiceAbbreviation = "xx"
 $resourceTags = @(
   "Owner=Auto Deployed",
   "System=$($namingConfig.systemName)",
-  "Environment=$($namingConfig.environmentName)",
+  "Environment=$($environmentConfig.environmentName)",
   "Service=$($namingConfig.serviceName)",
   "Source=https://repo_url"
 )
