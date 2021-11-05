@@ -61,7 +61,7 @@ $resourceTags = @(
 )
 
 & "$PSScriptRoot\deploy.initial.ps1" -environmentConfig $environmentConfig -namingConfig $namingConfig -resourceTags $resourceTags
-& "$PSScriptRoot\deploy.services.ps1" -environmentConfig $environmentConfig -namingConfig $namingConfig -resourceTags $resourceTags -subscriptionId $subscriptionId -sendGridApiKey $sendGridApiKey
+& "$PSScriptRoot\deploy.services.ps1" -environmentConfig $environmentConfig -namingConfig $namingConfig -resourceTags $resourceTags
 
 if ($?) {
   Write-Host "Deployment successful" -ForegroundColor Green
