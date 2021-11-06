@@ -1,0 +1,34 @@
+trigger:
+  - main
+
+# Change major and/or minor version here.
+name: 1.0$(Rev:.r)
+
+stages:
+- template: templates/stages/test.stage.yml
+  parameters:
+    dependsOn: []
+  
+- template: templates/stages/build.stage.yml
+  parameters:
+    dependsOn: ['Test']
+
+- template: templates/stages/deploy.stage.yml
+  parameters:
+    dependsOn: ['Build']
+    subscription: "ISS-GI-BIGDATA-IOT-IAC-PROVISIONING"
+    devopsEnvironment: "BIG IoT Product Development"
+    environmentName: "Development"
+    developmentEnvironment: "prdev"
+    productEnvironment: "dev"
+    subscriptionId: "9fc2e291-3afe-4264-b905-aea4a82e6eb2"
+
+- template: templates/stages/deploy.stage.yml
+  parameters:
+    dependsOn: ['Deploy_Development']
+    subscription: "ISS-GI-BIGDATA-IOT-IAC-PROVISIONING"
+    devopsEnvironment: "BIG IoT Product Test"
+    environmentName: "Test"
+    developmentEnvironment: "prdev"
+    productEnvironment: "tst"
+    subscriptionId: "9fc2e291-3afe-4264-b905-aea4a82e6eb2"

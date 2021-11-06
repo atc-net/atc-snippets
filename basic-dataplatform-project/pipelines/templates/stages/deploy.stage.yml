@@ -1,0 +1,51 @@
+parameters:
+- name: dependsOn
+  type: object
+  default: []
+- name: subscription
+  type: string
+  default: ""
+- name: devopsEnvironment
+  type: string
+  default: ""
+- name: environmentName
+  type: string
+  default: ""
+- name: developmentEnvironment
+  type: string
+  default: ""
+- name: productEnvironment
+  type: string
+  default: ""
+- name: subscriptionId
+  type: string
+  default: ""
+
+stages:
+  - stage: 'Deploy_${{parameters.environmentName}}'
+    displayName: 'Deploy to ${{parameters.environmentName}} environment'
+    dependsOn: ${{parameters.dependsOn}}
+    condition: "and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))"
+
+    jobs:
+      - deployment: 'deployment'
+        displayName: 'Deploy to ${{parameters.environmentName}} environment'
+        pool:
+          vmImage: 'ubuntu-latest'
+        environment: ${{parameters.devopsEnvironment}}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: drop
+
+                - task: AzureCLI@2
+                  displayName: 'Provision Databricks resources'
+                  inputs:
+                    azureSubscription: ${{parameters.subscription}}
+                    scriptType: pscore
+                    scriptPath: '$(Pipeline.Workspace)/drop/deploy/deploy.ps1'
+                    arguments: -environmentName ${{parameters.environmentName}} -developmentEnvironment ${{parameters.developmentEnvironment}} -productEnvironment ${{parameters.productEnvironment}} -subscriptionId ${{parameters.subscriptionId}}
+                    addSpnToEnvironment: true
+                    workingDirectory: '$(Pipeline.Workspace)/drop/deploy'

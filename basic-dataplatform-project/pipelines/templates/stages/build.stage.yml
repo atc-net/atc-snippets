@@ -1,0 +1,52 @@
+parameters:
+- name: dependsOn
+  type: object
+  default: []
+
+stages:
+  - stage: 'Build'
+    displayName: 'Build & Publish'
+    dependsOn: ${{parameters.dependsOn}}
+    condition: "and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))"
+
+    jobs:
+      - job: dotnet
+        displayName: 'Publish'
+        pool:
+          vmImage: 'ubuntu-latest'
+        variables:
+          buildConfiguration: 'Release'
+        
+        steps:
+          - task: PowerShell@2
+            displayName: 'Build Python Wheel for Library'
+            inputs:
+              targetType: inline
+              script: |
+                cd $(Build.Repository.LocalPath)/src
+                python3 setup.py sdist bdist_wheel
+                cd $(Build.Repository.LocalPath)
+          
+          - task: CopyFiles@2
+            displayName: 'Copy deploy files'
+            inputs:
+              SourceFolder: '$(Build.Repository.LocalPath)/deploy'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)/deploy'
+          
+          - task: CopyFiles@2
+            displayName: 'Copy notebooks'
+            inputs:
+              SourceFolder: '$(Build.Repository.LocalPath)/notebooks'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)/notebooks'
+
+          - task: CopyFiles@2
+            displayName: 'Copy python library'
+            inputs:
+              SourceFolder: '$(Build.Repository.LocalPath)/src/dist'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)/src/dist'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Upload files for deploy'
+            inputs:
+              pathToPublish: $(Build.ArtifactStagingDirectory)
+              artifactName: drop

@@ -1,0 +1,44 @@
+parameters:
+- name: dependsOn
+  type: object
+  default: []
+
+stages:
+  - stage: 'Test'
+    displayName: 'Test'
+    dependsOn: ${{parameters.dependsOn}}
+
+    jobs:
+      - job: 'TestLibrary'
+        displayName: 'Test dataplatform python library'
+        pool:
+          vmImage: 'ubuntu-latest'
+      
+        steps:
+          - checkout: self
+
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.8'
+              addToPath: true
+
+          - task: PowerShell@2
+            displayName: 'Load Python Dependencies'
+            inputs:
+              targetType: inline
+              script: |
+                pip install -r $(Build.Repository.LocalPath)/src/test_requirements.txt
+                python $(Build.Repository.LocalPath)/src/setup.py install
+                
+          - task: PowerShell@2
+            displayName: 'Run Python Unit Tests'
+            inputs:
+              targetType: inline
+              script: |
+                python -m pytest $(Build.Repository.LocalPath)/src/unittests --junit-xml=$(Build.Repository.LocalPath)/logs/TEST-DEV.xml
+
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFiles: '**/TEST-*.xml'
+              failTaskOnFailedTests: true
+              publishRunAttachments: true
