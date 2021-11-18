@@ -48,12 +48,12 @@ function Set-KeyVaultSecretPlain {
   )
 
   . "$PSScriptRoot\get_KeyVaultSecret.ps1"
-  . "$PSScriptRoot\recoverKeyVaultSecret.ps1"
-  . "$PSScriptRoot\verifyKeyVaultSecret.ps1"
+  . "$PSScriptRoot\recover_KeyVaultSecret.ps1"
+  . "$PSScriptRoot\verify_KeyVaultSecret.ps1"
 
   Write-Host "  Setting $secretName secret" -ForegroundColor DarkYellow
 
-  $alreadySet = VerifyKeyVaultSecret `
+  $alreadySet = Verify-KeyVaultSecret `
     -keyVaultName $keyVaultName `
     -secretName $secretName `
     -secretPlain $secretPlain
@@ -76,7 +76,7 @@ function Set-KeyVaultSecretPlain {
       if ($err -like "*Secret $secretName is currently in a deleted but recoverable state, and its name cannot be reused; in this state, the secret can only be recovered or purged.*") {
         Write-Host "  Secret was soft-deleted. Recovering $secretName secret" -ForegroundColor DarkYellow
 
-        $output = RecoverKeyVaultSecret `
+        $output = Recover-KeyVaultSecret `
           -keyVaultName $keyVaultName `
           -secretName $secretName
 
