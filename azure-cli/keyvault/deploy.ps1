@@ -71,19 +71,15 @@ param (
 . "$PSScriptRoot\get_KeyVaultSecret.ps1"
 . "$PSScriptRoot\set_KeyVaultSecret.ps1"
 . "$PSScriptRoot\set_KeyVaultSPNPolicy.ps1"
+. "$PSScriptRoot\test_KeyVaultExists.ps1"
 
 #############################################################################################
 # Provision Key Vault
 #############################################################################################
 Write-Host "Provision Key Vault" -ForegroundColor DarkGreen
 
-Write-Host "  Query Key Vault" -ForegroundColor DarkYellow
-$output = az keyvault show `
-  --name $keyVaultName `
-  --resource-group $resourceGroupName `
-
-if (!$?) {
-  Write-Host "  Create key vault" -ForegroundColor DarkYellow
+if ((Test-KeyVaultExists -keyVaultName $keyVaultName -resourceGroupName $resourceGroupName) -eq $false) {
+  Write-Host "  Creating key Vault $keyVaultName" -ForegroundColor DarkYellow
   $output = az keyvault create `
     --name $keyVaultName `
     --location $location `
@@ -106,9 +102,6 @@ if (!$?) {
       Throw-WhenError -output $output
     }
   }
-}
-else {
-  Write-Host "  Key vault already exists, skipping creation" -ForegroundColor DarkYellow
 }
 
 Throw-WhenError -output $output
