@@ -1,3 +1,6 @@
+# This function deltes and re-creates the api key if it exists
+# It is not possible to get an existing api key secret from azure
+# if you need idempotence you need to wrap this function in extra logic
 function Get-NewApplicationInsightsApiKey {
   param (
     [Parameter(Mandatory = $true)]
