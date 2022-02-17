@@ -50,15 +50,37 @@ function Set-DatabricksSpnAdminUser {
     'X-Databricks-Azure-Workspace-Resource-Id' = $resourceId
   }
 
-  $response = Invoke-WebRequest `
-    -Uri "https://$workspaceUrl/api/2.0/clusters/list-node-types" `
-    -Method 'GET' `
-    -Headers $headers
+  # Do a retry loop to allow databricks to start up.
+  $Stoploop = $false
+  [int]$Retrycount = 0
 
-  if ($response.StatusCode -ne 200) {
-    Write-Error $response.StatusDescription
-    throw
-  }
+  do {
+    try {
+      $response = Invoke-WebRequest `
+      -Uri "https://$workspaceUrl/api/2.0/clusters/list-node-types" `
+      -Method 'GET' `
+      -Headers $headers
+
+      if ($response.StatusCode -ne 200) {
+        Write-Error $response.StatusDescription
+        throw
+      }
+
+      Write-Host "Job completed"
+      $Stoploop = $true
+    }
+    catch {
+      if ($Retrycount -gt 3){
+        throw
+        $Stoploop = $true
+      }
+      else {
+        $Retrycount = $Retrycount + 1
+        Write-Host "  Databricks API failed. Retry $Retrycount of 3 in 10 seconds" -ForegroundColor Red
+        Start-Sleep -Seconds 10
+      }
+    }
+  } While ($Stoploop -eq $false)
 
   return $bearerToken
 }
