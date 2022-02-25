@@ -1,11 +1,5 @@
 function New-DatabricksJob {
   param (
-    [Parameter(Mandatory = $false)]
-    [ValidateNotNullOrEmpty()]
-    [ValidateSet('DevTest', 'Production')]
-    [string]
-    $environmentType = "Production",
-
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
@@ -16,9 +10,13 @@ function New-DatabricksJob {
     [string]
     $notebookPath,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory=$false)]
     [object]
-    $notebookParameters,
+    $notebookParameters = @{},
+
+    [Parameter(Mandatory=$false)]
+    [array]
+    $libraries = @(),
 
     [Parameter(Mandatory = $false)]
     [string]
@@ -33,7 +31,7 @@ function New-DatabricksJob {
     [ValidateNotNullOrEmpty()]
     [ValidateSet('Standard_F4s', 'Standard_DS3_v2', 'Standard_DS4_v2', 'Standard_L4s')]
     [string]
-    $clusterNodeType = "Standard_L4s",
+    $clusterNodeType = "Standard_F4s",
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
@@ -43,7 +41,7 @@ function New-DatabricksJob {
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $sparkVersion = "8.1.x-scala2.12",
+    $sparkVersion = "9.1.x-scala2.12",
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
@@ -53,7 +51,7 @@ function New-DatabricksJob {
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [int]
-    $numberOfWorkers = 1,
+    $numberOfWorkers = 0,
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
@@ -72,16 +70,31 @@ function New-DatabricksJob {
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
+    [int]
+    $timeoutSeconds = 3600,
+
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [int]
+    $maxRetries = 1,
+
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
     [string]
     $timezoneId = "UTC",
 
     [Parameter(Mandatory = $false)]
-    [switch]
-    $runNow = $false,
+    [ValidateNotNullOrEmpty()]
+    [array]
+    $emailRecipient = @(), #@("email1@customer.com", "email2@customer.com")
 
     [Parameter(Mandatory = $false)]
-    [bool]
-    $emailNotificationOnFailure = $true,
+    [switch]
+    $emailNotification = $false,
+
+    [Parameter(Mandatory = $false)]
+    [switch]
+    $emailNotificationOnFailure,
 
     [Parameter(Mandatory = $false)]
     [switch]
@@ -89,22 +102,38 @@ function New-DatabricksJob {
 
     [Parameter(Mandatory = $false)]
     [switch]
-    $emailNotificationOnSuccess
+    $emailNotificationOnSuccess,
+
+    [Parameter(Mandatory = $false)]
+    [switch]
+    $runAsContinuousStreaming = $false,
+
+    [Parameter(Mandatory = $false)]
+    [switch]
+    $runNow = $false
   )
 
   $job = @{
-    name                = $name
-    max_concurrent_runs = $maxConcurrentRuns
-    max_retries         = 1
-    notebook_task       = @{
+    name                 = $name
+    max_concurrent_runs  = $maxConcurrentRuns
+    timeout_seconds      = $timeoutSeconds
+    max_retries          = $maxRetries
+    notebook_task        = @{
       revision_timestamp = 0
       notebook_path      = $notebookPath
+      base_parameters    = $notebookParameters
     }
-    email_notifications = @{ }
+    email_notifications  = @{ }
+    libraries            = $libraries
   }
 
-  $emailRecipient = @("email1@customer.com", "email2@customer.com")
-  if (($environmentType -eq "Production")) {
+  if ($runAsContinuousStreaming) {
+    $job.max_concurrent_runs = 1
+    $job.timeout_seconds = 0
+    $job.max_retries = -1
+  }
+
+  if ($emailNotification) {
     if ($emailNotificationOnStart) {
       $job.email_notifications.on_start = $emailRecipient
     }
@@ -116,57 +145,28 @@ function New-DatabricksJob {
     }
   }
 
-  $job.libraries = @(
-    @{
-      maven = @{
-        coordinates = "com.microsoft.azure:spark-mssql-connector_2.12_3.0:1.0.0-alpha"
-      }
-    },
-    @{
-      maven = @{
-        coordinates = "com.azure.cosmos.spark:azure-cosmos-spark_3-1_2-12:4.0.0-beta.3"
-      }
-    },
-    @{
-      egg = "dbfs:/databricks/customer/customer.dataplatform.egg"
-    },
-    @{
-      pypi = @{
-        package = "pyodbc"
-      }
-    },
-    @{
-      pypi = @{
-        package = "sqlparse"
-      }
-    }
-  )
-
-  $pysparkEnvironmentVariables = @{
-    "PYSPARK_PYTHON" = "/databricks/python3/bin/python3"
-  }
-
   if ($clusterId) {
     $job.existing_cluster_id = $clusterId
-  }
-  else {
-    $job.new_cluster = @{
-      spark_version  = $sparkVersion
-      spark_env_vars = $pysparkEnvironmentVariables
-      spark_conf     = @{
-        "spark.sql.streaming.schemaInference"             = $true;
-        "spark.databricks.delta.preview.enabled"          = $true;
-        "spark.databricks.delta.schema.autoMerge.enabled" = $true;
-        "spark.databricks.io.cache.enabled"               = $true;
-      }
-      custom_tags    = @{
-        "JobName"  = $name
-        "Notebook" = $notebookPath
-      }
+  } else {
+    $environmentVariables = Get-PysparkEnvironmentVariables
+
+    $sparkConfig = Get-SparkConfig
+
+    $customTags = @{
+      "JobName"     = $name
+      "Notebook"    = $notebookPath
     }
 
-    if ($environmentType -eq "DevTest") {
-      $numberOfWorkers = 1
+    if ($numberOfWorkers -eq 0) {
+      $sparkConfig = $sparkConfig + (Get-SparkConfigSingleNode)
+      $customTags = $customTags + (Get-CustomTagsSingleNode)
+    }
+
+    $job.new_cluster = @{
+      spark_version     = $sparkVersion
+      spark_env_vars    = $environmentVariables
+      spark_conf        = $sparkConfig
+      custom_tags       = $customTags
     }
 
     if ($minWorkers -gt 0 -And $maxWorkers -gt 1) {
@@ -174,44 +174,36 @@ function New-DatabricksJob {
         min_workers = $minWorkers
         max_workers = $maxWorkers
       }
-    }
-    else {
+    } else {
       $job.new_cluster.num_workers = $numberOfWorkers
     }
 
     if ($clusterPoolId) {
-      $job.new_cluster.instance_pool_id = $clusterPoolId
-    }
-    else {
-      $job.new_cluster.node_type_id = $clusterNodeType
-      $job.new_cluster.enable_elastic_disk = $enableElasticDisk
-    }
-  }
-
-  if ($env:UNSCHEDULE_ALL_JOBS -ne 1) {
-    if ($cronExpression) {
-      $job.schedule = @{
-        timezone_id            = $timezoneId
-        quartz_cron_expression = $cronExpression
-      }
+      $job.new_cluster.instance_pool_id      = $clusterPoolId
+    } else {
+      $job.new_cluster.node_type_id          = $clusterNodeType
+      $job.new_cluster.enable_elastic_disk   = $enableElasticDisk
     }
   }
 
-  if ($notebookParameters) {
-    $job.notebook_task.base_parameters = $notebookParameters
+  if ($cronExpression) {
+    $job.schedule = @{
+      timezone_id            = $timezoneId
+      quartz_cron_expression = $cronExpression
+    }
   }
 
   Set-Content ./job.json ($job | ConvertTo-Json -Depth 4)
 
-  Write-Host (Get-Content -Path ./job.json)
+  Write-Host (Get-Content -Path ./job.json) -ForegroundColor DarkCyan
 
   $jobs = ((databricks jobs list --output JSON | ConvertFrom-Json -Depth 99).jobs) | Where-Object { $_.settings.name -eq $name }
   if ($jobs.Count -eq 0) {
-    Write-Host "  Creating $name job"
+    Write-Host "    Creating $name job" 
     $jobId = ((databricks jobs create --json-file ./job.json) | ConvertFrom-Json).job_id
   }
   else {
-    Write-Host "  Updating $name job"
+    Write-Host "    Updating $name job"
     $jobId = $jobs[0].job_id;
     databricks jobs reset --job-id $jobId --json-file ./job.json
   }
@@ -219,8 +211,63 @@ function New-DatabricksJob {
   Remove-Item ./job.json
 
   if ($runNow) {
-    Start-DatabricksJob -jobId $jobId -name $name
+    if ($runAsContinuousStreaming) {
+      Start-DatabricksJob -jobId $jobId -waitForCompletion $false -restartIfRunning $true
+    }
+    else {
+      Start-DatabricksJob -jobId $jobId
+    }
   }
+}
+
+function Get-PysparkEnvironmentVariables {
+  $vars = @{
+    "PYSPARK_PYTHON" = "/databricks/python3/bin/python3"
+  }
+  $vars
+}
+
+function Get-SparkConfig {
+  $config = @{
+    "spark.sql.streaming.schemaInference"                           = $true;
+    "spark.databricks.delta.preview.enabled"                        = $true;
+    "spark.databricks.delta.schema.autoMerge.enabled"               = $true;
+    "spark.databricks.io.cache.enabled"                             = $true;
+    "spark.databricks.delta.merge.repartitionBeforeWrite.enabled"   = $true;
+    "spark.scheduler.mode"                                          = "FAIR";
+  }
+  $config
+}
+
+function Get-SparkConfigSingleNode {
+  $config = @{
+    "spark.databricks.cluster.profile" = "singleNode";
+    "spark.master" = "local[*]";
+  }
+  $config
+}
+
+function Get-SparkConfigHighConcurrency {
+  $config = @{
+    "spark.databricks.acl.dfAclsEnabled"     = "true";
+    "spark.databricks.cluster.profile"       = "serverless";
+    "spark.databricks.repl.allowedLanguages" = "sql,python";
+  }
+  $config
+}
+
+function Get-CustomTagsSingleNode {
+  $customTags = @{
+    "ResourceClass" = "SingleNode"
+  }
+  $customTags
+}
+
+function Get-CustomTagsHighConcurrency {
+  $customTags = @{
+    "ResourceClass" = "Serverless"
+  }
+  $customTags
 }
 
 function Start-DatabricksJob {
@@ -237,6 +284,10 @@ function Start-DatabricksJob {
 
     [Parameter(Mandatory = $false)]
     [bool]
+    $restartIfRunning = $false,
+
+    [Parameter(Mandatory = $false)]
+    [bool]
     $waitForCompletion = $true,
 
     [Parameter(Mandatory = $false)]
@@ -244,34 +295,69 @@ function Start-DatabricksJob {
     $pollIntervalInSeconds = 5
   )
 
-  Write-Host "  Running job: $name"
-  $runId = ((databricks jobs run-now --job-id $jobId) | ConvertFrom-Json).run_id
-
-  if (!$waitForCompletion) {
-    return
+  if ($restartIfRunning) {
+    Stop-DatabricksJob -jobId $jobId -name $name
   }
 
-  $state_message = ""
-  $result_state = ""
-  Write-Host "    Waiting for completion..."
-  do {
-    $run = (databricks runs get --run-id $runId) | ConvertFrom-Json
+  Write-Host "    Starting job: $name"
+  $runId = ((databricks jobs run-now --job-id $jobId) | ConvertFrom-Json).run_id
 
-    if ($state_message -ne $run.state.state_message) {
-      $state_message = $run.state.state_message
-      if ($state_message) {
-        Write-Host "      $state_message"
-      }
-    }
-
-    Start-Sleep -Seconds $pollIntervalInSeconds
-    $result_state = $run.state.result_state
-  } until ($result_state)
-
-  Write-Host "    $result_state"
+  if ($waitForCompletion) {
+    Wait-For-DatabricksRun-To-Stop -runId $runId -pollIntervalInSeconds $pollIntervalInSeconds
+  }
 }
 
-function Reset-DatabricksJobs {
+function Stop-DatabricksJob {
+  param (
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $jobId,
+
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $name,
+
+    [Parameter(Mandatory = $false)]
+    [bool]
+    $waitForStopping = $true,
+
+    [Parameter(Mandatory = $false)]
+    [int]
+    $pollIntervalInSeconds = 5
+  )
+
+  $runs = ((databricks runs list --job-id $jobId --output JSON | ConvertFrom-Json -Depth 99).runs) | Where-Object { $_.state.life_cycle_state -eq 'RUNNING' }
+  if ($runs.Count -gt 0) {
+    Write-Host "    Stopping job: $name"
+    $runId = $runs[0].run_id;
+    databricks runs cancel --run-id $runId
+
+    if ($waitForStopping) {
+      Wait-For-DatabricksRun-To-Stop -runId $runId -pollIntervalInSeconds $pollIntervalInSeconds
+    }
+  }
+  else {
+    Write-Host "    job: $name is not running"
+  }
+}
+
+function Stop-All-DatabricksJobs {
+  param (
+  )
+
+  $jobs = ((databricks jobs list --output JSON | ConvertFrom-Json -Depth 99).jobs)
+
+  foreach ($job in $jobs) {
+    $jobId = $job.job_id
+    $jobName = $job.settings.name
+
+    Stop-DatabricksJob -jobId $jobId -name $jobName
+  }
+}
+
+function Reset-All-DatabricksJobs {
   $list = (databricks jobs list --output JSON) | ConvertFrom-Json
   $message = "  Found " + $list.jobs.Length + " job(s)"
   Write-Host $message
