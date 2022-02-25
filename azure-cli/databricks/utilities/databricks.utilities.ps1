@@ -5,7 +5,7 @@ function New-DatabricksJob {
     [string]
     $name,
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [string]
     $notebookPath,
@@ -13,6 +13,16 @@ function New-DatabricksJob {
     [Parameter(Mandatory=$false)]
     [object]
     $notebookParameters = @{},
+
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $wheelPackageName,
+
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $wheelEntryPoint,
 
     [Parameter(Mandatory=$false)]
     [array]
@@ -118,13 +128,23 @@ function New-DatabricksJob {
     max_concurrent_runs  = $maxConcurrentRuns
     timeout_seconds      = $timeoutSeconds
     max_retries          = $maxRetries
-    notebook_task        = @{
+    email_notifications  = @{ }
+    libraries            = $libraries
+  }
+
+  if ($notebookPath) {
+    $job.notebook_task = @{
       revision_timestamp = 0
       notebook_path      = $notebookPath
       base_parameters    = $notebookParameters
     }
-    email_notifications  = @{ }
-    libraries            = $libraries
+  }
+  
+  if ($wheelEntryPoint) {
+    $job.python_wheel_task = @{
+      package_name        = $wheelPackageName
+      entry_point         = $wheelEntryPoint
+    }
   }
 
   if ($runAsContinuousStreaming) {
