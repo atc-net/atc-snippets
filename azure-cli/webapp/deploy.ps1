@@ -118,19 +118,45 @@ Throw-WhenError -output $output
 
 Write-Host "  Allow cross-origin resource sharing (CORS)" -ForegroundColor DarkYellow
 
-$output = az webapp cors remove `
-  --name $apiName `
+$existingCors = az webapp cors show `
   --resource-group $resourceGroupName `
-  --allowed-origins *
+  --name $apiName `
+  --query allowedOrigins `
+  --output tsv
 
 Throw-WhenError -output $output
 
-$output = az webapp cors add `
-  --name $apiName `
-  --resource-group $resourceGroupName `
-  --allowed-origins *
+if (!$?) {
+  Write-Host " -> Cross-origin resource sharing (CORS) not set, setting it." -ForegroundColor Cyan
 
-Throw-WhenError -output $output
+  $output = az webapp cors add `
+    --name $apiName `
+    --resource-group $resourceGroupName `
+    --allowed-origins '*'
+
+  Throw-WhenError -output $output
+} else {
+  if ($existingCors -ne '*')
+  {
+    Write-Host " -> Cross-origin resource sharing (CORS) not set to *, setting it." -ForegroundColor Cyan
+
+    $output = az webapp cors remove `
+      --name $apiName `
+      --resource-group $resourceGroupName `
+      --allowed-origins '*'
+
+    Throw-WhenError -output $output
+
+    $output = az webapp cors add `
+      --name $apiName `
+      --resource-group $resourceGroupName `
+      --allowed-origins '*'
+
+      Throw-WhenError -output $output
+  } else {
+    Write-Host " -> Cross-origin resource sharing (CORS) already set, skipping" -ForegroundColor Cyan
+  }
+}
 
 Write-Host "  Apply web app settings" -ForegroundColor DarkYellow
 $output = az webapp config appsettings set `
