@@ -30,7 +30,6 @@ function Add-ActionGroup {
     $actionGroupName = Get-ResourceGroupName -serviceName $namingConfig.ServiceName -systemName $namingConfig.SystemName -environmentName $environmentConfig.EnvironmentName
     $actionGroupShortName = ($namingConfig.SystemAbbreviation + "-" + $namingConfig.ServiceAbbreviation).ToLower()
 
-
     ############################################################################################
     # Action group section
     ############################################################################################
