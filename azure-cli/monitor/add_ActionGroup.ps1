@@ -36,7 +36,8 @@ function Add-ActionGroup {
     Write-Host "  Creating action group if not exist" -ForegroundColor DarkYellow
 
     $output = Get-ActionGroup -resourceGroupName $resourceGroupName -actionGroupName $actionGroupName
-    if (!$?) {
+    if (!$? -Or $null -eq $output) {
+        Write-Host "  Creating..."
         $output = New-ActionGroup -resourceGroupName $resourceGroupName -actionGroupName $actionGroupName -actionGroupShortName $actionGroupShortName -tags $resourceTags
         Throw-WhenError -output $output
     }
