@@ -165,6 +165,30 @@ function Get-AllEmailActions{
         | ConvertFrom-Json
 }
 
+function Add-WebhookAction{
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $resourceGroupName,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string] 
+        $actionGroupName,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string] 
+        $alertUri
+    )
+
+    return az monitor action-group update `
+    --resource-group $resourceGroupName `
+    --name $actionGroupName `
+    --add-action webhook alert_hook $alertUri usecommonalertschema
+}
+
 function Get-ActionGroup {
     param (
         [Parameter(Mandatory=$true)]
