@@ -145,7 +145,7 @@ function Get-EmailAction{
         | ConvertFrom-Json
 }
 
-function Get-AllEmailAction{
+function Get-AllEmailActions{
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]

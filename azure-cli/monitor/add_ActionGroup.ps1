@@ -33,7 +33,7 @@ function Add-ActionGroup {
     ############################################################################################
     # Action group section
     ############################################################################################
-    Write-Host "  Creating action group if not exist" -ForegroundColor DarkYellow
+    Write-Host "  Creating action group if not exists" -ForegroundColor DarkYellow
 
     $output = Get-ActionGroup -resourceGroupName $resourceGroupName -actionGroupName $actionGroupName
     if (!$? -Or $null -eq $output) {
