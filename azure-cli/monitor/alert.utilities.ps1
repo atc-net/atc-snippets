@@ -158,10 +158,9 @@ function Get-AllEmailActions{
         $actionGroupName
     )
 
-    return az monitor action-group show `
+        return az monitor action-group list `
         --resource-group $resourceGroupName `
-        --name $actionGroupName `
-        --query "emailReceivers" `
+        --query "[?name == '$actionGroupName'].emailReceivers|[0]" `
         | ConvertFrom-Json
 }
 
