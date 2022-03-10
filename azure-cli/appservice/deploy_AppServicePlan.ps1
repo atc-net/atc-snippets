@@ -6,11 +6,6 @@ function Deploy-AppServicePlan {
         [string]
         $environmentType = "DevTest",
   
-        [Parameter(Mandatory = $false)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $location = "westeurope",
-  
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -20,6 +15,11 @@ function Deploy-AppServicePlan {
         [ValidateNotNullOrEmpty()]
         [string]
         $appServicePlanName,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $location = "westeurope",
   
         [Parameter(Mandatory = $false)]
         [string[]] $resourceTags = @()
