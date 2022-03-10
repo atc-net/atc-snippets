@@ -134,6 +134,8 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 $appServicePlanId = Deploy-AppServicePlan `
   -AppServicePlanName $appServicePlanName `
   -ResourceGroupName $resourceGroupName `
+  -EnvironmentType $environmentConfig.EnvironmentType `
+  -Location $environmentConfig.Location `
   -ResourceTags $resourceTags
 
 ############################################################################################
