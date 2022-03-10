@@ -1,42 +1,4 @@
 . "$PSScriptRoot\..\utilities\deploy.utilities.ps1"
-
-function New-Topic-Condition
-{
-    param (
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $dimension,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $threshold
-    )
-
-    return az monitor metrics alert condition create `
-    -t static `
-    --dimension $dimension `
-    --aggregation Average `
-    --metric "ActiveMessages" `
-    --op GreaterThan `
-    --threshold $threshold
-}
-
-function New-Dimension
-{
-    param (
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $entity
-    )
-
-    return az monitor metrics alert dimension create `
-    -n "EntityName" `
-    -v $entity
-}
-
 function Get-ResourceId {
     param (
         [Parameter(Mandatory=$true)]
