@@ -9,7 +9,7 @@ function Get-AppServicePlanId {
       $resourceGroup
     )
 
-    Write-Host "  Get app service plan id" -ForegroundColor DarkYellow
+    Write-Host "  Querying app service plan id" -ForegroundColor DarkYellow
     $appServicePlanId = az appservice plan show `
       --name $appServicePlanName `
       --resource-group $resourceGroup `
