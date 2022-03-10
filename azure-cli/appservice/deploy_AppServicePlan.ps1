@@ -3,48 +3,48 @@ function Deploy-AppServicePlan {
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $appServicePlanName,
+    $AppServicePlanName,
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $resourceGroupName,
+    $ResourceGroupName,
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [ValidateSet('DevTest', 'Production')]
     [string]
-    $environmentType = "DevTest",
+    $EnvironmentType = "DevTest",
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $location = "westeurope",
+    $Location = "westeurope",
   
     [Parameter(Mandatory = $false)]
-    [string[]] $resourceTags = @()
+    [string[]] $ResourceTags = @()
   )  
-  Write-Host "Provision app service plan '$appServicePlanName'" -ForegroundColor DarkGreen
+  Write-Host "Provision app service plan '$AppServicePlanName'" -ForegroundColor DarkGreen
 
   $sku = 'S1'
-  if ($environmentType -eq 'Production') {
+  if ($EnvironmentType -eq 'Production') {
     $sku = 'P1V2'
   }
 
   Write-Host "  Querying for existing app service plan" -ForegroundColor DarkYellow -NoNewline
 
   $appServicePlanJson = az appservice plan list `
-    --query "[?name=='$($appServicePlanName)'] | [0] .{sku : sku.size, location: location, id: id}"
+    --query "[?name=='$($AppServicePlanName)'] | [0] .{sku : sku.size, location: location, id: id}"
 
   if ($null -eq $appServicePlanJson) {
     Write-Host " -> Resource not found." -ForegroundColor Cyan
-    Write-Host "  Creating app service plan '$appServicePlanName'" -ForegroundColor DarkYellow
+    Write-Host "  Creating app service plan '$AppServicePlanName'" -ForegroundColor DarkYellow
     $appServicePlanId = az appservice plan create `
-      --name $appServicePlanName `
-      --location $location `
-      --resource-group $resourceGroupName `
+      --name $AppServicePlanName `
+      --location $Location `
+      --resource-group $ResourceGroupName `
       --sku $sku `
-      --tags $resourceTags `
+      --tags $ResourceTags `
       --query id
 
     Throw-WhenError -output $appServicePlanId
@@ -54,12 +54,12 @@ function Deploy-AppServicePlan {
     
     if ($appServicePlanResource.sku -ne $sku -or $appServicePlanResource.location -ne "West Europe") {
       Write-Host " -> Resource exists, but changes are detected" -ForegroundColor Cyan
-      Write-Host "  Updating app service plan '$appServicePlanName'" -ForegroundColor DarkYellow
+      Write-Host "  Updating app service plan '$AppServicePlanName'" -ForegroundColor DarkYellow
       $appServicePlanId = az appservice plan update `
-        --name $appServicePlanName `
-        --resource-group $resourceGroupName `
+        --name $AppServicePlanName `
+        --resource-group $ResourceGroupName `
         --sku $sku `
-        --tags $resourceTags `
+        --tags $ResourceTags `
         --query id
     }
     else {

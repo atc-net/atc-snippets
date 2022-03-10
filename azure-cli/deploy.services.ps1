@@ -132,9 +132,9 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 # Provision Azure App Service Plan
 #############################################################################################
 $appServicePlanId = Deploy-AppServicePlan `
-    -resourceGroupName $resourceGroupName `
-    -appServicePlanName $appServicePlanName `
-    -resourceTags $resourceTags
+  -AppServicePlanName $appServicePlanName `
+  -ResourceGroupName $resourceGroupName `
+  -ResourceTags $resourceTags
 
 ############################################################################################
 # Provision Log Analytics and Application Insights
