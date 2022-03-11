@@ -1,9 +1,18 @@
+using module "./AppServicePlanSkuNames.psm1"
+
 function Deploy-AppServicePlan {
   param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
+    [Alias("Name")]
     [string]
     $AppServicePlanName,
+
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateSet([AppServicePlanSkuNames])]
+    [string]
+    $Sku,
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
@@ -12,24 +21,18 @@ function Deploy-AppServicePlan {
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet('DevTest', 'Production')]
-    [string]
-    $EnvironmentType = "DevTest",
-
-    [Parameter(Mandatory = $false)]
-    [ValidateNotNullOrEmpty()]
     [string]
     $Location = "westeurope",
   
     [Parameter(Mandatory = $false)]
     [string[]] $ResourceTags = @()
-  )  
-  Write-Host "Provision app service plan '$AppServicePlanName'" -ForegroundColor DarkGreen
+  )
+  
+  # import utility functions
+  . "$PSScriptRoot\New-AppServicePlan.ps1"
+  . "$PSScriptRoot\Update-AppServicePlan.ps1"
 
-  $sku = 'S1'
-  if ($EnvironmentType -eq 'Production') {
-    $sku = 'P1V2'
-  }
+  Write-Host "Provision app service plan '$AppServicePlanName'" -ForegroundColor DarkGreen
 
   Write-Host "  Querying for existing app service plan" -ForegroundColor DarkYellow -NoNewline
 
@@ -38,32 +41,29 @@ function Deploy-AppServicePlan {
 
   if ($null -eq $appServicePlanJson) {
     Write-Host " -> Resource not found." -ForegroundColor Cyan
-    Write-Host "  Creating app service plan '$AppServicePlanName'" -ForegroundColor DarkYellow
-    $appServicePlanId = az appservice plan create `
-      --name $AppServicePlanName `
-      --location $Location `
-      --resource-group $ResourceGroupName `
-      --sku $sku `
-      --tags $ResourceTags `
-      --query id
 
-    Throw-WhenError -output $appServicePlanId
+    $appServicePlanId = New-AppServicePlan `
+      -AppServicePlanName $AppServicePlanName `
+      -ResourceGroupName $ResourceGroupName `
+      -Sku $Sku `
+      -Location $Location `
+      -ResourceTags $ResourceTags
   }
   else {
     $appServicePlanResource = $appServicePlanJson | ConvertFrom-Json -AsHashtable
     
-    if ($appServicePlanResource.sku -ne $sku -or $appServicePlanResource.location -ne "West Europe") {
+    if ($appServicePlanResource.sku -ne $Sku -or $appServicePlanResource.location -ne "West Europe") {
       Write-Host " -> Resource exists, but changes are detected" -ForegroundColor Cyan
-      Write-Host "  Updating app service plan '$AppServicePlanName'" -ForegroundColor DarkYellow
-      $appServicePlanId = az appservice plan update `
-        --name $AppServicePlanName `
-        --resource-group $ResourceGroupName `
-        --sku $sku `
-        --tags $ResourceTags `
-        --query id
+
+      $appServicePlanId = Update-AppServicePlan `
+        -AppServicePlanName $AppServicePlanName `
+        -ResourceGroupName $ResourceGroupName `
+        -Sku $Sku `
+        -Location $Location
     }
     else {
       Write-Host " -> Resource exists with desired configuration." -ForegroundColor Cyan
+
       $appServicePlanId = $appServicePlanResource.id
     }
 

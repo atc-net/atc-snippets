@@ -37,6 +37,7 @@ param (
 Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 
 # import utility functions
+. "$PSScriptRoot\appservice\Deploy-AppServicePlan.ps1"
 . "$PSScriptRoot\utilities\deploy.utilities.ps1"
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
 . "$PSScriptRoot\monitor\get_LogAnalyticsId.ps1"
@@ -131,10 +132,15 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 #############################################################################################
 # Provision Azure App Service Plan
 #############################################################################################
+$appServiceSku = 'S1'
+if ($environmentConfig.EnvironmentType -eq 'Production') {
+  $appServiceSku = 'P1V2'
+}
+
 $appServicePlanId = Deploy-AppServicePlan `
-  -AppServicePlanName $appServicePlanName `
+  -Name $appServicePlanName `
+  -Sku $appServiceSku `
   -ResourceGroupName $resourceGroupName `
-  -EnvironmentType $environmentConfig.EnvironmentType `
   -Location $environmentConfig.Location `
   -ResourceTags $resourceTags
 
