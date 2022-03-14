@@ -60,6 +60,9 @@ function Deploy-AppServicePlan {
     if ($UseLinux -and $appServicePlanResource.os -ne "linux") {
       throw "App Service Plan '$AppServicePlanName' is already Windows and cannot be converted in-place to Linux"
     }
+    elseif ($false -eq $UseLinux -and $appServicePlanResource.os -eq "linux") {
+      throw "App Service Plan '$AppServicePlanName' is already Linux and cannot be converted in-place to Windows"
+    }
 
     if ($appServicePlanResource.sku -ne $Sku -or $appServicePlanResource.location -ne "West Europe") {
       Write-Host " -> Resource exists, but changes are detected" -ForegroundColor Cyan
