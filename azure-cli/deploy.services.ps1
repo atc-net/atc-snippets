@@ -37,7 +37,7 @@ param (
 Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 
 # import utility functions
-. "$PSScriptRoot\appservice\Deploy-AppServicePlan.ps1"
+. "$PSScriptRoot\appservice\Provision-AppServicePlan.ps1"
 . "$PSScriptRoot\utilities\deploy.utilities.ps1"
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
 . "$PSScriptRoot\monitor\get_LogAnalyticsId.ps1"
@@ -137,7 +137,7 @@ if ($environmentConfig.EnvironmentType -eq 'Production') {
   $appServiceSku = 'P1V2'
 }
 
-$appServicePlanId = Deploy-AppServicePlan `
+$appServicePlanId = Provision-AppServicePlan `
   -Name $appServicePlanName `
   -Sku $appServiceSku `
   -ResourceGroupName $resourceGroupName `
