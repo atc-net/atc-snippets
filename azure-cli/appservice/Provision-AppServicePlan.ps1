@@ -57,7 +57,7 @@ function Deploy-AppServicePlan {
   else {
     $appServicePlanResource = $appServicePlanJson | ConvertFrom-Json -AsHashtable
     
-    if ($UseLinux -and $appServicePlanResource.os -ne "linux") {
+    if ($true -eq $UseLinux -and $appServicePlanResource.os -ne "linux") {
       throw "App Service Plan '$AppServicePlanName' is already Windows and cannot be converted in-place to Linux"
     }
     elseif ($false -eq $UseLinux -and $appServicePlanResource.os -eq "linux") {
