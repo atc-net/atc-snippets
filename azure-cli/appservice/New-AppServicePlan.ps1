@@ -7,35 +7,46 @@ function New-AppServicePlan {
     [Alias("Name")]
     [string]
     $AppServicePlanName,
-    
+
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [ValidateSet([AppServicePlanSkuNames])]
     [string]
     $Sku,
-    
+
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $ResourceGroupName,
- 
+
     [Parameter(Mandatory = $false)]
-    [ValidateNotNullOrEmpty()]
+    [bool]
+    $UseLinux = $false,
+
+    [Parameter(Mandatory = $false)]
     [string]
     $Location = "westeurope",
-  
+
     [Parameter(Mandatory = $false)]
     [string[]] $ResourceTags = @()
   )
   
   Write-Host "  Creating app service plan '$AppServicePlanName'" -ForegroundColor DarkYellow
+
+  $dynamicParameters = @()
+  if ($UseLinux) {
+    # Host web app on Linux worker
+    $dynamicParameters += "--is-linux"
+  }
+
   $appServicePlanId = az appservice plan create `
     --name $AppServicePlanName `
     --location $Location `
     --resource-group $ResourceGroupName `
     --sku $Sku `
     --tags $ResourceTags `
-    --query id
+    --query id `
+    @dynamicParameters
 
   Throw-WhenError -output $appServicePlanId
 
