@@ -20,7 +20,6 @@ function Update-AppServicePlan {
     $ResourceGroupName,
    
     [Parameter(Mandatory = $false)]
-    [ValidateNotNullOrEmpty()]
     [string]
     $Location = "westeurope"
   )
