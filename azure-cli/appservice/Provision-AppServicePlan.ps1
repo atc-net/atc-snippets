@@ -1,6 +1,6 @@
 using module "./AppServicePlanSkuNames.psm1"
 
-function Deploy-AppServicePlan {
+function Provision-AppServicePlan {
   param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
