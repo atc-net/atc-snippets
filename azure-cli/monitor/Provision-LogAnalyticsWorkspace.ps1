@@ -17,7 +17,7 @@ function Provision-LogAnalyticsWorkspace {
     $Location = "westeurope",
     
     [Parameter(Mandatory = $false)]
-    [string[]] 
+    [string[]]
     $ResourceTags = @()
   )
 
@@ -33,7 +33,7 @@ function Provision-LogAnalyticsWorkspace {
 
   if ($null -eq $response) {
     Write-Host " -> Resource not found." -ForegroundColor Cyan
-        
+
     $logAnalyticsId = New-LogAnalyticsWorkspace `
       -Name $LogAnalyticsName `
       -ResourceGroupName $ResourceGroupName `
@@ -45,6 +45,6 @@ function Provision-LogAnalyticsWorkspace {
 
     $logAnalyticsId = ($response | ConvertFrom-Json -AsHashtable).id
   }
-  
+
   return $logAnalyticsId
 }
