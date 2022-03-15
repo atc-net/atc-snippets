@@ -39,7 +39,7 @@ function Get-NewApplicationInsightsApiKey {
         --api-key $apiKeyName
     Throw-WhenError -output $oldApiKey
   }
-    
+
   Write-Host "    create new api-key" -ForegroundColor DarkYellow
   $apiKey = az monitor app-insights api-key create `
               --app $name `

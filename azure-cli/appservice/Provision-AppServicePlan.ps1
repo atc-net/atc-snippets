@@ -26,11 +26,12 @@ function Provision-AppServicePlan {
     [Parameter(Mandatory = $false)]
     [string]
     $Location = "westeurope",
-  
+
     [Parameter(Mandatory = $false)]
-    [string[]] $ResourceTags = @()
+    [string[]]
+    $ResourceTags = @()
   )
-  
+
   # import utility functions
   . "$PSScriptRoot\New-AppServicePlan.ps1"
   . "$PSScriptRoot\Update-AppServicePlan.ps1"
@@ -56,7 +57,7 @@ function Provision-AppServicePlan {
   }
   else {
     $appServicePlanResource = $appServicePlanJson | ConvertFrom-Json -AsHashtable
-    
+
     if ($true -eq $UseLinux -and $appServicePlanResource.os -ne "linux") {
       throw "App Service Plan '$AppServicePlanName' is already Windows and cannot be converted in-place to Linux"
     }

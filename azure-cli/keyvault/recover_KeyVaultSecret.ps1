@@ -10,7 +10,7 @@ function Recover-KeyVaultSecret {
   )
 
   Write-Host "    Recovering $secretName secret"
-  
+
   $output = az keyvault secret recover `
     --vault-name $keyVaultName `
     --name $secretName
@@ -27,7 +27,7 @@ function Recover-KeyVaultSecret {
     if ($err) {
       if ($err -like "*ERROR: (SecretNotFound)*") {
         Write-Host "    Secret is being recovered. Waiting one second"
-        Start-Sleep -Seconds 1 
+        Start-Sleep -Seconds 1
       }
       else {
         Throw-WhenError -output $err

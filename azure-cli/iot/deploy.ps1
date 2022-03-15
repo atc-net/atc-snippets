@@ -1,37 +1,4 @@
-<#
-  .SYNOPSIS
-  Deploys Azure Container Registry instance
-
-  .DESCRIPTION
-  The deploy.ps1 script deploys an IoT Hub instance using Azure CLI to a resource group in the relevant environment.
-
-  .PARAMETER location
-  Specifies the location where the services are deployed. Default is West Europe
-
-  .PARAMETER resourceGroupName
-  Specifies the name of the resource group
-
-  .PARAMETER iotHubName
-  Specifies the name of the Container Registry
-
-  .PARAMETER resourceTags
-  Specifies the tag elements that will be used to tag the deployed services
-
-  .INPUTS
-  None. You cannot pipe objects to deploy.ps1.
-
-  .OUTPUTS
-  None. deploy.ps1 does not generate any output.
-
-  .EXAMPLE
-  PS> .\deploy.ps1 -resourceGroupName xxx-DEV-xxx -iotHubName xxxxxxdevxxiot
-#>
 param (
-  [Parameter(Mandatory = $false)]
-  [ValidateNotNullOrEmpty()]
-  [string]
-  $location = "westeurope",
-
   [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
@@ -58,7 +25,12 @@ param (
   $iotHubProcessorConsumerGroupName,
 
   [Parameter(Mandatory = $false)]
-  [string[]] $resourceTags = @()
+  [string]
+  $location = "westeurope",
+
+  [Parameter(Mandatory = $false)]
+  [string[]]
+  $resourceTags = @()
 )
 
 #############################################################################################

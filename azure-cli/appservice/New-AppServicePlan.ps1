@@ -28,9 +28,10 @@ function New-AppServicePlan {
     $Location = "westeurope",
 
     [Parameter(Mandatory = $false)]
-    [string[]] $ResourceTags = @()
+    [string[]]
+    $ResourceTags = @()
   )
-  
+
   Write-Host "  Creating app service plan '$AppServicePlanName'" -ForegroundColor DarkYellow
 
   $dynamicParameters = @()

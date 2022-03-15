@@ -1,39 +1,3 @@
-<#
-  .SYNOPSIS
-  Deploys Azure App Service instance
-  .DESCRIPTION
-  The deploy.ps1 script deploys an Azure App Service instance using Azure CLI to a resource group in the relevant environment.
-
-  .PARAMETER environmentType
-  Specifies the environment type. Staging (DevTest) or Production
-
-  .PARAMETER location
-  Specifies the location where the services are deployed. Default is West Europe
-
-  .PARAMETER resourceGroupName
-  Specifies the name of the resource group
-
-  .PARAMETER apiName
-  Specifies the name of the app service api
-
-  .PARAMETER insightsName
-  Specifies the name of the application insights
-
-  .PARAMETER appServicePlanName
-  Specifies the name of the app service plan
-
-  .PARAMETER keyVaultName
-  Specifies the name of the key vault
-
-  .PARAMETER resourceTags
-  Specifies the tag elements that will be used to tag the deployed services
-
-  .INPUTS
-  None. You cannot pipe objects to deploy.ps1.
-
-  .OUTPUTS
-  None. deploy.ps1 does not generate any output.
-#>
 param (
   [Parameter(Mandatory = $false)]
   [ValidateNotNullOrEmpty()]
@@ -77,7 +41,8 @@ param (
   $keyVaultName,
 
   [Parameter(Mandatory = $false)]
-  [string[]] $resourceTags = @()
+  [string[]]
+  $resourceTags = @()
 )
 
 #############################################################################################
@@ -91,7 +56,7 @@ param (
 # Resource naming section
 #############################################################################################
 $instrumentationKey = Get-ApplicationInsightsInstrumentationKey $insightsName $resourceGroupName
-$appServicePlanId = Get-AppServicePlanId  $appServicePlanName $resourceGroupName
+$appServicePlanId = Get-AppServicePlanId $appServicePlanName $resourceGroupName
 
 #############################################################################################
 # Provision WebApi Service

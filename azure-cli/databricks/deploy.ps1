@@ -47,7 +47,7 @@ param (
   [string]
   $location = "westeurope",
 
-  [Parameter(Mandatory=$true)]
+  [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
   $tenantId,
@@ -57,35 +57,36 @@ param (
   [string]
   $resourceGroupName,
 
-  [Parameter(Mandatory=$true)]
+  [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
   $databricksName,
 
-  [Parameter(Mandatory=$true)]
+  [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
   $clientId,
 
-  [Parameter(Mandatory=$true)]
+  [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
   $objectId,
 
-  [Parameter(Mandatory=$true)]
+  [Parameter(Mandatory = $true)]
   [securestring]
   $clientSecret,
 
-  [Parameter(Mandatory=$true)]
+  [Parameter(Mandatory = $true)]
   [string]
   $logAnalyticsId,
 
-  [Parameter(Mandatory=$true)]
+  [Parameter(Mandatory = $true)]
   [string]
   $logAnalyticsKey,
 
   [Parameter(Mandatory = $false)]
-  [string[]] $resourceTags = @()
+  [string[]]
+  $resourceTags = @()
 )
 
 #############################################################################################
@@ -134,7 +135,7 @@ $resourceId = az resource show `
   --name $databricksName `
   --resource-type "Microsoft.Databricks/workspaces" `
   --query id
-$resourceId = $resourceId.Replace('"','')
+$resourceId = $resourceId.Replace('"', '')
 
 Throw-WhenError -output $resourceId
 
@@ -143,7 +144,7 @@ $workspaceUrl = az resource show `
   --name $databricksName `
   --resource-type "Microsoft.Databricks/workspaces" `
   --query properties.workspaceUrl
-$workspaceUrl = $workspaceUrl.Replace('"','')
+$workspaceUrl = $workspaceUrl.Replace('"', '')
 
 Throw-WhenError -output $workspaceUrl
 
