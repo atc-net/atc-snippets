@@ -19,8 +19,8 @@ function New-LogAnalyticsWorkspace {
     [string[]]
     $ResourceTags = @()
   )
-  
-  Write-Host "  Creating Log Analytics Workspace '$AppServicePlanName'" -ForegroundColor DarkYellow
+
+  Write-Host "  Creating Log Analytics Workspace '$LogAnalyticsName'" -ForegroundColor DarkYellow
 
   $logAnalyticsId = az monitor log-analytics workspace create `
     --workspace-name $LogAnalyticsName `
