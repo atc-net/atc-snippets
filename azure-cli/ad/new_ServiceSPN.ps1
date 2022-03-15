@@ -16,10 +16,12 @@ function New-ServiceSPN {
     $envKeyVaultName,
 
     [Parameter(Mandatory = $true)]
-    [EnvironmentConfig] $environmentConfig,
+    [EnvironmentConfig]
+    $environmentConfig,
 
     [Parameter(Mandatory = $true)]
-    [NamingConfig] $namingConfig,
+    [NamingConfig]
+    $namingConfig,
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]

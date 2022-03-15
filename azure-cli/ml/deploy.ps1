@@ -1,46 +1,4 @@
-<#
-  .SYNOPSIS
-  Deploys Azure Machine Learning workspace instance
-
-  .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Machine Learning workspace instance using Azure CLI to a resource group in the relevant environment.
-
-  .PARAMETER location
-  Specifies the location where the services are deployed. Default is West Europe
-
-  .PARAMETER resourceGroupName
-  Specifies the name of the resource group
-
-  .PARAMETER mlWorkspaceName
-  Specifies the name of the Machine Learning workspace
-
-  .PARAMETER dataLakeName
-  Specifies the name of the Data Lake
-
-  .PARAMETER insightsName
-  Specifies the name of the Application Insights
-
-  .PARAMETER keyVaultName
-  Specifies the name of the Key Vault
-
-  .PARAMETER registryName
-  Specifies the name of the Container Registry
-
-  .PARAMETER resourceTags
-  Specifies the tag elements that will be used to tag the deployed services
-
-  .INPUTS
-  None. You cannot pipe objects to deploy.ps1.
-
-  .OUTPUTS
-  None. deploy.ps1 does not generate any output.
-#>
 param (
-  [Parameter(Mandatory = $false)]
-  [ValidateNotNullOrEmpty()]
-  [string]
-  $location = "westeurope",
-
   [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
@@ -72,7 +30,12 @@ param (
   $registryName,
 
   [Parameter(Mandatory = $false)]
-  [string[]] $resourceTags = @()
+  [string]
+  $location = "westeurope",
+
+  [Parameter(Mandatory = $false)]
+  [string[]]
+  $resourceTags = @()
 )
 
 #############################################################################################

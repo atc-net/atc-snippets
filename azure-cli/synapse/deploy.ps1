@@ -1,40 +1,4 @@
-<#
-  .SYNOPSIS
-  Deploys Azure Synapse instance
-
-  .DESCRIPTION
-  The deploy.ps1 script deploys an Azure Synapse instance using Azure CLI to a resource group in the relevant environment.
-
-  .PARAMETER location
-  Specifies the location where the services are deployed. Default is West Europe
-
-  .PARAMETER resourceGroupName
-  Specifies the name of the resource group
-
-  .PARAMETER synapseWorkspaceName
-  Specifies the name of the Synapse workspace
-
-  .PARAMETER storageAccountName
-  Specifies the name of the storage account
-
-  .PARAMETER keyVaultName
-  Specifies the name of the key vault
-
-  .PARAMETER resourceTags
-  Specifies the tag elements that will be used to tag the deployed services
-
-  .INPUTS
-  None. You cannot pipe objects to deploy.ps1.
-
-  .OUTPUTS
-  None. deploy.ps1 does not generate any output.
-#>
 param (
-  [Parameter(Mandatory = $false)]
-  [ValidateNotNullOrEmpty()]
-  [string]
-  $location = "westeurope",
-
   [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
@@ -56,7 +20,12 @@ param (
   $keyVaultName,
 
   [Parameter(Mandatory = $false)]
-  [string[]] $resourceTags = @()
+  [string]
+  $location = "westeurope",
+
+  [Parameter(Mandatory = $false)]
+  [string[]]
+  $resourceTags = @()
 )
 
 #############################################################################################

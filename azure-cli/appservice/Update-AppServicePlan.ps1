@@ -18,7 +18,7 @@ function Update-AppServicePlan {
     [ValidateNotNullOrEmpty()]
     [string]
     $ResourceGroupName,
-   
+
     [Parameter(Mandatory = $false)]
     [string]
     $Location = "westeurope"
@@ -33,6 +33,6 @@ function Update-AppServicePlan {
     --query id
 
   Throw-WhenError -output $appServicePlanId
-  
+
   return $appServicePlanId
 }

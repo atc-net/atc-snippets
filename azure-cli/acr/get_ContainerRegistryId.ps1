@@ -1,10 +1,10 @@
 function Get-ContainerRegistryId {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $registryName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $resourceGroupName
   )

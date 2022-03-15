@@ -1,18 +1,18 @@
 function Test-EventGridSubscription {
   param(
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $name,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $sourceResourceId,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [array]
     $includedEventTypes = @(),
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [string]
     $advancedFilter = $null
   )
