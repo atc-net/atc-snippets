@@ -25,7 +25,7 @@ function New-ApplicationInsights {
     $ResourceTags = @()
   )
     
-  Write-Host "  Creating Application Insights '$AppServicePlanName'" -ForegroundColor DarkYellow
+  Write-Host "  Creating Application Insights '$InsightsName'" -ForegroundColor DarkYellow
   
   $instrumentationKey = az monitor app-insights component create `
     --app $InsightsName `
