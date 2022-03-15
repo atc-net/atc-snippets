@@ -2,18 +2,20 @@ function Get-LogAnalyticsKey {
   param (
     [Parameter(Mandatory = $true)]
     [string]
-    $logAnalyticsName,
+    $LogAnalyticsName,
 
     [Parameter(Mandatory = $true)]
     [string]
-    $resourceGroup
+    $ResourceGroupName
   )
 
-  Write-Host "  Get log analytics key" -ForegroundColor DarkYellow
+  Write-Host "  Getting Log Analytics key" -ForegroundColor DarkYellow
+  
   $logAnalyticsKey = az monitor log-analytics workspace get-shared-keys `
-    --workspace-name $logAnalyticsName `
-    --resource-group $resourceGroup `
-    --query primarySharedKey
+    --workspace-name $LogAnalyticsName `
+    --resource-group $ResourceGroupName `
+    --query primarySharedKey `
+    --output tsv
 
   Throw-WhenError -output $logAnalyticsKey
 
