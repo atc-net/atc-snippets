@@ -162,7 +162,7 @@ $instrumentationKey = Provision-ApplicationInsights `
   -LogAnalyticsId $logAnalyticsId `
   -ResourceGroupName $resourceGroupName `
   -Location $environmentConfig.Location `
-  -ResourceTags $resourceTags `
+  -ResourceTags $resourceTags
 
 #############################################################################################
 # Provision Azure Kubernetes Cluster (AKS)
