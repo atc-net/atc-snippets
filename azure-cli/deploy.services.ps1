@@ -40,8 +40,8 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 . "$PSScriptRoot\appservice\Provision-AppServicePlan.ps1"
 . "$PSScriptRoot\utilities\deploy.utilities.ps1"
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
-. "$PSScriptRoot\monitor\get_LogAnalyticsId.ps1"
-. "$PSScriptRoot\monitor\get_LogAnalyticsKey.ps1"
+. "$PSScriptRoot\monitor\Provision-ApplicationInsights.ps1"
+. "$PSScriptRoot\monitor\Provision-LogAnalyticsWorkspace.ps1"
 . "$PSScriptRoot\keyvault\get_KeyVaultSecret.ps1"
 . "$PSScriptRoot\storage\get_StorageAccountKey.ps1"
 . "$PSScriptRoot\iot\add_IotHubToDataLakeRoutingEndpoint.ps1"
@@ -147,14 +147,22 @@ $appServicePlanId = Provision-AppServicePlan `
 ############################################################################################
 # Provision Log Analytics and Application Insights
 ############################################################################################
-& "$PSScriptRoot\monitor\deploy.ps1" `
-  -resourceGroupName $resourceGroupName `
-  -logAnalyticsName $logAnalyticsName `
-  -insightsName $insightsName `
-  -resourceTags $resourceTags
+$logAnalyticsId = Provision-LogAnalyticsWorkspace `
+  -LogAnalyticsName $logAnalyticsName `
+  -ResourceGroupName $resourceGroupName `
+  -Location $environmentConfig.Location `
+  -ResourceTags $resourceTags
 
-$logAnalyticsId = Get-LogAnalyticsId -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
-$logAnalyticsKey = Get-LogAnalyticsKey -logAnalyticsName $logAnalyticsName -resourceGroup $resourceGroupName
+$logAnalyticsKey = Get-LogAnalyticsKey `
+  -LogAnalyticsName $logAnalyticsName `
+  -ResourceGroup $resourceGroupName
+
+$instrumentationKey = Provision-ApplicationInsights `
+  -Name $insightsName `
+  -LogAnalyticsId $logAnalyticsId `
+  -ResourceGroupName $resourceGroupName `
+  -Location $environmentConfig.Location `
+  -ResourceTags $resourceTags
 
 #############################################################################################
 # Provision Azure Kubernetes Cluster (AKS)
