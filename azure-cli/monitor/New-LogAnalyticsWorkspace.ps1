@@ -16,7 +16,8 @@ function New-LogAnalyticsWorkspace {
     $Location = "westeurope",
 
     [Parameter(Mandatory = $false)]
-    [string[]] $ResourceTags = @()
+    [string[]]
+    $ResourceTags = @()
   )
   
   Write-Host "  Creating Log Analytics Workspace '$AppServicePlanName'" -ForegroundColor DarkYellow
