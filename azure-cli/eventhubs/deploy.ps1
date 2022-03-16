@@ -57,6 +57,7 @@ Write-Host "  Creating event hub namespace $eventHubNamespaceName" -ForegroundCo
 $output = az eventhubs namespace create `
   --name $eventHubNamespaceName `
   --resource-group $resourceGroupName `
+  --location $location `
   --sku 'Standard' `
   --tags $resourceTags
 
