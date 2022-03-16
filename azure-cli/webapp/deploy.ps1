@@ -10,11 +10,6 @@ param (
   [string]
   $environmentName,
 
-  [Parameter(Mandatory = $false)]
-  [ValidateNotNullOrEmpty()]
-  [string]
-  $location = "westeurope",
-
   [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
