@@ -1,34 +1,15 @@
-<#
-  .SYNOPSIS
-  Deploys Azure resource groups and key vaults with Azure CLI
-
-  .DESCRIPTION
-  The deploy.initial.ps1 script deploys Azure resource groups and key vaults for an application with an environment resource group and a service recource group
-
-  .PARAMETER environmentConfig
-  Specifies the environment configuration
-
-  .PARAMETER namingConfig
-  Specifies the configuration element used to build the resource names for the resource group and the services
-
-  .PARAMETER resourceTags
-  Specifies the tag elements that will be used to tag the deployed services
-
-  .INPUTS
-  None. You cannot pipe objects to deploy.initial.ps1.
-
-  .OUTPUTS
-  None. deploy.initial.ps1 does not generate any output.
-#>
 param (
   [Parameter(Mandatory = $true)]
-  [EnvironmentConfig] $environmentConfig,
+  [EnvironmentConfig]
+  $environmentConfig,
 
   [Parameter(Mandatory = $true)]
-  [NamingConfig] $namingConfig,
+  [NamingConfig]
+  $namingConfig,
 
   [Parameter(Mandatory = $false)]
-  [string[]] $resourceTags = @()
+  [string[]]
+  $resourceTags = @()
 )
 
 #############################################################################################

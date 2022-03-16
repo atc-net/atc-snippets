@@ -1,34 +1,15 @@
-<#
-  .SYNOPSIS
-  Deploys Azure services with Azure CLI
-
-  .DESCRIPTION
-  The deploy.services.ps1 script deploys Azure service using the CLI tool to a resource group in the relevant environment.
-
-  .PARAMETER environmentConfig
-  Specifies the environment configuration
-
-  .PARAMETER namingConfig
-  Specifies the configuration element used to build the resource names for the resource group and the services
-
-  .PARAMETER resourceTags
-  Specifies the tag elements that will be used to tag the deployed services
-
-  .INPUTS
-  None. You cannot pipe objects to deploy.services.ps1.
-
-  .OUTPUTS
-  None. deploy.services.ps1 does not generate any output.
-#>
 param (
   [Parameter(Mandatory = $true)]
-  [EnvironmentConfig] $environmentConfig,
+  [EnvironmentConfig]
+  $environmentConfig,
 
   [Parameter(Mandatory = $true)]
-  [NamingConfig] $namingConfig,
+  [NamingConfig]
+  $namingConfig,
 
   [Parameter(Mandatory = $false)]
-  [string[]] $resourceTags = @()
+  [string[]]
+  $resourceTags = @()
 )
 
 #############################################################################################
