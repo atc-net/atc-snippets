@@ -33,6 +33,7 @@ function Provision-AppServicePlan {
   )
 
   # import utility functions
+  . "$PSScriptRoot\..\utilities\ConvertFrom-LocationDisplayName.ps1"
   . "$PSScriptRoot\New-AppServicePlan.ps1"
   . "$PSScriptRoot\Update-AppServicePlan.ps1"
 
@@ -65,7 +66,8 @@ function Provision-AppServicePlan {
       throw "App Service Plan '$AppServicePlanName' is already Linux and cannot be converted in-place to Windows"
     }
 
-    if ($appServicePlanResource.sku -ne $Sku -or $appServicePlanResource.location -ne "West Europe") {
+    if ($appServicePlanResource.sku -ne $Sku -or 
+       ($appServicePlanResource.location | ConvertFrom-LocationDisplayName) -ne $Location) {
       Write-Host " -> Resource exists, but changes are detected" -ForegroundColor Cyan
 
       $appServicePlanId = Update-AppServicePlan `
