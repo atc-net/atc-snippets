@@ -56,6 +56,7 @@ $eventHubNamespaceName  = Get-ResourceName -environmentConfig $environmentConfig
 $databricksName         = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
 $functionName           = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig -suffix 'func'
 $iotHubName             = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
+$dpsName                = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
 $sqlServerName          = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
 $sqlServerName          = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig
 $dataLakeName           = Get-ResourceName -environmentConfig $environmentConfig -namingConfig $namingConfig -suffix 'dls'
@@ -85,6 +86,7 @@ Write-Host "* Event hub namespace              : $eventHubNamespaceName" -Foregr
 Write-Host "* Databricks workspace             : $databricksName" -ForegroundColor White
 Write-Host "* Function app                     : $functionName" -ForegroundColor White
 Write-Host "* IoT Hub                          : $iotHubName" -ForegroundColor White
+Write-Host "* Device Provisioning Service      : $dpsName" -ForegroundColor White
 Write-Host "* SQL server                       : $sqlServerName" -ForegroundColor White
 Write-Host "* Data Lake                        : $dataLakeName" -ForegroundColor White
 Write-Host "* Machine Learning workspace       : $mlWorkspaceName" -ForegroundColor White
@@ -103,7 +105,7 @@ $objectId = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $objec
 $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $clientSecretName
 
 #############################################################################################
-# Provision Azure Container Registry
+# Initialize Azure Container Registry
 #############################################################################################
 & "$PSScriptRoot\acr\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
@@ -111,7 +113,7 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
   -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Azure App Service Plan
+# Initialize Azure App Service Plan
 #############################################################################################
 $appServiceSku = 'S1'
 if ($environmentConfig.EnvironmentType -eq 'Production') {
@@ -126,7 +128,7 @@ $appServicePlanId = Provision-AppServicePlan `
   -ResourceTags $resourceTags
 
 ############################################################################################
-# Provision Log Analytics and Application Insights
+# Initialize Log Analytics and Application Insights
 ############################################################################################
 $logAnalyticsId = Provision-LogAnalyticsWorkspace `
   -LogAnalyticsName $logAnalyticsName `
@@ -146,7 +148,7 @@ $instrumentationKey = Provision-ApplicationInsights `
   -ResourceTags $resourceTags
 
 #############################################################################################
-# Provision Azure Kubernetes Cluster (AKS)
+# Initialize Azure Kubernetes Cluster (AKS)
 #############################################################################################
 & "$PSScriptRoot\aks\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
@@ -158,7 +160,7 @@ $instrumentationKey = Provision-ApplicationInsights `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Cosmos Db account
+# Initialize Cosmos Db account
 #############################################################################################
 & "$PSScriptRoot\cosmosdb\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
@@ -166,7 +168,7 @@ $instrumentationKey = Provision-ApplicationInsights `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Storage Account
+# Initialize Storage Account
 #############################################################################################
 & "$PSScriptRoot\storage\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
@@ -174,7 +176,7 @@ $instrumentationKey = Provision-ApplicationInsights `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Event Hubs
+# Initialize Event Hubs
 #############################################################################################
 & "$PSScriptRoot\eventhubs\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
@@ -183,7 +185,7 @@ $instrumentationKey = Provision-ApplicationInsights `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Databricks
+# Initialize Databricks
 #############################################################################################
 & "$PSScriptRoot\databricks\deploy.ps1" `
   -tenantId $tenantId `
@@ -196,7 +198,7 @@ $instrumentationKey = Provision-ApplicationInsights `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Provision function app
+# Initialize function app
 #############################################################################################
 & "$PSScriptRoot\functionapp\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
@@ -208,18 +210,44 @@ $instrumentationKey = Provision-ApplicationInsights `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Provision IoTHub
+# Initialize IotHub & DPS
 #############################################################################################
-& "$PSScriptRoot\iot\deploy.ps1" `
-  -resourceGroupName $resourceGroupName `
-  -iotHubName $iotHubName `
-  -iotHubSasPolicyNameWebApi 'webapiService' `
-  -iotHubSasPolicyNameFunctionApp 'functionAppService' `
-  -iotHubProcessorConsumerGroupName 'processorfunction' `
-  -resourceTags $resourceTags
+$iotHubSku = 'S1'
+if ($environmentConfig.EnvironmentType -eq 'Production') {
+  $iotHubSku = 'S2'
+}
+
+Initialize-IotHub `
+  -Name $iotHubName `
+  -ResourceGroupName $resourceGroupName `
+  -Sku $iotHubSku `
+  -NumberOfUnits 1 `
+  -PartitionCount 4 `
+  -RetentionTimeInDays 7 `
+  -CloudToDeviceMaxAttempts 10 `
+  -CloudToDeviceMessageLifeTimeInHours 1 `
+  -FeedbackQueueMaximumDeliveryCount 10 `
+  -FeedbackQueueLockDurationInSeconds 60 `
+  -FeedbackQueueTimeToLiveInHours 1 `
+  -Location $environmentConfig.Location `
+  -ResourceTags $resourceTags
+
+Initialize-DeviceProvisioningService `
+  -Name $dpsName `
+  -ResourceGroupName $resourceGroupName `
+  -Sku 'S1' `
+  -NumberOfUnits 1 `
+  -AllocationPolicy 'Hashed' `
+  -Location $environmentConfig.Location `
+  -ResourceTags $resourceTags
+
+Connect-IotHubWithDeviceProvisioningService `
+  -IotHubName $iotHubName `
+  -DeviceProvisioningServiceName $dpsName `
+  -ResourceGroupName $resourceGroupName
 
 #############################################################################################
-# Provision SQL server
+# Initialize SQL server
 #############################################################################################
 & "$PSScriptRoot\sql\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
@@ -229,7 +257,7 @@ $instrumentationKey = Provision-ApplicationInsights `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Data Lake
+# Initialize Data Lake
 #############################################################################################
 & "$PSScriptRoot\datalake\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
@@ -237,7 +265,7 @@ $instrumentationKey = Provision-ApplicationInsights `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Machine Learning workspace
+# Initialize Machine Learning workspace
 #############################################################################################
 & "$PSScriptRoot\ml\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
@@ -249,7 +277,7 @@ $instrumentationKey = Provision-ApplicationInsights `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Provision SignalR
+# Initialize SignalR
 #############################################################################################
 & "$PSScriptRoot\signalR\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
@@ -258,7 +286,7 @@ $instrumentationKey = Provision-ApplicationInsights `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Synapse workspace
+# Initialize Synapse workspace
 #############################################################################################
 & "$PSScriptRoot\synapse\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
@@ -278,7 +306,7 @@ $instrumentationKey = Provision-ApplicationInsights `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Provision function app api
+# Initialize function app api
 #############################################################################################
 & "$PSScriptRoot\webapp\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
@@ -290,7 +318,7 @@ $instrumentationKey = Provision-ApplicationInsights `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Provision Service Bus namespace
+# Initialize Service Bus namespace
 #############################################################################################
 & "$PSScriptRoot\servicebus\deploy.ps1" `
   -resourceGroupName $resourceGroupName `
