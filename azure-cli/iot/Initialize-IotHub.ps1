@@ -74,9 +74,23 @@ function Initialize-IotHub {
 
   Write-Host "  Querying for existing iot hub" -ForegroundColor DarkYellow -NoNewline
 
+  $jmesPath = `
+  "[?name=='$IotHubName'] " + `
+  "| [0]" + `
+  ".{" + `
+  "retentionTimeInDays: properties.eventHubEndpoints.events.retentionTimeInDays, " + `
+  "cloudToDeviceMessageLifeTimeIso8601: properties.cloudToDevice.defaultTtlAsIso8601, " + `
+  "cloudToDeviceMaxAttempts: properties.cloudToDevice.maxDeliveryCount, " + `
+  "feedbackQueueMaximumDeliveryCount: properties.cloudToDevice.feedback.maxDeliveryCount, " + `
+  "feedbackQueueLockDurationIso8601: properties.cloudToDevice.feedback.lockDurationAsIso8601, " + `
+  "feedbackQueueTimeToLiveIso8601: properties.cloudToDevice.feedback.ttlAsIso8601" + `
+  "sku: sku.name" + `
+  "numberOfUnits: sku.capacity" + `
+  "}"
+
   $iotJson = az iot hub list `
     --resource-group $ResourceGroupName `
-    --query "[?name=='$IotHubName']|[0].{retentionTimeInDays: properties.eventHubEndpoints.events.retentionTimeInDays, cloudToDeviceMessageLifeTimeIso8601: properties.cloudToDevice.defaultTtlAsIso8601, cloudToDeviceMaxAttempts: properties.cloudToDevice.maxDeliveryCount, feedbackQueueMaximumDeliveryCount: properties.cloudToDevice.feedback.maxDeliveryCount, feedbackQueueLockDurationIso8601: properties.cloudToDevice.feedback.lockDurationAsIso8601, feedbackQueueTimeToLiveIso8601: properties.cloudToDevice.feedback.ttlAsIso8601, sku: sku.name, numberOfUnits: sku.capacity}"
+    --query $jmesPath
 
   if ($null -eq $iotJson) {
     Write-Host " -> Resource not found." -ForegroundColor Cyan
