@@ -53,9 +53,9 @@ function Update-IotHub {
     $FeedbackQueueTimeToLiveInHours = 1
   )
 
-  Write-Host "  Updating iot hub '$DeviceProvisioningServiceName'" -ForegroundColor DarkYellow
+  Write-Host "  Updating iot hub '$IotHubName'" -ForegroundColor DarkYellow
   $output = az iot hub update `
-    --name $DeviceProvisioningServiceName `
+    --name $IotHubName `
     --resource-group $ResourceGroupName `
     --retention-day $RetentionTimeInDays `
     --c2d-max-delivery-count $CloudToDeviceMaxAttempts `
