@@ -27,6 +27,10 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 . "$PSScriptRoot\storage\get_StorageAccountKey.ps1"
 . "$PSScriptRoot\iot\add_IotHubToDataLakeRoutingEndpoint.ps1"
 . "$PSScriptRoot\iot\get_IoTHubServiceFunctionEventHubEndpointConnection.ps1"
+. "$PSScriptRoot\iot\Initialize-IotHub.ps1"
+. "$PSScriptRoot\iot\Initialize-DeviceProvisioningService.ps1"
+. "$PSScriptRoot\iot\Connect-IotHubWithDeviceProvisioningService.ps1"
+. "$PSScriptRoot\acr\Initialize-ContainerRegistry.ps1"
 . "$PSScriptRoot\cosmosdb\get_CosmosConnectionString.ps1"
 . "$PSScriptRoot\signalr\get_SignalRConnectionString.ps1"
 
@@ -107,10 +111,13 @@ $clientSecret = Get-KeyVaultSecret -keyVaultName $envKeyVaultName -secretName $c
 #############################################################################################
 # Initialize Azure Container Registry
 #############################################################################################
-& "$PSScriptRoot\acr\deploy.ps1" `
-  -resourceGroupName $resourceGroupName `
-  -registryName $registryName `
-  -resourceTags $resourceTags
+Initialize-ContainerRegistry `
+  -Name $environmentContainerRegistryName `
+  -ResourceGroupName $environmentResourceGroupName `
+  -Sku 'Standard' `
+  -$AdminEnabled $true `
+  -Location $environmentConfig.Location `
+  -ResourceTags $resourceTags
 
 #############################################################################################
 # Initialize Azure App Service Plan
