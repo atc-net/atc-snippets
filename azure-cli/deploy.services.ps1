@@ -325,6 +325,15 @@ Connect-IotHubWithDeviceProvisioningService `
   -resourceTags $resourceTags
 
 #############################################################################################
+# Add Swagger authorization to function app api
+#############################################################################################
+& "$PSScriptRoot\add\deploy.swagger.ps1" `
+  -companyHostName $companyHostName `
+  -environmentConfig $environmentConfig `
+  -namingConfig $namingConfig `
+  -serviceInstance $serviceInstance
+
+#############################################################################################
 # Initialize Service Bus namespace
 #############################################################################################
 & "$PSScriptRoot\servicebus\deploy.ps1" `
