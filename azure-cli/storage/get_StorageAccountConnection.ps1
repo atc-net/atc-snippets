@@ -6,7 +6,7 @@ function Get-StorageConnectionString {
 
     [Parameter(Mandatory = $true)]
     [string]
-    $resourceGroup
+    $resourceGroupName
   )
 
   Write-Host "  Get Storage Account connection string for $storageAccountName" -ForegroundColor DarkYellow
