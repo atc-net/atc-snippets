@@ -17,7 +17,7 @@ param (
 #############################################################################################
 Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 
-# import utility functions
+# Import utility functions
 . "$PSScriptRoot\appservice\Provision-AppServicePlan.ps1"
 . "$PSScriptRoot\utilities\deploy.utilities.ps1"
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
@@ -33,6 +33,11 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 . "$PSScriptRoot\acr\Initialize-ContainerRegistry.ps1"
 . "$PSScriptRoot\cosmosdb\get_CosmosConnectionString.ps1"
 . "$PSScriptRoot\signalr\get_SignalRConnectionString.ps1"
+. "$PSScriptRoot\webapp\Initialize-WebApp.ps1"
+
+# Import classes
+. "$PSScriptRoot\utilities\VnetIntegration.ps1"
+
 
 # Install required extensions
 . "$PSScriptRoot\extensions.ps1"
@@ -313,16 +318,26 @@ Connect-IotHubWithDeviceProvisioningService `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Initialize function app api
+# Initialize Web App Service
 #############################################################################################
-& "$PSScriptRoot\webapp\deploy.ps1" `
-  -resourceGroupName $resourceGroupName `
-  -environmentName $environmentConfig.EnvironmentName `
-  -apiName $apiName `
-  -insightsName $insightsName  `
-  -appServicePlanName $appServicePlanName `
-  -keyVaultName $keyVaultName `
-  -resourceTags $resourceTags
+$webAppSettings = @{
+  APPINSIGHTS_INSTRUMENTATIONKEY             = $instrumentationKey
+  ApplicationInsightsAgent_EXTENSION_VERSION = "~2"
+  XDT_MicrosoftApplicationInsights_Mode      = "recommended"
+  ServiceOptions__EnvironmentName            = $environmentConfig.EnvironmentName
+  ServiceOptions__EnvironmentType            = $environmentConfig.EnvironmentType
+}
+
+Initialize-WebApp `
+  -Name $apiName `
+  -AppServicePlanId $appServicePlanId `
+  -AppSettings $webAppSettings `
+  -ResourceGroupName $resourceGroupName `
+  -AllowedOrigins @("*") `
+  -KeyVaultName $keyVaultName `
+  -VnetIntegrations @([VnetIntegration]::new($vnetName, $subnetName)) `
+  -SubscriptionId $subscriptionId `
+  -ResourceTags $resourceTags
 
 #############################################################################################
 # Initialize Service Bus namespace
