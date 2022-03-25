@@ -1,6 +1,11 @@
 function Set-KeyVaultSecretPermissions {
   param (
     [Parameter(Mandatory = $true)]
+    [Alias("Name")]
+    [string]
+    $KeyVaultName,
+    
+    [Parameter(Mandatory = $true)]
     [string]
     $ObjectId,
 
@@ -8,10 +13,6 @@ function Set-KeyVaultSecretPermissions {
     [ValidateSet("all", "backup", "delete", "get", "list", "purge", "recover", "restore", "set")]
     [string[]]
     $SecretPermissions,
-
-    [Parameter(Mandatory = $true)]
-    [string]
-    $KeyVaultName,
 
     [Parameter(Mandatory = $true)]
     [string]
