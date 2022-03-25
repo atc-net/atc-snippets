@@ -45,7 +45,7 @@ function Set-WebAppCors {
       Write-Host " -> CORS changes detected." -ForegroundColor Cyan
       Write-Host "  Setting CORS Allowed Origins to '$AllowedOrigins'" -ForegroundColor DarkYellow
 
-      # If allowed-origins is a wildcard, we have to wrap and escape the wildcard for it work with az cli
+      # If allowed-origins is a wildcard, we have to wrap and escape the wildcard for it to also work with az cli on Linux.
       $wildcardIndex = $AllowedOrigins.IndexOf("*")
       if ($wildcardIndex -ge 0) {
         $AllowedOrigins[$wildcardIndex] = "`"`*`""
