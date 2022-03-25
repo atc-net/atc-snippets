@@ -23,7 +23,7 @@ function Set-KeyVaultSecretPermissions {
 
   $output = az keyvault list `
     --resource-group $ResourceGroupName `
-    --query "[?name=='$($KeyVaultName)']|[0].properties.accessPolicies[?objectId=='$ObjectId']|[0].permissions.secrets"
+    --query "[?name=='$KeyVaultName']|[0].properties.accessPolicies[?objectId=='$ObjectId']|[0].permissions.secrets"
 
   # Create a boolean that determines if we should invoke the `az keyvault set-policy` command.
   # If the $output variable is null, it means that there is no pre-existing policies configured and thus we should always invoke the command.
