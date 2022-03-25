@@ -1,14 +1,14 @@
 class VnetIntegration {
   [Parameter(Mandatory = $true)]
   [string]
-  $Vnet
+  $VnetName
 
   [Parameter(Mandatory = $true)]
   [string]
-  $Subnet
+  $SubnetName
 
-  VnetIntegration([string]$Vnet, [string]$Subnet) {
-    $this.Vnet = $Vnet
-    $this.Subnet = $Subnet
+  VnetIntegration([string]$VnetName, [string]$SubnetName) {
+    $this.VnetName = $VnetName
+    $this.SubnetName = $SubnetName
   }
 }
