@@ -26,7 +26,7 @@ function Set-KeyVaultSecretPermissions {
     --query "[?name=='$KeyVaultName']|[0].properties.accessPolicies[?objectId=='$ObjectId']|[0].permissions.secrets"
 
   # Create a boolean that determines if we should invoke the `az keyvault set-policy` command.
-  # If the $output variable is null, it means that there is no pre-existing policies configured and thus we should always invoke the command.
+  # If the $output variable is null, it means that there are no pre-existing policies configured and thus we should always invoke the command.
   $invokeSetKeyVaultPolicy = $null -eq $output
 
   if (-not $invokeKeyVaultSetPolicy) {
