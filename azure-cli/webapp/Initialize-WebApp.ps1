@@ -65,7 +65,8 @@ function Initialize-WebApp {
     "{" + `
     "appServicePlanId: appServicePlanId, " + `
     "minTlsVersion: siteConfig.minTlsVersion, " + `
-    "use32BitWorkerProcess: siteConfig.use32BitWorkerProcess" + `
+    "use32BitWorkerProcess: siteConfig.use32BitWorkerProcess, " + `
+    "ftpsState: siteConfig.ftpsState" + `
     "}"
 
   # `az webapp list` returns null values for all siteConfig properties.
@@ -106,7 +107,8 @@ function Initialize-WebApp {
   $webAppResource = $webAppResourceJson | ConvertFrom-Json -AsHashtable
 
   if ($webAppResource.minTlsVersion -ne $minTlsVersion -or
-    $webAppResource.use32BitWorkerProcess -ne $false) {
+    $webAppResource.use32BitWorkerProcess -ne $false -or
+    $webAppResource.ftpsState -ne "Disabled") {
     Write-Host " -> Changes found." -ForegroundColor Cyan
     Write-Host "  Updating general settings" -ForegroundColor DarkYellow
     $output = az webapp config set `
