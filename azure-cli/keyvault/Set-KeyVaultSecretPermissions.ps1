@@ -29,8 +29,8 @@ function Set-KeyVaultSecretPermissions {
   # If the $output variable is null, it means that there are no pre-existing policies configured and thus we should always invoke the command.
   $invokeSetKeyVaultPolicy = $null -eq $output
 
-  if (-not $invokeKeyVaultSetPolicy) {
-    # If $invokeKeyVaultSetPolicy is false, we know that we got a match and a valid JSON response from the query above.
+  if (-not $invokeSetKeyVaultPolicy) {
+    # If $invokeSetKeyVaultPolicy is false, we know that we got a match and a valid JSON response from the query above.
     $existingPermissions = $output | ConvertFrom-Json
 
     # Use LINQ to determine if all the permissions in our $SecretPermissions parameter is already present on the key vault.
