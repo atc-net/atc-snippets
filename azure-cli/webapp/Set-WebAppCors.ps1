@@ -16,7 +16,7 @@ function Set-WebAppCors {
     $ResourceGroupName
   )
 
-  Write-Host "  Verifiying cross-origin resource sharing (CORS)" -ForegroundColor DarkYellow -NoNewline
+  Write-Host "  Verifying cross-origin resource sharing (CORS)" -ForegroundColor DarkYellow -NoNewline
   $output = az webapp cors show `
     --name $WebAppName `
     --resource-group $ResourceGroupName `
