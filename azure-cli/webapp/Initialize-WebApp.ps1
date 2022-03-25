@@ -89,7 +89,7 @@ function Initialize-WebApp {
     Throw-WhenError -output $output
 
     # As with `az webapp list`, `az webapp create` returns null values for all siteConfig properties.
-    # Therefor we invoke the `az webapp show` query again, to get all the needed info.
+    # Therefore we invoke the `az webapp show` query again, to get all the needed info.
     $webAppResourceJson = az webapp show `
       --resource-group $ResourceGroupName `
       --name $WebAppName `
