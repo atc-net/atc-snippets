@@ -19,7 +19,7 @@ function Set-KeyVaultSecretPermissions {
     $ResourceGroupName
   )
 
-  Write-Host "  Verifiying secret permissions '$SecretPermissions' on Key Vault '$KeyVaultName' for Object ID '$ObjectId'" -ForegroundColor DarkYellow -NoNewline
+  Write-Host "  Verifying secret permissions '$SecretPermissions' on Key Vault '$KeyVaultName' for Object ID '$ObjectId'" -ForegroundColor DarkYellow -NoNewline
 
   $output = az keyvault list `
     --resource-group $ResourceGroupName `
