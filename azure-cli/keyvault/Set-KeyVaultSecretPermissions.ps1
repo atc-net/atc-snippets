@@ -39,7 +39,7 @@ function Set-KeyVaultSecretPermissions {
 
   if ($invokeSetKeyVaultPolicy) {
     Write-Host "  -> Permissions are not configured." -ForegroundColor Cyan
-    Write-Host "  Granting '$SecretPermissions' secret permissions to target Key Vault '$KeyVaultName'" -ForegroundColor DarkYellow
+    Write-Host "  Granting '$SecretPermissions' secret permissions to Key Vault '$KeyVaultName'" -ForegroundColor DarkYellow
     $output = az keyvault set-policy `
       --object-id $ObjectId `
       --secret-permissions $SecretPermissions `
