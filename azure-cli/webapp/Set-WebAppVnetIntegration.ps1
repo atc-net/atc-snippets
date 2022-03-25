@@ -15,6 +15,11 @@ function Set-WebAppVnetIntegration {
 
     [Parameter(Mandatory = $true, ParameterSetName = "Single")]
     [Parameter(Mandatory = $true, ParameterSetName = "Multiple")]
+    [Alias("AppName")]
+    $WebAppName,
+
+    [Parameter(Mandatory = $true, ParameterSetName = "Single")]
+    [Parameter(Mandatory = $true, ParameterSetName = "Multiple")]
     $SubscriptionId,
 
     [Parameter(Mandatory = $true, ParameterSetName = "Single")]

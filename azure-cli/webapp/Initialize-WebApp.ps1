@@ -145,6 +145,7 @@ function Initialize-WebApp {
   #############################################################################################
   if ($VnetIntegrations.Count -gt 0) {
     Set-WebAppVnetIntegration `
+      -WebAppName $WebAppName `
       -VnetIntegrations $VnetIntegrations `
       -SubscriptionId $SubscriptionId `
       -ResourceGroupName $ResourceGroupName
