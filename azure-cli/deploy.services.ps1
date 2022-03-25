@@ -18,11 +18,11 @@ param (
 Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 
 # Import utility functions
-. "$PSScriptRoot\appservice\Provision-AppServicePlan.ps1"
+. "$PSScriptRoot\appservice\Initialize-AppServicePlan.ps1"
 . "$PSScriptRoot\utilities\deploy.utilities.ps1"
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
-. "$PSScriptRoot\monitor\Provision-ApplicationInsights.ps1"
-. "$PSScriptRoot\monitor\Provision-LogAnalyticsWorkspace.ps1"
+. "$PSScriptRoot\monitor\Initialize-ApplicationInsights.ps1"
+. "$PSScriptRoot\monitor\Initialize-LogAnalyticsWorkspace.ps1"
 . "$PSScriptRoot\keyvault\get_KeyVaultSecret.ps1"
 . "$PSScriptRoot\storage\get_StorageAccountKey.ps1"
 . "$PSScriptRoot\iot\add_IotHubToDataLakeRoutingEndpoint.ps1"
@@ -132,7 +132,7 @@ if ($environmentConfig.EnvironmentType -eq 'Production') {
   $appServiceSku = 'P1V2'
 }
 
-$appServicePlanId = Provision-AppServicePlan `
+$appServicePlanId = Initialize-AppServicePlan `
   -Name $appServicePlanName `
   -Sku $appServiceSku `
   -ResourceGroupName $resourceGroupName `
@@ -142,7 +142,7 @@ $appServicePlanId = Provision-AppServicePlan `
 ############################################################################################
 # Initialize Log Analytics and Application Insights
 ############################################################################################
-$logAnalyticsId = Provision-LogAnalyticsWorkspace `
+$logAnalyticsId = Initialize-LogAnalyticsWorkspace `
   -LogAnalyticsName $logAnalyticsName `
   -ResourceGroupName $resourceGroupName `
   -Location $environmentConfig.Location `
@@ -152,7 +152,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey `
   -LogAnalyticsName $logAnalyticsName `
   -ResourceGroup $resourceGroupName
 
-$instrumentationKey = Provision-ApplicationInsights `
+$instrumentationKey = Initialize-ApplicationInsights `
   -Name $insightsName `
   -LogAnalyticsId $logAnalyticsId `
   -ResourceGroupName $resourceGroupName `

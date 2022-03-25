@@ -1,4 +1,4 @@
-function Provision-ApplicationInsights {
+function Initialize-ApplicationInsights {
   param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
