@@ -107,7 +107,7 @@ function Initialize-WebApp {
 
   if ($webAppResource.minTlsVersion -ne $minTlsVersion -or
     $webAppResource.use32BitWorkerProcess -ne $false) {
-    Write-Host " -> Changes changes found." -ForegroundColor Cyan
+    Write-Host " -> Changes found." -ForegroundColor Cyan
     Write-Host "  Updating general settings" -ForegroundColor DarkYellow
     $output = az webapp config set `
       --name $WebAppName `
