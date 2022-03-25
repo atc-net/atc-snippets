@@ -1,6 +1,7 @@
 function Get-WebAppManagedIdentityPrincipalId {
   param(
     [Parameter(Mandatory = $true)]
+    [Alias("Name", "AppName")]
     [string]
     $WebAppName,
 
