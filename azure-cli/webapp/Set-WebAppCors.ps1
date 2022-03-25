@@ -6,14 +6,14 @@ function Set-WebAppCors {
     [string]
     $WebAppName,
 
-    [Parameter(Mandatory = $false)]
-    [string[]]
-    $AllowedOrigins,
-
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $ResourceGroupName
+    $ResourceGroupName,
+
+    [Parameter(Mandatory = $false)]
+    [string[]]
+    $AllowedOrigins
   )
 
   Write-Host "  Verifying cross-origin resource sharing (CORS)" -ForegroundColor DarkYellow -NoNewline
