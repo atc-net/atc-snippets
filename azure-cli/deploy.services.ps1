@@ -33,7 +33,7 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 . "$PSScriptRoot\acr\Initialize-ContainerRegistry.ps1"
 . "$PSScriptRoot\cosmosdb\get_CosmosConnectionString.ps1"
 . "$PSScriptRoot\signalr\get_SignalRConnectionString.ps1"
-. "$PSScriptRoot\ad\Initialize-SwaggerSPN.ps1"
+. "$PSScriptRoot\ad\Initialize-SwaggerSpn.ps1"
 
 # Install required extensions
 . "$PSScriptRoot\extensions.ps1"
@@ -335,7 +335,7 @@ if ($environmentConfig.EnvironmentType -ne "Production") {
   $redirectUris = "[\""$($redirectUri.ToLower())\"", \""https://localhost:5001/swagger/oauth2-redirect.html\""]"
 }
 
-Initialize-SwaggerSPN `
+Initialize-SwaggerSpn `
   -CompanyHostName $companyHostName `
   -EnvironmentConfig $environmentConfig `
   -NamingConfig $namingConfig `

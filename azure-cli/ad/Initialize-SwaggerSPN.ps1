@@ -1,4 +1,4 @@
-function Initialize-SwaggerSPN {
+function Initialize-SwaggerSpn {
   param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
