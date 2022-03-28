@@ -72,7 +72,7 @@ az rest `
   --method PATCH `
   --uri "https://graph.microsoft.com/v1.0/applications/$swaggerAppObjectId" `
   --headers "Content-Type=application/json" `
-    --body "{\""spa\"":{\""redirectUris\"":$redirectUris}}"
+  --body "{\""spa\"":{\""redirectUris\"":$redirectUris}}"
 
 Write-Host "  Granting group access to api SPN" -ForegroundColor DarkGreen
 if ($environmentConfig.environmentType -ne "Production") {
