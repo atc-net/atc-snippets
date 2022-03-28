@@ -328,10 +328,18 @@ Connect-IotHubWithDeviceProvisioningService `
 ###############################################################################################################
 # Provision App Registrations and Service Principals to allow for authorization using OAuth through Swagger UI
 ###############################################################################################################
+$domainUrl = "$($namingConfig.ServiceAbbreviation).$($environmentConfig.EnvironmentName).$companyHostName"
+$redirectUri = "https://$domainUrl/swagger/oauth2-redirect.html"
+$redirectUris = "[\""$($redirectUri.ToLower())\""]"
+if ($environmentConfig.EnvironmentType -ne "Production") {
+  $redirectUris = "[\""$($redirectUri.ToLower())\"", \""https://localhost:5001/swagger/oauth2-redirect.html\""]"
+}
+
 Initialize-SwaggerSPN `
   -CompanyHostName $companyHostName `
   -EnvironmentConfig $environmentConfig `
   -NamingConfig $namingConfig `
+  -RedirectUris $redirectUris `
   -ServiceInstance $serviceInstance
 
 #############################################################################################

@@ -13,6 +13,10 @@ function Initialize-SwaggerSPN {
     [NamingConfig]
     $NamingConfig,
 
+    [Parameter(Mandatory = $true)]
+    [string]
+    $RedirectUris,
+
     [Parameter(Mandatory = $false)]
     [string]
     $ServiceInstance
@@ -62,19 +66,11 @@ function Initialize-SwaggerSPN {
   Write-Host "  Setting redirect URIs" -ForegroundColor DarkYellow
   $swaggerAppObjectId = az ad app show --id $clientId --query objectId
 
-  $redirectUri = "https://$($NamingConfig.ServiceAbbreviation).$($EnvironmentConfig.EnvironmentName).$CompanyHostName/swagger/oauth2-redirect.html"
-
-  $redirectUris = "[\""$($redirectUri.ToLower())\""]"
-
-  if ($EnvironmentConfig.environmentType -ne "Production") {
-    $redirectUris = "[\""$($redirectUri.ToLower())\"", \""https://localhost:5001/swagger/oauth2-redirect.html\""]"
-  }
-
   az rest `
     --method PATCH `
     --uri "https://graph.microsoft.com/v1.0/applications/$swaggerAppObjectId" `
     --headers "Content-Type=application/json" `
-    --body "{\""spa\"":{\""redirectUris\"":$redirectUris}}"
+    --body "{\""spa\"":{\""redirectUris\"":$RedirectUris}}"
 
   Write-Host "  Granting group access to api SPN" -ForegroundColor DarkYellow
   if ($EnvironmentConfig.environmentType -ne "Production") {
