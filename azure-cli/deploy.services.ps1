@@ -33,6 +33,7 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 . "$PSScriptRoot\acr\Initialize-ContainerRegistry.ps1"
 . "$PSScriptRoot\cosmosdb\get_CosmosConnectionString.ps1"
 . "$PSScriptRoot\signalr\get_SignalRConnectionString.ps1"
+. "$PSScriptRoot\ad\Initialize-SwaggerSPN.ps1"
 
 # Install required extensions
 . "$PSScriptRoot\extensions.ps1"
@@ -324,14 +325,14 @@ Connect-IotHubWithDeviceProvisioningService `
   -keyVaultName $keyVaultName `
   -resourceTags $resourceTags
 
-#############################################################################################
-# Add Swagger authorization to function app api
-#############################################################################################
-& "$PSScriptRoot\add\deploy.swagger.ps1" `
-  -companyHostName $companyHostName `
-  -environmentConfig $environmentConfig `
-  -namingConfig $namingConfig `
-  -serviceInstance $serviceInstance
+###############################################################################################################
+# Provision App Registrations and Service Principals to allow for authorization using OAuth through Swagger UI
+###############################################################################################################
+Initialize-SwaggerSPN `
+  -CompanyHostName $companyHostName `
+  -EnvironmentConfig $environmentConfig `
+  -NamingConfig $namingConfig `
+  -ServiceInstance $serviceInstance
 
 #############################################################################################
 # Initialize Service Bus namespace
