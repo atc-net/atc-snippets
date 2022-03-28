@@ -120,7 +120,7 @@ Initialize-ContainerRegistry `
   -Name $environmentContainerRegistryName `
   -ResourceGroupName $environmentResourceGroupName `
   -Sku 'Standard' `
-  -$AdminEnabled $true `
+  -AdminEnabled $true `
   -Location $environmentConfig.Location `
   -ResourceTags $resourceTags
 
