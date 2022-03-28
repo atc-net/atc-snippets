@@ -1,17 +1,19 @@
 function Add-GroupToServicePrincipal(
   [Parameter(Mandatory = $true)]
-  [EnvironmentConfig] $environmentConfig,
+  [EnvironmentConfig]
+  $EnvironmentConfig,
 
   [Parameter(Mandatory = $true)]
-  [NamingConfig] $namingConfig,
+  [NamingConfig]
+  $NamingConfig,
 
   [Parameter(Mandatory = $true)]
-  [string] $groupId,
+  [string]
+  $GroupId,
 
   [Parameter(Mandatory = $false)]
-  [ValidateNotNullOrEmpty()]
   [string]
-  $serviceInstance = ""
+  $ServiceInstance
 )
 {
   # import utility functions
@@ -19,9 +21,9 @@ function Add-GroupToServicePrincipal(
 
   $spnAppIdentityName = Get-AppIdentityDisplayName `
     -type "api" `
-    -environmentConfig $environmentConfig `
-    -namingConfig $namingConfig `
-    -serviceInstance $serviceInstance
+    -environmentConfig $EnvironmentConfig `
+    -namingConfig $NamingConfig `
+    -serviceInstance $ServiceInstance
 
   $objectId = az ad sp list --display-name $spnAppIdentityName --query [0].objectId
 
@@ -30,5 +32,5 @@ function Add-GroupToServicePrincipal(
     --method POST `
     --url https://graph.microsoft.com/v1.0/servicePrincipals/$objectId/appRoleAssignedTo `
     --headers "Content-Type=application/json" `
-    --body "{\""resourceId\"":\""$objectId\"",\""principalId\"":\""$groupId\""}"
+    --body "{\""resourceId\"":\""$objectId\"",\""principalId\"":\""$GroupId\""}"
 }

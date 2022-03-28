@@ -2,18 +2,19 @@ param (
   [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
-  $companyHostName,
+  $CompanyHostName,
 
   [Parameter(Mandatory = $true)]
-  [EnvironmentConfig] $environmentConfig,
+  [EnvironmentConfig]
+  $EnvironmentConfig,
 
   [Parameter(Mandatory = $true)]
-  [NamingConfig] $namingConfig,
+  [NamingConfig]
+  $NamingConfig,
 
   [Parameter(Mandatory = $false)]
-  [ValidateNotNullOrEmpty()]
   [string]
-  $serviceInstance = ""
+  $ServiceInstance
 )
 
 # import utility functions
@@ -21,15 +22,15 @@ param (
 
 $spnAppIdentityId = Get-AppIdentityUri `
   -type "api" `
-  -companyHostName $companyHostName `
-  -environmentConfig $environmentConfig `
-  -namingConfig $namingConfig `
-  -serviceInstance $serviceInstance
+  -companyHostName $CompanyHostName `
+  -environmentConfig $EnvironmentConfig `
+  -NamingConfig $NamingConfig `
+  -serviceInstance $ServiceInstance
 
 $spnAppIdentityName = Get-AppIdentityDisplayName `
   -type "spn" `
-  -environmentConfig $environmentConfig `
-  -namingConfig $namingConfig `
+  -environmentConfig $EnvironmentConfig `
+  -NamingConfig $NamingConfig `
   -serviceInstance "swagger"
 
 $appId = az ad app list `
@@ -60,11 +61,11 @@ az ad app permission admin-consent --id $clientId
 Write-Host "  Setting redirect URIs" -ForegroundColor DarkGreen
 $swaggerAppObjectId = az ad app show --id $clientId --query objectId
 
-$redirectUri = "https://$($namingConfig.ServiceAbbreviation).$($environmentConfig.EnvironmentName).$companyHostName/swagger/oauth2-redirect.html"
+$redirectUri = "https://$($NamingConfig.ServiceAbbreviation).$($EnvironmentConfig.EnvironmentName).$CompanyHostName/swagger/oauth2-redirect.html"
 
 $redirectUris = "[\""$($redirectUri.ToLower())\""]"
 
-if ($environmentConfig.environmentType -ne "Production") {
+if ($EnvironmentConfig.environmentType -ne "Production") {
   $redirectUris = "[\""$($redirectUri.ToLower())\"", \""https://localhost:5001/swagger/oauth2-redirect.html\""]"
 }
 
@@ -75,6 +76,6 @@ az rest `
   --body "{\""spa\"":{\""redirectUris\"":$redirectUris}}"
 
 Write-Host "  Granting group access to api SPN" -ForegroundColor DarkGreen
-if ($environmentConfig.environmentType -ne "Production") {
-  Add-GroupToServicePrincipal -environmentConfig $environmentConfig -namingConfig $namingConfig -groupId "GROUP-ID"
+if ($EnvironmentConfig.environmentType -ne "Production") {
+  Add-GroupToServicePrincipal -EnvironmentConfig $EnvironmentConfig -NamingConfig $NamingConfig -GroupId "GROUP-ID"
 }
