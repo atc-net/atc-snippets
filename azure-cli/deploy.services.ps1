@@ -324,8 +324,8 @@ $webAppSettings = @{
   APPINSIGHTS_INSTRUMENTATIONKEY             = $instrumentationKey
   ApplicationInsightsAgent_EXTENSION_VERSION = "~2"
   XDT_MicrosoftApplicationInsights_Mode      = "recommended"
-  ServiceOptions__EnvironmentName            = $environmentConfig.EnvironmentName
-  ServiceOptions__EnvironmentType            = $environmentConfig.EnvironmentType
+  EnvironmentOptions__EnvironmentName            = $environmentConfig.EnvironmentName
+  EnvironmentOptions__EnvironmentType            = $environmentConfig.EnvironmentType
 }
 
 Initialize-WebApp `
