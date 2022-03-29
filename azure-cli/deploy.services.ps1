@@ -17,12 +17,12 @@ param (
 #############################################################################################
 Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 
-# import utility functions
-. "$PSScriptRoot\appservice\Provision-AppServicePlan.ps1"
+# Import utility functions
+. "$PSScriptRoot\appservice\Initialize-AppServicePlan.ps1"
 . "$PSScriptRoot\utilities\deploy.utilities.ps1"
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
-. "$PSScriptRoot\monitor\Provision-ApplicationInsights.ps1"
-. "$PSScriptRoot\monitor\Provision-LogAnalyticsWorkspace.ps1"
+. "$PSScriptRoot\monitor\Initialize-ApplicationInsights.ps1"
+. "$PSScriptRoot\monitor\Initialize-LogAnalyticsWorkspace.ps1"
 . "$PSScriptRoot\keyvault\get_KeyVaultSecret.ps1"
 . "$PSScriptRoot\storage\get_StorageAccountKey.ps1"
 . "$PSScriptRoot\iot\add_IotHubToDataLakeRoutingEndpoint.ps1"
@@ -34,6 +34,10 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 . "$PSScriptRoot\cosmosdb\get_CosmosConnectionString.ps1"
 . "$PSScriptRoot\signalr\get_SignalRConnectionString.ps1"
 . "$PSScriptRoot\ad\Initialize-SwaggerSpn.ps1"
+. "$PSScriptRoot\webapp\Initialize-WebApp.ps1"
+
+# Import classes
+. "$PSScriptRoot\utilities\VnetIntegration.ps1"
 
 # Install required extensions
 . "$PSScriptRoot\extensions.ps1"
@@ -116,7 +120,7 @@ Initialize-ContainerRegistry `
   -Name $environmentContainerRegistryName `
   -ResourceGroupName $environmentResourceGroupName `
   -Sku 'Standard' `
-  -$AdminEnabled $true `
+  -AdminEnabled $true `
   -Location $environmentConfig.Location `
   -ResourceTags $resourceTags
 
@@ -128,7 +132,7 @@ if ($environmentConfig.EnvironmentType -eq 'Production') {
   $appServiceSku = 'P1V2'
 }
 
-$appServicePlanId = Provision-AppServicePlan `
+$appServicePlanId = Initialize-AppServicePlan `
   -Name $appServicePlanName `
   -Sku $appServiceSku `
   -ResourceGroupName $resourceGroupName `
@@ -138,7 +142,7 @@ $appServicePlanId = Provision-AppServicePlan `
 ############################################################################################
 # Initialize Log Analytics and Application Insights
 ############################################################################################
-$logAnalyticsId = Provision-LogAnalyticsWorkspace `
+$logAnalyticsId = Initialize-LogAnalyticsWorkspace `
   -LogAnalyticsName $logAnalyticsName `
   -ResourceGroupName $resourceGroupName `
   -Location $environmentConfig.Location `
@@ -148,7 +152,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey `
   -LogAnalyticsName $logAnalyticsName `
   -ResourceGroup $resourceGroupName
 
-$instrumentationKey = Provision-ApplicationInsights `
+$instrumentationKey = Initialize-ApplicationInsights `
   -Name $insightsName `
   -LogAnalyticsId $logAnalyticsId `
   -ResourceGroupName $resourceGroupName `
@@ -314,16 +318,26 @@ Connect-IotHubWithDeviceProvisioningService `
   -resourceTags $resourceTags
 
 #############################################################################################
-# Initialize function app api
+# Initialize Web App Service
 #############################################################################################
-& "$PSScriptRoot\webapp\deploy.ps1" `
-  -resourceGroupName $resourceGroupName `
-  -environmentName $environmentConfig.EnvironmentName `
-  -apiName $apiName `
-  -insightsName $insightsName  `
-  -appServicePlanName $appServicePlanName `
-  -keyVaultName $keyVaultName `
-  -resourceTags $resourceTags
+$webAppSettings = @{
+  APPINSIGHTS_INSTRUMENTATIONKEY             = $instrumentationKey
+  ApplicationInsightsAgent_EXTENSION_VERSION = "~2"
+  XDT_MicrosoftApplicationInsights_Mode      = "recommended"
+  EnvironmentOptions__EnvironmentName            = $environmentConfig.EnvironmentName
+  EnvironmentOptions__EnvironmentType            = $environmentConfig.EnvironmentType
+}
+
+Initialize-WebApp `
+  -Name $apiName `
+  -AppServicePlanId $appServicePlanId `
+  -AppSettings $webAppSettings `
+  -ResourceGroupName $resourceGroupName `
+  -AllowedOrigins @("*") `
+  -KeyVaultName $keyVaultName `
+  -VnetIntegrations @([VnetIntegration]::new($vnetName, $subnetName)) `
+  -SubscriptionId $subscriptionId `
+  -ResourceTags $resourceTags
 
 ###############################################################################################################
 # Provision App Registrations and Service Principals to allow for authorization using OAuth through Swagger UI

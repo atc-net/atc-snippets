@@ -1,4 +1,4 @@
-function Provision-LogAnalyticsWorkspace {
+function Initialize-LogAnalyticsWorkspace {
   param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
