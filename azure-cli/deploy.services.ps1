@@ -33,11 +33,11 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 . "$PSScriptRoot\acr\Initialize-ContainerRegistry.ps1"
 . "$PSScriptRoot\cosmosdb\get_CosmosConnectionString.ps1"
 . "$PSScriptRoot\signalr\get_SignalRConnectionString.ps1"
+. "$PSScriptRoot\ad\Initialize-SwaggerSpn.ps1"
 . "$PSScriptRoot\webapp\Initialize-WebApp.ps1"
 
 # Import classes
 . "$PSScriptRoot\utilities\VnetIntegration.ps1"
-
 
 # Install required extensions
 . "$PSScriptRoot\extensions.ps1"
@@ -338,6 +338,23 @@ Initialize-WebApp `
   -VnetIntegrations @([VnetIntegration]::new($vnetName, $subnetName)) `
   -SubscriptionId $subscriptionId `
   -ResourceTags $resourceTags
+
+###############################################################################################################
+# Provision App Registrations and Service Principals to allow for authorization using OAuth through Swagger UI
+###############################################################################################################
+$domain = "$apiName.azurewebsites.net"
+$redirectUri = "https://$domain/swagger/oauth2-redirect.html"
+$redirectUris = @($redirectUri.ToLower())
+if ($environmentConfig.EnvironmentType -ne "Production") {
+  $redirectUris += "https://localhost:5001/swagger/oauth2-redirect.html"
+}
+
+Initialize-SwaggerSpn `
+  -CompanyHostName $companyHostName `
+  -EnvironmentConfig $environmentConfig `
+  -NamingConfig $namingConfig `
+  -RedirectUris $redirectUris `
+  -ServiceInstance $serviceInstance
 
 #############################################################################################
 # Initialize Service Bus namespace
