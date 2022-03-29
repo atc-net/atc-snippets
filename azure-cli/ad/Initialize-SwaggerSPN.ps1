@@ -14,7 +14,7 @@ function Initialize-SwaggerSpn {
     $NamingConfig,
 
     [Parameter(Mandatory = $true)]
-    [string]
+    [string[]]
     $RedirectUris,
 
     [Parameter(Mandatory = $false)]
@@ -70,10 +70,10 @@ function Initialize-SwaggerSpn {
     --method PATCH `
     --uri "https://graph.microsoft.com/v1.0/applications/$swaggerAppObjectId" `
     --headers "Content-Type=application/json" `
-    --body "{\""spa\"":{\""redirectUris\"":$RedirectUris}}"
+    --body "{`"spa`":{`"redirectUris`":$(ConvertTo-Json -Compress $RedirectUris)}}"
 
   Write-Host "  Granting group access to api SPN" -ForegroundColor DarkYellow
-  if ($EnvironmentConfig.environmentType -ne "Production") {
+  if ($EnvironmentConfig.EnvironmentType -ne "Production") {
     Add-GroupToServicePrincipal -EnvironmentConfig $EnvironmentConfig -NamingConfig $NamingConfig -GroupId "GROUP-ID"
   }
 }
