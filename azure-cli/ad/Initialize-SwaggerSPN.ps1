@@ -29,13 +29,13 @@ function Initialize-SwaggerSpn {
     -type "api" `
     -companyHostName $CompanyHostName `
     -environmentConfig $EnvironmentConfig `
-    -NamingConfig $NamingConfig `
+    -namingConfig $NamingConfig `
     -serviceInstance $ServiceInstance
 
   $spnAppIdentityName = Get-AppIdentityDisplayName `
     -type "spn" `
     -environmentConfig $EnvironmentConfig `
-    -NamingConfig $NamingConfig `
+    -namingConfig $NamingConfig `
     -serviceInstance "swagger"
 
   $appId = az ad app list `

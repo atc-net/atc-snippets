@@ -342,8 +342,8 @@ Initialize-WebApp `
 ###############################################################################################################
 # Provision App Registrations and Service Principals to allow for authorization using OAuth through Swagger UI
 ###############################################################################################################
-$domainUri = "$($namingConfig.ServiceAbbreviation).$($environmentConfig.EnvironmentName).$companyHostName"
-$redirectUri = "https://$domainUri/swagger/oauth2-redirect.html"
+$domain = "$apiName.azurewebsites.net"
+$redirectUri = "https://$domain/swagger/oauth2-redirect.html"
 $redirectUris = @($redirectUri.ToLower())
 if ($environmentConfig.EnvironmentType -ne "Production") {
   $redirectUris += "https://localhost:5001/swagger/oauth2-redirect.html"
