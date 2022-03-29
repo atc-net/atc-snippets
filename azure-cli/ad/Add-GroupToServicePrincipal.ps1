@@ -32,5 +32,5 @@ function Add-GroupToServicePrincipal(
     --method POST `
     --url https://graph.microsoft.com/v1.0/servicePrincipals/$objectId/appRoleAssignedTo `
     --headers "Content-Type=application/json" `
-    --body "{\""resourceId\"":\""$objectId\"",\""principalId\"":\""$GroupId\""}"
+    --body "{`"resourceId`":`"$objectId`",`"principalId`":`"$GroupId`"}"
 }
