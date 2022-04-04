@@ -33,12 +33,12 @@ function Initialize-ApplicationInsights {
   Write-Host "  Querying for existing Application Insights" -ForegroundColor DarkYellow -NoNewline
   $response = az monitor app-insights component show `
     --resource-group $ResourceGroupName `
-    --query "[?name=='$InsightsName']|[0].{instrumentationKey: instrumentationKey}"
+    --query "[?name=='$InsightsName']|[0].{connectionString: connectionString}"
 
   if ($null -eq $response) {
     Write-Host " -> Resource not found." -ForegroundColor Cyan
     
-    $instrumentationKey = New-ApplicationInsights `
+    $connectionString = New-ApplicationInsights `
       -Name $InsightsName `
       -LogAnalyticsId $LogAnalyticsId `
       -ResourceGroupName $ResourceGroupName `
@@ -47,8 +47,8 @@ function Initialize-ApplicationInsights {
   }
   else {
     Write-Host " -> Resource exists." -ForegroundColor Cyan
-    $instrumentationKey = ($response | ConvertFrom-Json -AsHashtable).instrumentationKey
+    $connectionString = ($response | ConvertFrom-Json -AsHashtable).connectionString
   }
 
-  return $instrumentationKey
+  return $connectionString
 }

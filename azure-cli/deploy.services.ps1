@@ -23,6 +23,7 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
 . "$PSScriptRoot\monitor\Initialize-ApplicationInsights.ps1"
 . "$PSScriptRoot\monitor\Initialize-LogAnalyticsWorkspace.ps1"
+. "$PSScriptRoot\monitor\Get-LogAnalyticsKey.ps1"
 . "$PSScriptRoot\keyvault\get_KeyVaultSecret.ps1"
 . "$PSScriptRoot\storage\get_StorageAccountKey.ps1"
 . "$PSScriptRoot\iot\add_IotHubToDataLakeRoutingEndpoint.ps1"
@@ -152,7 +153,7 @@ $logAnalyticsKey = Get-LogAnalyticsKey `
   -LogAnalyticsName $logAnalyticsName `
   -ResourceGroup $resourceGroupName
 
-$instrumentationKey = Initialize-ApplicationInsights `
+$insightsConnectionString = Initialize-ApplicationInsights `
   -Name $insightsName `
   -LogAnalyticsId $logAnalyticsId `
   -ResourceGroupName $resourceGroupName `
@@ -321,11 +322,11 @@ Connect-IotHubWithDeviceProvisioningService `
 # Initialize Web App Service
 #############################################################################################
 $webAppSettings = @{
-  APPINSIGHTS_INSTRUMENTATIONKEY             = $instrumentationKey
+  APPLICATIONINSIGHTS_CONNECTION_STRING      = $insightsConnectionString
   ApplicationInsightsAgent_EXTENSION_VERSION = "~2"
   XDT_MicrosoftApplicationInsights_Mode      = "recommended"
-  EnvironmentOptions__EnvironmentName            = $environmentConfig.EnvironmentName
-  EnvironmentOptions__EnvironmentType            = $environmentConfig.EnvironmentType
+  EnvironmentOptions__EnvironmentName        = $environmentConfig.EnvironmentName
+  EnvironmentOptions__EnvironmentType        = $environmentConfig.EnvironmentType
 }
 
 Initialize-WebApp `
