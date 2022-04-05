@@ -48,7 +48,6 @@ param (
 # Configure names and options
 #############################################################################################
 # import utility functions
-. "$PSScriptRoot\..\monitor\get_ApplicationInsights_InstrumentationKey.ps1"
 . "$PSScriptRoot\..\storage\get_StorageAccountId.ps1"
 . "$PSScriptRoot\..\appservice\get_AppServicePlanId.ps1"
 
@@ -56,7 +55,6 @@ param (
 # Resource naming section
 #############################################################################################
 $storageAccountId = Get-StorageAccountId  $storageAccountName $resourceGroupName
-$instrumentationKey = Get-ApplicationInsightsInstrumentationKey $insightsName $resourceGroupName
 $appServicePlanId = Get-AppServicePlanId  $appServicePlanName $resourceGroupName
 
 #############################################################################################
@@ -69,7 +67,7 @@ $output = az functionapp create `
   --name $functionName `
   --resource-group $resourceGroupName `
   --storage-account $storageAccountId `
-  --app-insights-key $instrumentationKey `
+  --app-insights $insightsName `
   --plan $appServicePlanId `
   --runtime dotnet `
   --functions-version 3 `

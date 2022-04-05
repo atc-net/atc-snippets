@@ -27,7 +27,7 @@ function New-ApplicationInsights {
     
   Write-Host "  Creating Application Insights '$InsightsName'" -ForegroundColor DarkYellow
   
-  $instrumentationKey = az monitor app-insights component create `
+  $connectionString = az monitor app-insights component create `
     --app $InsightsName `
     --resource-group $ResourceGroupName `
     --location $Location `
@@ -35,10 +35,10 @@ function New-ApplicationInsights {
     --kind web `
     --workspace $logAnalyticsId `
     --tags $resourceTags `
-    --query instrumentationKey `
+    --query connectionString `
     --output tsv
   
-  Throw-WhenError -output $instrumentationKey
+  Throw-WhenError -output $connectionString
 
-  return $instrumentationKey
+  return $connectionString
 }
