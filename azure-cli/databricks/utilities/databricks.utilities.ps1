@@ -6,7 +6,6 @@ function New-DatabricksJob {
     $name,
 
     [Parameter(Mandatory = $false)]
-    [ValidateNotNullOrEmpty()]
     [string]
     $notebookPath,
 
@@ -15,12 +14,10 @@ function New-DatabricksJob {
     $notebookParameters = @{},
 
     [Parameter(Mandatory = $false)]
-    [ValidateNotNullOrEmpty()]
     [string]
     $wheelPackageName,
 
     [Parameter(Mandatory = $false)]
-    [ValidateNotNullOrEmpty()]
     [string]
     $wheelEntryPoint,
 
