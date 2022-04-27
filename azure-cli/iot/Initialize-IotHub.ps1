@@ -83,8 +83,8 @@ function Initialize-IotHub {
   "cloudToDeviceMaxAttempts: properties.cloudToDevice.maxDeliveryCount, " + `
   "feedbackQueueMaximumDeliveryCount: properties.cloudToDevice.feedback.maxDeliveryCount, " + `
   "feedbackQueueLockDurationIso8601: properties.cloudToDevice.feedback.lockDurationAsIso8601, " + `
-  "feedbackQueueTimeToLiveIso8601: properties.cloudToDevice.feedback.ttlAsIso8601" + `
-  "sku: sku.name" + `
+  "feedbackQueueTimeToLiveIso8601: properties.cloudToDevice.feedback.ttlAsIso8601," + `
+  "sku: sku.name," + `
   "numberOfUnits: sku.capacity" + `
   "}"
 
