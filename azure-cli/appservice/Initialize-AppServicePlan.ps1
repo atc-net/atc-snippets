@@ -81,7 +81,7 @@ function Initialize-AppServicePlan {
 
       $appServicePlanId = $appServicePlanResource.id
     }
-
-    return $appServicePlanId
   }
+
+  return $appServicePlanId
 }
