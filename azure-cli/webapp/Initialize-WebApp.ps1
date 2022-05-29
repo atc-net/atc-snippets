@@ -25,6 +25,7 @@ function Initialize-WebApp {
     $AllowedOrigins,
 
     [Parameter(Mandatory = $false)]
+    [string]
     $KeyVaultName,
 
     [Parameter(Mandatory = $false)]
