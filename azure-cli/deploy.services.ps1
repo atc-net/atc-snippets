@@ -380,4 +380,4 @@ Initialize-SwaggerSpn `
   -resourceGroupName $resourceGroupName `
   -serviceBusName $serviceBusName `
   -logAnalyticsId $logAnalyticsId `
-  -resourceTags $resourceTags`
+  -resourceTags $resourceTags
