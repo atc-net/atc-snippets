@@ -22,6 +22,7 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 . "$PSScriptRoot\ad\Initialize-SwaggerSpn.ps1"
 . "$PSScriptRoot\appservice\Initialize-AppServicePlan.ps1"
 . "$PSScriptRoot\cosmosdb\get_CosmosConnectionString.ps1"
+. "$PSScriptRoot\functionapp\Initialize-FunctionApp.ps1"
 . "$PSScriptRoot\iot\Connect-IotHubWithDeviceProvisioningService.ps1"
 . "$PSScriptRoot\iot\Initialize-DeviceProvisioningService.ps1"
 . "$PSScriptRoot\iot\Initialize-IotHub.ps1"
@@ -32,6 +33,7 @@ Write-Host "Initialize deployment" -ForegroundColor DarkGreen
 . "$PSScriptRoot\monitor\Initialize-ApplicationInsights.ps1"
 . "$PSScriptRoot\monitor\Initialize-LogAnalyticsWorkspace.ps1"
 . "$PSScriptRoot\signalr\get_SignalRConnectionString.ps1"
+. "$PSScriptRoot\storage\Get-StorageAccountConnectionString.ps1"
 . "$PSScriptRoot\storage\get_StorageAccountKey.ps1"
 . "$PSScriptRoot\utilities\deploy.naming.ps1"
 . "$PSScriptRoot\utilities\deploy.utilities.ps1"
@@ -128,6 +130,8 @@ Initialize-ContainerRegistry `
 #############################################################################################
 # Initialize Azure App Service Plan
 #############################################################################################
+$useLinux = $true
+
 $appServiceSku = 'S1'
 if ($environmentConfig.EnvironmentType -eq 'Production') {
   $appServiceSku = 'P1V2'
@@ -136,6 +140,7 @@ if ($environmentConfig.EnvironmentType -eq 'Production') {
 $appServicePlanId = Initialize-AppServicePlan `
   -Name $appServicePlanName `
   -Sku $appServiceSku `
+  -UseLinux $useLinux `
   -ResourceGroupName $resourceGroupName `
   -Location $environmentConfig.Location `
   -ResourceTags $resourceTags
@@ -188,6 +193,10 @@ $insightsConnectionString = Initialize-ApplicationInsights `
   -storageAccountName $storageAccountName `
   -resourceTags $resourceTags
 
+$storageAccountConnectionString = Get-StorageAccountConnectionString `
+  -Name $storageAccountName `
+  -ResourceGroupName $resourceGroupName
+
 #############################################################################################
 # Initialize Event Hubs
 #############################################################################################
@@ -213,14 +222,21 @@ $insightsConnectionString = Initialize-ApplicationInsights `
 #############################################################################################
 # Initialize function app
 #############################################################################################
-& "$PSScriptRoot\functionapp\deploy.ps1" `
-  -resourceGroupName $resourceGroupName `
-  -functionName $functionName `
-  -storageAccountName $storageAccountName `
-  -insightsName $insightsName  `
-  -appServicePlanName $appServicePlanName `
-  -keyVaultName $keyVaultName `
-  -resourceTags $resourceTags
+$functionAppSettings = @{
+  EnvironmentOptions__EnvironmentName = $environmentConfig.EnvironmentName
+  EnvironmentOptions__EnvironmentType = $environmentConfig.EnvironmentType
+}
+
+Initialize-FunctionApp `
+  -FunctionAppName $functionName `
+  -AppServicePlanId $appServicePlanId `
+  -AppServicePlanIsLinux $useLinux `
+  -AppSettings $functionAppSettings `
+  -StorageAccountConnectionString $storageAccountConnectionString `
+  -InsightsConnectionString $insightsConnectionString `
+  -ResourceGroupName $resourceGroupName `
+  -KeyVaultName $keyVaultName `
+  -ResourceTags $resourceTags
 
 #############################################################################################
 # Initialize IotHub & DPS
