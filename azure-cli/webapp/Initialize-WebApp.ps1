@@ -52,7 +52,7 @@ function Initialize-WebApp {
   . "$PSScriptRoot\New-WebApp.ps1"
   . "$PSScriptRoot\Get-WebAppManagedIdentityPrincipalId.ps1"
   . "$PSScriptRoot\Set-WebAppCors.ps1"
-  . "$PSScriptRoot\Set-WebAppVnetIntegration.ps1"
+  . "$PSScriptRoot\..\utilities\Set-AppVnetIntegration.ps1"
   . "$PSScriptRoot\..\utilities\Sync-AppSettings.ps1"
   . "$PSScriptRoot\..\keyvault\Set-KeyVaultSecretPermissions.ps1"
 
@@ -146,8 +146,9 @@ function Initialize-WebApp {
   # VNet Integrations
   #############################################################################################
   if ($VnetIntegrations.Count -gt 0) {
-    Set-WebAppVnetIntegration `
-      -WebAppName $WebAppName `
+    Set-AppVnetIntegration `
+      -WebApp `
+      -Name $WebAppName `
       -VnetIntegrations $VnetIntegrations `
       -SubscriptionId $SubscriptionId `
       -ResourceGroupName $ResourceGroupName

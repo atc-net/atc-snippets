@@ -1,4 +1,4 @@
-function Set-WebAppVnetIntegration {
+function Set-AppVnetIntegration {
   [CmdletBinding(DefaultParameterSetName = "Single")]
   param(
     [Parameter(Mandatory = $true, ParameterSetName = "Single")]
@@ -15,26 +15,51 @@ function Set-WebAppVnetIntegration {
 
     [Parameter(Mandatory = $true, ParameterSetName = "Single")]
     [Parameter(Mandatory = $true, ParameterSetName = "Multiple")]
-    [Alias("AppName")]
-    $WebAppName,
+    [Alias("Name")]
+    [string]
+    $AppName,
 
     [Parameter(Mandatory = $true, ParameterSetName = "Single")]
     [Parameter(Mandatory = $true, ParameterSetName = "Multiple")]
+    [string]
     $SubscriptionId,
 
     [Parameter(Mandatory = $true, ParameterSetName = "Single")]
     [Parameter(Mandatory = $true, ParameterSetName = "Multiple")]
-    $ResourceGroupName
+    [string]
+    $ResourceGroupName,
+
+    [Parameter()]
+    [switch]
+    $WebApp,
+
+    [Parameter()]
+    [switch]
+    $FunctionApp
   )
 
   begin {
+    # If the command is invoked as with the "Single" ParametSet,
+    # initialize the VnetIntegrations array from the "Single" parameters to generalize the approach.
     if ($VnetName) {
       $VnetIntegrations = @([VnetIntegration]::new($VnetName, $SubnetName))
     }
+
+    # Get the resource type
+    if (($WebApp -and $FunctionApp) -or
+        (-not $WebApp -and -not $FunctionApp)) {
+      throw "This function needs to invoked with either WebApp or FunctionApp switch parameter"
+    }
+    elseif ($WebApp) {
+      $type = "webapp"
+    }
+    elseif ($FunctionApp) {
+      $type = "functionapp"
+    }
   }
   process {
-    $output = az webapp vnet-integration list `
-      --name $WebAppName `
+    $output = az $type vnet-integration list `
+      --name $AppName `
       --resource-group $ResourceGroupName `
       --query [].vnetResourceId
 
@@ -51,12 +76,13 @@ function Set-WebAppVnetIntegration {
       }
       else {
         Write-Host " -> Integration not configured." -ForegroundColor Cyan
+
         Write-Host "  Adding VNet integration to '$($vnetIntegration.VnetName)', subnet '$($vnetIntegration.SubnetName)'" -ForegroundColor DarkYellow
-        $output = az webapp vnet-integration add `
-          --name $WebAppName `
+        $output = az $type vnet-integration add `
+          --name $AppName `
           --resource-group $ResourceGroupName `
-          --subnet $vnetIntegration.SubnetName `
-          --vnet $vnetIntegration.VnetName
+          --vnet $vnetIntegration.VnetName `
+          --subnet $vnetIntegration.SubnetName
 
         Throw-WhenError -output $output
       }
