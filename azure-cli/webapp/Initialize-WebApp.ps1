@@ -53,7 +53,7 @@ function Initialize-WebApp {
   . "$PSScriptRoot\Get-WebAppManagedIdentityPrincipalId.ps1"
   . "$PSScriptRoot\Set-WebAppCors.ps1"
   . "$PSScriptRoot\Set-WebAppVnetIntegration.ps1"
-  . "$PSScriptRoot\Sync-WebAppSettings.ps1"
+  . "$PSScriptRoot\..\utilities\Sync-AppSettings.ps1"
   . "$PSScriptRoot\..\keyvault\Set-KeyVaultSecretPermissions.ps1"
 
   Write-Host "Provision Web App Service '$WebAppName'" -ForegroundColor DarkGreen
@@ -128,8 +128,9 @@ function Initialize-WebApp {
   #############################################################################################
   # Ensure correct AppSettings
   #############################################################################################
-  Sync-WebAppSettings `
-    -WebAppName $WebAppName `
+  Sync-AppSettings `
+    -WebApp `
+    -Name $WebAppName `
     -AppSettings $AppSettings `
     -ResourceGroupName $ResourceGroupName
 
