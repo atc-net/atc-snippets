@@ -25,6 +25,7 @@ function Initialize-WebApp {
     $AllowedOrigins,
 
     [Parameter(Mandatory = $false)]
+    [string]
     $KeyVaultName,
 
     [Parameter(Mandatory = $false)]
@@ -51,8 +52,8 @@ function Initialize-WebApp {
   . "$PSScriptRoot\New-WebApp.ps1"
   . "$PSScriptRoot\Get-WebAppManagedIdentityPrincipalId.ps1"
   . "$PSScriptRoot\Set-WebAppCors.ps1"
-  . "$PSScriptRoot\Set-WebAppVnetIntegration.ps1"
-  . "$PSScriptRoot\Sync-WebAppSettings.ps1"
+  . "$PSScriptRoot\..\utilities\Set-AppVnetIntegration.ps1"
+  . "$PSScriptRoot\..\utilities\Sync-AppSettings.ps1"
   . "$PSScriptRoot\..\keyvault\Set-KeyVaultSecretPermissions.ps1"
 
   Write-Host "Provision Web App Service '$WebAppName'" -ForegroundColor DarkGreen
@@ -127,8 +128,9 @@ function Initialize-WebApp {
   #############################################################################################
   # Ensure correct AppSettings
   #############################################################################################
-  Sync-WebAppSettings `
-    -WebAppName $WebAppName `
+  Sync-AppSettings `
+    -WebApp `
+    -Name $WebAppName `
     -AppSettings $AppSettings `
     -ResourceGroupName $ResourceGroupName
 
@@ -144,8 +146,9 @@ function Initialize-WebApp {
   # VNet Integrations
   #############################################################################################
   if ($VnetIntegrations.Count -gt 0) {
-    Set-WebAppVnetIntegration `
-      -WebAppName $WebAppName `
+    Set-AppVnetIntegration `
+      -WebApp `
+      -Name $WebAppName `
       -VnetIntegrations $VnetIntegrations `
       -SubscriptionId $SubscriptionId `
       -ResourceGroupName $ResourceGroupName
