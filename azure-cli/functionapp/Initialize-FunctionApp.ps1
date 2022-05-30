@@ -67,8 +67,8 @@ function Initialize-FunctionApp {
   # Hardcoded values
   $minTlsVersion = "1.2"
 
-  # Dynamicly switching between functions version, .NET version and out-of-process/in-process mode is very difficult to program.
-  # At the time of writing the, the newest long term supported .NET is 6.0 and it's best practice to run in isolated mode.
+  # Dynamically switching between functions version, .NET version and out-of-process/in-process mode would be very difficult to program and maintain.
+  # At the time of writing, the newest long term supported .NET is 6.0 and it's best practice to run in isolated mode.
   # This function is hardcoded towards that target.
 
   Write-Host "Provision Function App '$FunctionAppName'" -ForegroundColor DarkGreen
