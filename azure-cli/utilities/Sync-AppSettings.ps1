@@ -59,10 +59,12 @@ function Sync-AppSettings {
 
     # Compare the live appsettings with our local appsettings.
     foreach ($keyValuePair in $existingAppSettings) {
-      if (-not $AppSettings.Contains($keyValuePair.Key) -and $keyValuePair.Key -ne "MACHINEKEY_DecryptionKey") {
+      if (-not $AppSettings.Contains($keyValuePair.Key)) {
         # The live appsetting does not exist in our local appsettings.
         # Add it to the deletion list.
-        $deleteAppSettings.Add($keyValuePair.Key)
+        if ($keyValuePair.Key -ne "MACHINEKEY_DecryptionKey") {
+          $deleteAppSettings.Add($keyValuePair.Key)
+        }
       }
       else {
         $newValue = $AppSettings[$keyValuePair.Key]
