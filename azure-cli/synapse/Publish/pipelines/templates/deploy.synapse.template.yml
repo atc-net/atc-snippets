@@ -1,0 +1,76 @@
+parameters:
+- name: devopsEnvironment
+  type: string
+- name: environmentName
+  type: string
+  values:
+  - dev
+  - staging
+  - prod
+- name: environmentType
+  type: string
+  default: DevTest
+  values:
+  - DevTest
+  - Production
+- name: subscription
+  type: string
+- name: companyAbbr
+  type: string
+  default: 'co' # Change this
+- name: serviceAbbr
+  type: string
+  default: 'wh' # Change this
+- name: systemName
+  type: string
+  default: 'data' # Change this
+- name: serviceName
+  type: string
+  default: 'synapse' # Change this
+- name: workspaceFilesPath
+  type: string
+  default: 'cowhdev' # Change this
+
+jobs:
+  # track deployments on the environment
+  - deployment: 'deploy_synapse'
+    displayName: 'Deploy'
+
+    pool:
+      vmImage: 'ubuntu-latest'
+
+    # creates an environment if it doesn't exist
+    environment: '${{ parameters.devopsEnvironment }}'
+    strategy:
+      # Only supported deployment strategy when not deploying to Kubernetes or Azure VM's
+      runOnce:
+
+        # Used to run steps that deploy your application.
+        deploy:
+
+          steps:
+            - checkout: self
+              path: main/
+            - checkout: PublishBranch
+              path: PublishBranch/
+
+            - task: PowerShell@2
+              displayName: 'Parameterize Workspace Parameter File'
+              inputs:
+                targetType: 'inline'
+                script: | # Change this, the path to the publish.synapse.parameters.ps1
+                  cd $(Agent.BuildDirectory)/main
+                  ./deploy/publish.synapse.parameters.ps1 `
+                    -environmentName ${{ parameters.environmentName }} `
+                    -SynapseWorkspaceParameterJsonPath '$(Agent.BuildDirectory)/PublishBranch/${{ parameters.workspaceFilesPath }}/TemplateParametersForWorkspace.json' `
+                    -OutputPath '$(Agent.BuildDirectory)/main/CustomWorkspaceParameters.json'
+                    -ParameterJsonPath"'$(Agent.BuildDirectory)/main/synapse.${{ parameters.environmentName }}.parameters.json"
+
+            - task: AzureSynapseWorkspace.synapsecicd-deploy.synapse-deploy.Synapse workspace deployment@1
+              displayName: 'Deploy Synapse Workspace'
+              inputs:  
+                TemplateFile: '$(Agent.BuildDirectory)/PublishBranch/${{ parameters.workspaceFilesPath }}/TemplateForWorkspace.json'
+                ParametersFile: '$(Agent.BuildDirectory)/main/CustomWorkspaceParameters.json'
+                azureSubscription: '${{ parameters.subscription }}'
+                ResourceGroupName:  '${{ parameters.systemName }}-${{ parameters.environmentName }}-${{ parameters.serviceName }}'
+                TargetWorkspaceName: '${{ parameters.companyAbbr }}${{ parameters.serviceAbbr }}${{ parameters.environmentName }}'

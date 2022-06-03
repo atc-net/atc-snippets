@@ -1,0 +1,39 @@
+trigger:
+  branches:
+    include:
+    - workspace_publish # Deployment of Synapse ETL processes uses ARM templates from workspace_publish branch
+
+resources:
+  repositories:
+  - repository: PublishBranch
+    type: git
+    name: 'Azure-Project-Name/Repo-name' # Change this
+    ref: workspace_publish
+
+
+name: 1.0$(Rev:.r) 
+
+stages:
+  - stage: Staging
+    # Ignore PR flow
+    condition: "and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))"
+    jobs:
+
+    - template: pipelines/templates/deploy.synapse.template.yml
+      parameters:
+        environmentName: staging # Change this
+        environmentType: DevTest # Change this
+        subscription: 'AzureDevTestSub' # Change this
+        devopsEnvironment: 'data-warehouse-staging' # Change this
+         
+  - stage: Production
+    dependsOn: Staging
+    # Ignore PR flow
+    condition: "and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))"
+    jobs:
+    - template: pipelines/templates/deploy.synapse.template.yml
+      parameters:
+        environmentName: prod # Change this
+        environmentType: Production # Change this
+        subscription: 'AzureProdSub' # Change this
+        devopsEnvironment: 'data-warehouse-prod' # Change this
