@@ -64,7 +64,7 @@ jobs:
                     -environmentName ${{ parameters.environmentName }} `
                     -SynapseWorkspaceParameterJsonPath '$(Agent.BuildDirectory)/PublishBranch/${{ parameters.workspaceFilesPath }}/TemplateParametersForWorkspace.json' `
                     -OutputPath '$(Agent.BuildDirectory)/main/CustomWorkspaceParameters.json'
-                    -ParameterJsonPath"'$(Agent.BuildDirectory)/main/synapse.${{ parameters.environmentName }}.parameters.json"
+                    -ParameterJsonPath '$(Agent.BuildDirectory)/main/synapse.${{ parameters.environmentName }}.parameters.json'
 
             - task: AzureSynapseWorkspace.synapsecicd-deploy.synapse-deploy.Synapse workspace deployment@1
               displayName: 'Deploy Synapse Workspace'

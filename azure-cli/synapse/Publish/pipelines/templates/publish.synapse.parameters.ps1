@@ -15,7 +15,6 @@ param (
   $OutputPath,
 
   [Parameter(Mandatory = $False)]
-  [ValidateNotNullOrEmpty()]
   [string]
   $ParameterJsonPath
 )
