@@ -1,6 +1,7 @@
 function Unlock-Resource {
   # Lock deletion needs the service principal to have access: Microsoft.Authorization/locks/write
   # Find resourcetypes: https://docs.microsoft.com/en-us/azure/templates/
+  # The name of the locks should be the same as the locktype
   param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
@@ -27,7 +28,7 @@ function Unlock-Resource {
   $output = az lock delete `
       --name $LockType `
       --resource-group $ResourceGroupName `
-      --resource $Resource `
+      --resource $ResourceName `
       --resource-type $ResourceType
 
   Throw-WhenError -output $output

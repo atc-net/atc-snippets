@@ -1,6 +1,7 @@
 function Lock-Resource {
   # Lock creation needs the service principal to have access: Microsoft.Authorization/locks/write
   # Find resourcetypes: https://docs.microsoft.com/en-us/azure/templates/
+  # The name of the locks will be the same as the locktype
   param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
