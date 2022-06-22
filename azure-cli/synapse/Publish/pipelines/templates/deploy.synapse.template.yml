@@ -54,6 +54,15 @@ jobs:
             - checkout: PublishBranch
               path: PublishBranch/
 
+            # Stopping Synapse triggers while publishing to environment
+            - task: AzureSynapseWorkspace.synapsecicd-deploy.toggle-trigger.toggle-triggers-dev@2
+              displayName: 'Stop Triggers'
+              inputs:
+                azureSubscription: '${{ parameters.subscription }}'
+                ResourceGroupName: '${{ parameters.systemName }}-${{ parameters.environmentName }}-${{ parameters.serviceName }}'
+                WorkspaceName: '${{ parameters.companyAbbr }}${{ parameters.serviceAbbr }}${{ parameters.environmentName }}'
+                ToggleOn: false
+            
             - task: PowerShell@2
               displayName: 'Parameterize Workspace Parameter File'
               inputs:
@@ -74,3 +83,12 @@ jobs:
                 azureSubscription: '${{ parameters.subscription }}'
                 ResourceGroupName:  '${{ parameters.systemName }}-${{ parameters.environmentName }}-${{ parameters.serviceName }}'
                 TargetWorkspaceName: '${{ parameters.companyAbbr }}${{ parameters.serviceAbbr }}${{ parameters.environmentName }}'
+
+            # Starting triggers again after publishing.
+            - task: AzureSynapseWorkspace.synapsecicd-deploy.toggle-trigger.toggle-triggers-dev@2
+              displayName: 'Start Triggers'
+              inputs:
+                azureSubscription: '${{ parameters.subscription }}'
+                ResourceGroupName: '${{ parameters.systemName }}-${{ parameters.environmentName }}-${{ parameters.serviceName }}' 
+                WorkspaceName: '${{ parameters.companyAbbr }}${{ parameters.serviceAbbr }}${{ parameters.environmentName }}' 
+                ToggleOn: true
