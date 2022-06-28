@@ -27,10 +27,24 @@ function Add-GroupToServicePrincipal(
 
   $objectId = az ad sp list --display-name $spnAppIdentityName --query [0].objectId
 
-  Write-Host "Grant group access to Service Principal" -ForegroundColor DarkGreen
-  az rest `
-    --method POST `
-    --url https://graph.microsoft.com/v1.0/servicePrincipals/$objectId/appRoleAssignedTo `
-    --headers "Content-Type=application/json" `
-    --body "{`"resourceId`":`"$objectId`",`"principalId`":`"$GroupId`"}"
+    $existingAssignments = az rest `
+        --method GET `
+        --url "https://graph.microsoft.com/v1.0/servicePrincipals/$objectId/appRoleAssignedTo" `
+        --headers "Content-Type=application/json" ` `
+        | ConvertFrom-Json
+
+    Throw-WhenError -output $existingAssignments
+
+    if ($existingAssignments.value.principalId -eq $groupId ) {
+      Write-Host "  Group already has access to the Service Principal" -ForegroundColor DarkYellow
+    } else {
+      Write-Host "  Grant group access to Service Principal" -ForegroundColor DarkYellow
+      $output = az rest `
+          --method POST `
+          --url "https://graph.microsoft.com/v1.0/servicePrincipals/$objectId/appRoleAssignedTo" `
+          --headers "Content-Type=application/json" `
+          --body "{\""resourceId\"":\""$objectId\"",\""principalId\"":\""$groupId\""}"
+
+      Throw-WhenError -output $output
+    }
 }
