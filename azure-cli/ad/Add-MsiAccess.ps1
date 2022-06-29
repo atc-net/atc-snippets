@@ -8,7 +8,7 @@ function Add-MsiAccess(
   [Parameter(Mandatory = $false)]
   [ValidateSet('api', 'spn', 'app', 'https')]
   [string]
-  $appType = "app",
+  $appType = "api",
 
   [Parameter(Mandatory=$true)]
   [ValidateNotNullOrEmpty()]

@@ -6,7 +6,12 @@ function Add-ClientToServicePrincipal {
     [Parameter(Mandatory = $true)]
     [NamingConfig] $namingConfig,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $false)]
+    [ValidateSet('api', 'spn', 'app', 'https')]
+    [string]
+    $appType = "api",
+
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $applicationId
@@ -16,9 +21,9 @@ function Add-ClientToServicePrincipal {
   . "$PSScriptRoot\..\utilities\deploy.naming.ps1"
 
   $appIdentityId = Get-AppIdentityUri `
-      -type "api" `
-      -environmentConfig $environmentConfig `
-      -namingConfig $namingConfig
+    -type $appType `
+    -environmentConfig $environmentConfig `
+    -namingConfig $namingConfig
 
   $appId = az ad app list `
       --identifier-uri $appIdentityId `
