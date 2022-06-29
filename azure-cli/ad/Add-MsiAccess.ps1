@@ -44,9 +44,9 @@ function Add-MsiAccess {
 
   Throw-WhenError -output $roles
 
-    Write-Host "Assigning all available roles"
   if ($null -eq $RequiredRoles) {
     $RequiredRoles = @("include-all")
+    Write-Host "  Assigning all available roles" -ForegroundColor DarkYellow
   }
 
   $existingAssignments = (az rest `
@@ -61,8 +61,10 @@ function Add-MsiAccess {
     foreach ($role in $roles) {
       if ($roleValue -eq $role.value -or $roleValue -eq "include-all") {
 
+        Write-Host "  Assigning $($role.value) " -ForegroundColor DarkYellow -NoNewline
+
         if ($existingAssignments.appRoleId -contains $($role.id)) {
-          Write-Host "  API Permission $($role.value) already assigned" -ForegroundColor DarkYellow
+          Write-Host " -> Already assigned" -ForegroundColor Cyan
         }
         else {
           $output = az rest `
@@ -72,6 +74,8 @@ function Add-MsiAccess {
           --headers "Content-Type=application/json"
 
           Throw-WhenError -output $output
+
+          Write-Host " -> Permission assigned" -ForegroundColor Cyan
         }
       }
     }

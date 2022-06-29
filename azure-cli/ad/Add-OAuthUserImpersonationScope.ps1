@@ -13,6 +13,8 @@ function Add-OAuthUserImpersonationScope {
 
   Throw-WhenError -output $existingManifest
 
+  Write-Host "  Adding 'user_impersonation' scope to App Registration" -ForegroundColor DarkYellow -NoNewline
+
   $existingPermissionScopes = $existingManifest.api.oauth2PermissionScopes
   $existingScope = $existingPermissionScopes | Where-Object { $_.value -eq "user_impersonation" }
 
@@ -45,5 +47,10 @@ function Add-OAuthUserImpersonationScope {
       --body `@manifest.json
 
     Throw-WhenError -output $output
+
+    Write-Host " -> 'user_impersonation' scope added" -ForegroundColor Cyan
+  }
+  else {
+    Write-Host " -> App registration already has 'user_impersonation' scope" -ForegroundColor Cyan
   }
 }

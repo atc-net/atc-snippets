@@ -31,6 +31,8 @@ function Add-ClientToServicePrincipal {
     --identifier-uri $appIdentityId `
     --query [-1].id
 
+  Write-Host "  Assigning Client pre-authorized access to App Registration" -ForegroundColor DarkYellow
+
   $graphApiUri = "https://graph.microsoft.com/v1.0/applications/" + $appId
   $properties = az rest --method get --uri $graphApiUri | ConvertFrom-Json
 

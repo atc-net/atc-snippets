@@ -33,7 +33,7 @@ function Add-GroupToServicePrincipal {
 
   $objectId = az ad sp list --display-name $spnAppIdentityName --query [0].id
 
-  Write-Host "Assigning Group access to App Registration" -ForegroundColor DarkGreen
+  Write-Host "  Assigning Group access to App Registration" -ForegroundColor DarkYellow -NoNewline
 
   $existingAssignments = az rest `
     --method GET `
@@ -44,10 +44,10 @@ function Add-GroupToServicePrincipal {
   Throw-WhenError -output $existingAssignments
 
   if ($existingAssignments.value.principalId -eq $groupId) {
-    Write-Host "  Group already has access to the Service Principal" -ForegroundColor DarkYellow
+    Write-Host " -> Group already has access to the Service Principal" -ForegroundColor Cyan
   }
   else {
-    Write-Host "  Grant group access to Service Principal" -ForegroundColor DarkYellow
+    Write-Host " -> Grant group access to Service Principal" -ForegroundColor Cyan
     $output = az rest `
       --method POST `
       --url "https://graph.microsoft.com/v1.0/servicePrincipals/$objectId/appRoleAssignedTo" `
