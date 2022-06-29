@@ -1,10 +1,12 @@
 function Add-ClientToServicePrincipal {
   param (
     [Parameter(Mandatory = $true)]
-    [EnvironmentConfig] $environmentConfig,
+    [EnvironmentConfig]
+    $environmentConfig,
 
     [Parameter(Mandatory = $true)]
-    [NamingConfig] $namingConfig,
+    [NamingConfig]
+    $namingConfig,
 
     [Parameter(Mandatory = $false)]
     [ValidateSet('api', 'spn', 'app', 'https')]
@@ -26,8 +28,8 @@ function Add-ClientToServicePrincipal {
     -namingConfig $namingConfig
 
   $appId = az ad app list `
-      --identifier-uri $appIdentityId `
-      --query [-1].id
+    --identifier-uri $appIdentityId `
+    --query [-1].id
 
   $graphApiUri = "https://graph.microsoft.com/v1.0/applications/" + $appId
   $properties = az rest --method get --uri $graphApiUri | ConvertFrom-Json

@@ -1,21 +1,23 @@
 function Add-MsiAccess(
   [Parameter(Mandatory = $true)]
-  [EnvironmentConfig] $environmentConfig,
+  [EnvironmentConfig]
+  $environmentConfig,
 
   [Parameter(Mandatory = $true)]
-  [NamingConfig] $namingConfig,
+  [NamingConfig]
+  $namingConfig,
 
   [Parameter(Mandatory = $false)]
   [ValidateSet('api', 'spn', 'app', 'https')]
   [string]
   $appType = "api",
 
-  [Parameter(Mandatory=$true)]
+  [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
   [string]
   $msiId,
 
-  [Parameter(Mandatory=$false)]
+  [Parameter(Mandatory = $false)]
   [string[]]
   $requiredRoles = $null
 ) {
@@ -27,6 +29,7 @@ function Add-MsiAccess(
     -type $appType `
     -environmentConfig $environmentConfig `
     -namingConfig $namingConfig
+
   $spnId = az ad sp list `
     --spn $appUri `
     --query [-1].id
@@ -34,9 +37,9 @@ function Add-MsiAccess(
   Throw-WhenError -output $spnId
 
   $roles = az ad sp show `
-      --id $spnId `
-      --query appRoles `
-      | ConvertFrom-Json
+    --id $spnId `
+    --query appRoles `
+  | ConvertFrom-Json
 
   Throw-WhenError -output $roles
 
@@ -46,9 +49,9 @@ function Add-MsiAccess(
   }
 
   $existingAssignments = (az rest `
-    --method GET `
-    --uri "https://graph.microsoft.com/v1.0/servicePrincipals/$msiId/appRoleAssignments?`$filter=resourceId eq $spnId" `
-    --headers 'Content-Type=application/json' `
+      --method GET `
+      --uri "https://graph.microsoft.com/v1.0/servicePrincipals/$msiId/appRoleAssignments?`$filter=resourceId eq $spnId" `
+      --headers "Content-Type=application/json" `
     | ConvertFrom-Json).value
 
   Throw-WhenError -output $existingAssignments
@@ -57,15 +60,16 @@ function Add-MsiAccess(
     foreach ($role in $roles) {
       if ($roleValue -eq $role.value -or $roleValue -eq "include-all") {
 
-        if ($existingAssignments.appRoleId -contains $($role.id)){
-          Write-Host "API Permission $($role.value) Already Assigned"
-        } else {
-          Write-Host "Assign API Permission $($role.value)"
+        if ($existingAssignments.appRoleId -contains $($role.id)) {
+          Write-Host "  API Permission $($role.value) already assigned" -ForegroundColor DarkYellow
+        }
+        else {
+          Write-Host "  Assign API Permission $($role.value)" -ForegroundColor DarkYellow
           $output = az rest `
-          --method POST `
-          --uri "https://graph.microsoft.com/v1.0/servicePrincipals/$msiId/appRoleAssignments" `
-          --body "{\`"appRoleId\`": \`"$($role.id)\`",\`"principalId\`": \`"$msiId\`",\`"resourceId\`": \`"$spnId\`"}" `
-          --headers 'Content-Type=application/json'
+            --method POST `
+            --uri "https://graph.microsoft.com/v1.0/servicePrincipals/$msiId/appRoleAssignments" `
+            --body "{""appRoleId"": ""$($role.id)"",""principalId"": ""$msiId"",""resourceId"": ""$spnId""}" `
+            --headers "Content-Type=application/json"
 
           Throw-WhenError -output $output
         }

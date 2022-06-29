@@ -19,8 +19,7 @@ function Add-GroupToServicePrincipal(
   [Parameter(Mandatory = $false)]
   [string]
   $ServiceInstance
-)
-{
+) {
   # import utility functions
   . "$PSScriptRoot\..\utilities\deploy.naming.ps1"
 
@@ -32,24 +31,27 @@ function Add-GroupToServicePrincipal(
 
   $objectId = az ad sp list --display-name $spnAppIdentityName --query [0].id
 
-    $existingAssignments = az rest `
-        --method GET `
-        --url "https://graph.microsoft.com/v1.0/servicePrincipals/$objectId/appRoleAssignedTo" `
-        --headers "Content-Type=application/json" ` `
-        | ConvertFrom-Json
+  Write-Host "Assigning Group access to App Registration" -ForegroundColor DarkGreen
 
-    Throw-WhenError -output $existingAssignments
+  $existingAssignments = az rest `
+    --method GET `
+    --url "https://graph.microsoft.com/v1.0/servicePrincipals/$objectId/appRoleAssignedTo" `
+    --headers "Content-Type=application/json" ` `
+  | ConvertFrom-Json
 
-    if ($existingAssignments.value.principalId -eq $groupId ) {
-      Write-Host "  Group already has access to the Service Principal" -ForegroundColor DarkYellow
-    } else {
-      Write-Host "  Grant group access to Service Principal" -ForegroundColor DarkYellow
-      $output = az rest `
-          --method POST `
-          --url "https://graph.microsoft.com/v1.0/servicePrincipals/$objectId/appRoleAssignedTo" `
-          --headers "Content-Type=application/json" `
-          --body "{\""resourceId\"":\""$objectId\"",\""principalId\"":\""$groupId\""}"
+  Throw-WhenError -output $existingAssignments
 
-      Throw-WhenError -output $output
-    }
+  if ($existingAssignments.value.principalId -eq $groupId) {
+    Write-Host "  Group already has access to the Service Principal" -ForegroundColor DarkYellow
+  }
+  else {
+    Write-Host "  Grant group access to Service Principal" -ForegroundColor DarkYellow
+    $output = az rest `
+      --method POST `
+      --url "https://graph.microsoft.com/v1.0/servicePrincipals/$objectId/appRoleAssignedTo" `
+      --headers "Content-Type=application/json" `
+      --body "{""resourceId"":""$objectId"",""principalId"":""$groupId""}"
+
+    Throw-WhenError -output $output
+  }
 }
