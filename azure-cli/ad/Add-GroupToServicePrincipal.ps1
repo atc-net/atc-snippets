@@ -1,30 +1,32 @@
-function Add-GroupToServicePrincipal(
-  [Parameter(Mandatory = $true)]
-  [EnvironmentConfig]
-  $EnvironmentConfig,
+function Add-GroupToServicePrincipal {
+  param(
+    [Parameter(Mandatory = $true)]
+    [EnvironmentConfig]
+    $EnvironmentConfig,
 
-  [Parameter(Mandatory = $true)]
-  [NamingConfig]
-  $NamingConfig,
+    [Parameter(Mandatory = $true)]
+    [NamingConfig]
+    $NamingConfig,
 
-  [Parameter(Mandatory = $false)]
-  [ValidateSet('api', 'spn', 'app', 'https')]
-  [string]
-  $appType = "api",
+    [Parameter(Mandatory = $false)]
+    [ValidateSet('api', 'spn', 'app', 'https')]
+    [string]
+    $AppType = "api",
 
-  [Parameter(Mandatory = $true)]
-  [string]
-  $GroupId,
+    [Parameter(Mandatory = $true)]
+    [string]
+    $GroupId,
 
-  [Parameter(Mandatory = $false)]
-  [string]
-  $ServiceInstance
-) {
+    [Parameter(Mandatory = $false)]
+    [string]
+    $ServiceInstance
+  )
+
   # import utility functions
   . "$PSScriptRoot\..\utilities\deploy.naming.ps1"
 
   $spnAppIdentityName = Get-AppIdentityDisplayName `
-    -type $appType `
+    -type $AppType `
     -environmentConfig $EnvironmentConfig `
     -namingConfig $NamingConfig `
     -serviceInstance $ServiceInstance

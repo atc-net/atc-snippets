@@ -2,30 +2,30 @@ function Add-ClientToServicePrincipal {
   param (
     [Parameter(Mandatory = $true)]
     [EnvironmentConfig]
-    $environmentConfig,
+    $EnvironmentConfig,
 
     [Parameter(Mandatory = $true)]
     [NamingConfig]
-    $namingConfig,
+    $NamingConfig,
 
     [Parameter(Mandatory = $false)]
     [ValidateSet('api', 'spn', 'app', 'https')]
     [string]
-    $appType = "api",
+    $AppType = "api",
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $applicationId
+    $ApplicationId
   )
 
   # import utility functions
   . "$PSScriptRoot\..\utilities\deploy.naming.ps1"
 
   $appIdentityId = Get-AppIdentityUri `
-    -type $appType `
-    -environmentConfig $environmentConfig `
-    -namingConfig $namingConfig
+    -type $AppType `
+    -environmentConfig $EnvironmentConfig `
+    -namingConfig $NamingConfig
 
   $appId = az ad app list `
     --identifier-uri $appIdentityId `
@@ -35,7 +35,7 @@ function Add-ClientToServicePrincipal {
   $properties = az rest --method get --uri $graphApiUri | ConvertFrom-Json
 
   $scopeAppId = $properties.api.oauth2PermissionScopes.id
-  $body = '{""api"": {""preAuthorizedApplications"": [{""appId"": ""' + $applicationId + '"",""delegatedPermissionIds"": [""' + $scopeAppId + '""]}]}}'
+  $body = '{""api"": {""preAuthorizedApplications"": [{""appId"": ""' + $ApplicationId + '"",""delegatedPermissionIds"": [""' + $scopeAppId + '""]}]}}'
 
   az rest --method patch --uri $graphApiUri --headers "Content-Type=application/json" --body $body
 }

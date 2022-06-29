@@ -1,34 +1,35 @@
-function Add-MsiAccess(
-  [Parameter(Mandatory = $true)]
-  [EnvironmentConfig]
-  $environmentConfig,
+function Add-MsiAccess {
+  param(
+    [Parameter(Mandatory = $true)]
+    [EnvironmentConfig]
+    $EnvironmentConfig,
 
-  [Parameter(Mandatory = $true)]
-  [NamingConfig]
-  $namingConfig,
+    [Parameter(Mandatory = $true)]
+    [NamingConfig]
+    $NamingConfig,
 
-  [Parameter(Mandatory = $false)]
-  [ValidateSet('api', 'spn', 'app', 'https')]
-  [string]
-  $appType = "api",
+    [Parameter(Mandatory = $false)]
+    [ValidateSet('api', 'spn', 'app', 'https')]
+    [string]
+    $AppType = "api",
 
-  [Parameter(Mandatory = $true)]
-  [ValidateNotNullOrEmpty()]
-  [string]
-  $msiId,
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $MsiId,
 
-  [Parameter(Mandatory = $false)]
-  [string[]]
-  $requiredRoles = $null
-) {
+    [Parameter(Mandatory = $false)]
+    [string[]]
+    $RequiredRoles = $null
+  )
 
   # import utility functions
   . "$PSScriptRoot\..\utilities\deploy.naming.ps1"
 
   $appUri = Get-AppIdentityUri `
-    -type $appType `
-    -environmentConfig $environmentConfig `
-    -namingConfig $namingConfig
+    -type $AppType `
+    -environmentConfig $EnvironmentConfig `
+    -namingConfig $NamingConfig
 
   $spnId = az ad sp list `
     --spn $appUri `
@@ -43,20 +44,20 @@ function Add-MsiAccess(
 
   Throw-WhenError -output $roles
 
-  if ($null -eq $requiredRoles) {
-    $requiredRoles = @("include-all")
     Write-Host "Assigning all available roles"
+  if ($null -eq $RequiredRoles) {
+    $RequiredRoles = @("include-all")
   }
 
   $existingAssignments = (az rest `
       --method GET `
-      --uri "https://graph.microsoft.com/v1.0/servicePrincipals/$msiId/appRoleAssignments?`$filter=resourceId eq $spnId" `
+      --uri "https://graph.microsoft.com/v1.0/servicePrincipals/$MsiId/appRoleAssignments?`$filter=resourceId eq $spnId" `
       --headers "Content-Type=application/json" `
     | ConvertFrom-Json).value
 
   Throw-WhenError -output $existingAssignments
 
-  foreach ($roleValue in $requiredRoles) {
+  foreach ($roleValue in $RequiredRoles) {
     foreach ($role in $roles) {
       if ($roleValue -eq $role.value -or $roleValue -eq "include-all") {
 
@@ -64,12 +65,11 @@ function Add-MsiAccess(
           Write-Host "  API Permission $($role.value) already assigned" -ForegroundColor DarkYellow
         }
         else {
-          Write-Host "  Assign API Permission $($role.value)" -ForegroundColor DarkYellow
           $output = az rest `
-            --method POST `
-            --uri "https://graph.microsoft.com/v1.0/servicePrincipals/$msiId/appRoleAssignments" `
-            --body "{""appRoleId"": ""$($role.id)"",""principalId"": ""$msiId"",""resourceId"": ""$spnId""}" `
-            --headers "Content-Type=application/json"
+          --method POST `
+          --uri "https://graph.microsoft.com/v1.0/servicePrincipals/$MsiId/appRoleAssignments" `
+          --body "{""appRoleId"": ""$($role.id)"",""principalId"": ""$MsiId"",""resourceId"": ""$spnId""}" `
+          --headers "Content-Type=application/json"
 
           Throw-WhenError -output $output
         }

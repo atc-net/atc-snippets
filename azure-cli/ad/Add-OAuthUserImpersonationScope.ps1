@@ -1,12 +1,13 @@
-function Add-OAuthUserImpersonationScope(
-  [Parameter(Mandatory = $true)]
-  [string]
-  $spnId
-) {
+function Add-OAuthUserImpersonationScope {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]
+    $SpnId
+  )
 
   $existingManifest = az rest `
     --method Get `
-    --url https://graph.microsoft.com/v1.0/applications/$spnId `
+    --url https://graph.microsoft.com/v1.0/applications/$SpnId `
     --headers "Content-Type=application/json" `
   | ConvertFrom-Json
 
@@ -19,7 +20,7 @@ function Add-OAuthUserImpersonationScope(
     $newScope = @{
       adminConsentDescription = "Allow the application to access $($existingManifest.displayName) on behalf of the signed-in user."
       adminConsentDisplayName = "Access $($existingManifest.displayName)"
-      id                      = $([System.guid]::NewGuid().toString())
+      id                      = [System.guid]::NewGuid().toString()
       isEnabled               = $true
       type                    = "User"
       userConsentDescription  = "Allow the application to access $($existingManifest.displayName) on your behalf."
@@ -39,7 +40,7 @@ function Add-OAuthUserImpersonationScope(
 
     az rest `
       --method patch `
-      --url https://graph.microsoft.com/v1.0/applications/$spnId `
+      --url https://graph.microsoft.com/v1.0/applications/$SpnId `
       --headers "Content-Type=application/json" `
       --body `@manifest.json
 
