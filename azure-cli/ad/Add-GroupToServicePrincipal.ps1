@@ -30,7 +30,7 @@ function Add-GroupToServicePrincipal(
     -namingConfig $NamingConfig `
     -serviceInstance $ServiceInstance
 
-  $objectId = az ad sp list --display-name $spnAppIdentityName --query [0].objectId
+  $objectId = az ad sp list --display-name $spnAppIdentityName --query [0].id
 
     $existingAssignments = az rest `
         --method GET `
