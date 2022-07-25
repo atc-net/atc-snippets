@@ -30,3 +30,17 @@ function ConvertTo-Base64String {
   $bytes = [System.Text.Encoding]::UTF8.GetBytes($text)
   return [System.Convert]::ToBase64String($bytes)
 }
+
+function ConvertTo-RequestJson {
+  param (
+    [Parameter(ValueFromPipeline, Mandatory = $true)]
+    [object]
+    $Object,
+
+    [Parameter(Mandatory = $false)]
+    [int]
+    $Depth = 4
+  )
+
+  return $Object | ConvertTo-Json -Compress -Depth $Depth | ForEach-Object {$_.Replace('"', '\"')}
+}
