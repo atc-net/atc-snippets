@@ -5,9 +5,12 @@ function Add-OAuthUserImpersonationScope {
     $SpnId
   )
 
+  # import utility functions
+  . "$PSScriptRoot\..\utilities\deploy.utilities.ps1"
+
   $existingManifest = az rest `
-    --method Get `
-    --url https://graph.microsoft.com/v1.0/applications/$SpnId `
+    --method GET `
+    --url "https://graph.microsoft.com/v1.0/applications/$SpnId" `
     --headers "Content-Type=application/json" `
   | ConvertFrom-Json
 
@@ -36,15 +39,13 @@ function Add-OAuthUserImpersonationScope {
       api = @{
         oauth2PermissionScopes = $existingPermissionScopes
       }
-    } | ConvertTo-Json -Depth 4
+    }
 
-    Set-Content ./manifest.json $body
-
-    az rest `
-      --method patch `
-      --url https://graph.microsoft.com/v1.0/applications/$SpnId `
+    $output = az rest `
+      --method PATCH `
+      --url "https://graph.microsoft.com/v1.0/applications/$SpnId" `
       --headers "Content-Type=application/json" `
-      --body `@manifest.json
+      --body (ConvertTo-RequestJson $body -Depth 4)
 
     Throw-WhenError -output $output
 

@@ -25,6 +25,7 @@ function Add-MsiAccess {
 
   # import utility functions
   . "$PSScriptRoot\..\utilities\deploy.naming.ps1"
+  . "$PSScriptRoot\..\utilities\deploy.utilities.ps1"
 
   $appUri = Get-AppIdentityUri `
     -type $AppType `
@@ -33,7 +34,8 @@ function Add-MsiAccess {
 
   $spnId = az ad sp list `
     --spn $appUri `
-    --query [-1].id
+    --query [-1].id `
+    --out tsv
 
   Throw-WhenError -output $spnId
 
@@ -51,8 +53,8 @@ function Add-MsiAccess {
 
   $existingAssignments = (az rest `
       --method GET `
-      --uri "https://graph.microsoft.com/v1.0/servicePrincipals/$MsiId/appRoleAssignments?`$filter=resourceId eq $spnId" `
       --headers "Content-Type=application/json" `
+      --uri "https://graph.microsoft.com/v1.0/servicePrincipals/$MsiId/appRoleAssignments?`$filter=resourceId eq $spnId" `
     | ConvertFrom-Json).value
 
   Throw-WhenError -output $existingAssignments
@@ -67,11 +69,17 @@ function Add-MsiAccess {
           Write-Host " -> Already assigned" -ForegroundColor Cyan
         }
         else {
+          $body = @{
+            appRoleId = $role.id
+            principalId = $MsiId
+            resourceId = $spnId
+          }
+
           $output = az rest `
           --method POST `
+          --headers "Content-Type=application/json" `
           --uri "https://graph.microsoft.com/v1.0/servicePrincipals/$MsiId/appRoleAssignments" `
-          --body "{""appRoleId"": ""$($role.id)"",""principalId"": ""$MsiId"",""resourceId"": ""$spnId""}" `
-          --headers "Content-Type=application/json"
+          --body (ConvertTo-RequestJson $body)
 
           Throw-WhenError -output $output
 
