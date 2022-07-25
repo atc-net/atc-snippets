@@ -24,6 +24,7 @@ function Add-GroupToServicePrincipal {
 
   # import utility functions
   . "$PSScriptRoot\..\utilities\deploy.naming.ps1"
+  . "$PSScriptRoot\..\utilities\deploy.utilities.ps1"
 
   $spnAppIdentityName = Get-AppIdentityDisplayName `
     -type $AppType `
@@ -31,14 +32,19 @@ function Add-GroupToServicePrincipal {
     -namingConfig $NamingConfig `
     -serviceInstance $ServiceInstance
 
-  $objectId = az ad sp list --display-name $spnAppIdentityName --query [0].id
+  $objectId = az ad sp list `
+    --display-name $spnAppIdentityName `
+    --query [0].id `
+    --out tsv
+
+  Throw-WhenError -output $objectId
 
   Write-Host "  Assigning Group access to App Registration" -ForegroundColor DarkYellow -NoNewline
 
   $existingAssignments = az rest `
     --method GET `
     --url "https://graph.microsoft.com/v1.0/servicePrincipals/$objectId/appRoleAssignedTo" `
-    --headers "Content-Type=application/json" ` `
+    --headers "Content-Type=application/json" `
   | ConvertFrom-Json
 
   Throw-WhenError -output $existingAssignments
@@ -47,13 +53,18 @@ function Add-GroupToServicePrincipal {
     Write-Host " -> Group already has access to the Service Principal" -ForegroundColor Cyan
   }
   else {
-    Write-Host " -> Grant group access to Service Principal" -ForegroundColor Cyan
+    $body = @{
+      resourceId = $objectId
+      principalId = $groupId
+    }
+
     $output = az rest `
-      --method POST `
-      --url "https://graph.microsoft.com/v1.0/servicePrincipals/$objectId/appRoleAssignedTo" `
-      --headers "Content-Type=application/json" `
-      --body "{""resourceId"":""$objectId"",""principalId"":""$groupId""}"
+    --method POST `
+    --url "https://graph.microsoft.com/v1.0/servicePrincipals/$objectId/appRoleAssignedTo" `
+    --headers "Content-Type=application/json" `
+    --body (ConvertTo-RequestJson $body)
 
     Throw-WhenError -output $output
+    Write-Host " -> Granted group access to Service Principal" -ForegroundColor Cyan
   }
 }
