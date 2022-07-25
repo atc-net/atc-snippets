@@ -45,7 +45,7 @@ function Add-OAuthUserImpersonationScope {
       --method PATCH `
       --url "https://graph.microsoft.com/v1.0/applications/$SpnId" `
       --headers "Content-Type=application/json" `
-      --body (ConvertTo-RequestJson $body)
+      --body (ConvertTo-RequestJson $body -Depth 4)
 
     Throw-WhenError -output $output
 

@@ -39,7 +39,7 @@ function ConvertTo-RequestJson {
 
     [Parameter(Mandatory = $false)]
     [int]
-    $Depth = 4
+    $Depth = 2
   )
 
   return $Object | ConvertTo-Json -Compress -Depth $Depth | ForEach-Object {$_.Replace('"', '\"')}
