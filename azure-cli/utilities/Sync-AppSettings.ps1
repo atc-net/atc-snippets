@@ -106,7 +106,7 @@ function Sync-AppSettings {
         $output = az $type config appsettings set `
           --name $AppName `
           --resource-group $ResourceGroupName `
-          --settings $newAppSettings
+          --settings @newAppSettings
 
         Throw-WhenError -output $output
       }
@@ -116,7 +116,7 @@ function Sync-AppSettings {
         $output = az $type config appsettings delete `
           --name $AppName `
           --resource-group $ResourceGroupName `
-          --setting-names $deleteAppSettings
+          --setting-names @deleteAppSettings
 
         Throw-WhenError -output $output
       }
