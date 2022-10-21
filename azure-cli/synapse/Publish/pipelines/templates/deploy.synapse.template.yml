@@ -84,6 +84,13 @@ jobs:
                 ResourceGroupName:  '${{ parameters.systemName }}-${{ parameters.environmentName }}-${{ parameters.serviceName }}'
                 TargetWorkspaceName: '${{ parameters.companyAbbr }}${{ parameters.serviceAbbr }}${{ parameters.environmentName }}'
 
+            # You may encounter this error during 'Start Triggers' task 'Resource cannot be updated during provisioning'
+            # You can remedy by waiting for the provisioning to complete with this additional task:
+            # - powershell: |
+            #    Write-Host "Wait for provisioning for 2 minutes"
+            #    Start-Sleep -Seconds 120
+            #    Write-Host "Waited for provisioning for 2 minutes"
+
             # Starting triggers again after publishing.
             - task: AzureSynapseWorkspace.synapsecicd-deploy.toggle-trigger.toggle-triggers-dev@2
               displayName: 'Start Triggers'
