@@ -70,7 +70,7 @@ function Set-KeyVaultSecretPlain {
     $err = $( $output = az keyvault secret set `
         --vault-name $keyVaultName `
         --name $secretName `
-        --value $secretPlain ) 2>&1
+        --value """$secretPlain""" ) 2>&1
 
     if ($err) {
       if ($err -like "*Secret $secretName is currently in a deleted but recoverable state, and its name cannot be reused; in this state, the secret can only be recovered or purged.*") {
