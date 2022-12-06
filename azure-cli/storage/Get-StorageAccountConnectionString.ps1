@@ -10,15 +10,17 @@ function Get-StorageAccountConnectionString {
     $ResourceGroupName
   )
 
-  Write-Host "  Getting ConnectionString for Storage Account '$storageAccountName'" -ForegroundColor DarkYellow
-
-  $connectionString = az storage account show-connection-string `
-    --name $StorageAccountName `
+  $output = az storage account keys list `
+    --account-name $StorageAccountName `
     --resource-group $ResourceGroupName `
-    --query connectionString `
+    --query "[?keyName=='key1'] | [0].value" `
     --output tsv
 
-  Throw-WhenError -output $connectionString
+  Throw-WhenError $output
 
-  return $connectionString
+  return `
+    "DefaultEndpointsProtocol=https;" + `
+    "EndpointSuffix=core.windows.net;" + `
+    "AccountName=$StorageAccountName;" + `
+    "AccountKey=$output"
 }

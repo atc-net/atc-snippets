@@ -100,15 +100,19 @@ function Sync-AppSettings {
       Write-Host " -> AppSettings changes detected" -ForegroundColor Cyan
 
       if ($addOrUpdateAppSettings.Count -gt 0) {
-        $newAppSettings = $addOrUpdateAppSettings.GetEnumerator() | ForEach-Object { "$($_.Key)=$($_.Value)" }
+        $addOrUpdateAppSettingsJsonPath = Join-Path -Path $([System.IO.Path]::GetTempPath()) -ChildPath "$($AppName)_appsettings.json"
+        $addOrUpdateAppSettings | ConvertTo-Json -Depth 1 | Out-File $addOrUpdateAppSettingsJsonPath
 
-        Write-Host "    Adding or updating $($addOrUpdateAppSettings.Count) AppSettings ($newAppSettings)"
+
+        Write-Host "    Adding or updating $($addOrUpdateAppSettings.Count) AppSettings:$($addOrUpdateAppSettings.GetEnumerator() | ForEach-Object { "`n      $($_.Key): $($_.Value)" })"
         $output = az $type config appsettings set `
           --name $AppName `
           --resource-group $ResourceGroupName `
-          --settings @newAppSettings
+          --settings "@$addOrUpdateAppSettingsJsonPath"
 
         Throw-WhenError -output $output
+
+        Remove-Item $addOrUpdateAppSettingsJsonPath
       }
 
       if ($deleteAppSettings.Count -gt 0) {
