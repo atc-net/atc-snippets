@@ -1,7 +1,0 @@
-# Update Azure CLI to latest version
-# Please note that this can be a lengthy task, do not use unless the current version provided by Azure Devops is to old.
-
-- task: CmdLine@2
-  displayName: 'Update Azure CLI to latest version'
-  inputs:
-    script: choco upgrade azure-cli
