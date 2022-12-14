@@ -1,0 +1,18 @@
+{
+    "DevTest": {
+        "ServiceBusNamespace": {
+            "Sku": "Standard"
+        },
+        "LogAnalyticsWorkspace": {
+            "Sku": "PerGB2018"
+        }
+    },
+    "Production": {
+        "ServiceBusNamespace": {
+            "Sku": "Standard"
+        },
+        "LogAnalyticsWorkspace": {
+            "Sku": "PerGB2018"
+        }
+    }
+  }

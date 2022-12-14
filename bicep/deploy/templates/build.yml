@@ -1,0 +1,18 @@
+jobs:
+
+- job: Build
+  displayName: 'Build'
+
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+
+  - task: PublishPipelineArtifact@1
+    displayName: 'Upload deployment files'
+    condition: "and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))"
+    inputs:
+      targetPath: deploy
+      artifactName: 'deploy'
+      artifactType: 'pipeline'
+      parallel: true
