@@ -2,7 +2,7 @@ targetScope = 'subscription'
 
 @allowed([
   'Dev'
-  'Tst'
+  'Test'
   'Prod'
 ])
 @maxLength(4)
