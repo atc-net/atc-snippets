@@ -18,3 +18,11 @@ The [azure-pipeline.yml](azure-pipeline.yml) file contains the steps necessary t
 # Bicep Configuration
 
 An example [bicepconfig.json](bicepconfig.json) is also included. In this file common linting rules for developing bicep scripts have been added. This can be extended and/or tweaked to your liking.
+
+# Further resources
+
+For specific modules not being present in this repository, feel free to visit these more or less official repositories for inspiration.
+
+- https://github.com/Azure/azure-quickstart-templates/tree/master/quickstarts
+- https://github.com/Azure/ResourceModules/tree/main/modules
+- https://github.com/brwilkinson/AzureDeploymentFramework/tree/main/ADF/bicep
