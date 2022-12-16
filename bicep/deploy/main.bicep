@@ -29,7 +29,7 @@ var tags = loadJsonContent('config-tags.json')['${environmentType}']
 
 // Naming
 var resourceGroupName = '${constants.SystemName}-${toUpper(environmentName)}'
-var resourceName = '${constants.CompanyAbbreviation}${constants.SystemAbbreviation}${toLower(environmentName)}'
+var resourceName = toLower('${constants.CompanyAbbreviation}${constants.SystemAbbreviation}${environmentName)}')
 
 // Resource Group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' = {
