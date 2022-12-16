@@ -1,0 +1,30 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    exclude:
+    - README.md
+
+variables:
+- name: buildConfiguration
+  value: Release
+
+name: 1.0$(Rev:.r)
+
+stages:
+
+  - stage: Build
+    jobs:
+    - template: deploy/templates/build.yml
+
+  - stage: Development
+    dependsOn: Build
+    condition: "and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))"
+    jobs:
+
+    - template: deploy/templates/deploy.env.yml
+      parameters:
+        environmentName: dev
+        subscription: '<azure-subscription>'
+        devopsEnvironment: '<azure-devops-environment-name>'
