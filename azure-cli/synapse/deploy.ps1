@@ -34,7 +34,7 @@ param (
 Write-Host "Provision synapse workspace" -ForegroundColor DarkGreen
 
 # import utility functions
-. "$PSScriptRoot\..\_common\utilities\get_NewPassword.ps1"
+. "$PSScriptRoot\..\utilities\New-Password.ps1"
 
 #############################################################################################
 # Resource naming section
@@ -56,7 +56,7 @@ $synapseServerPassword = az keyvault secret show `
 
 if (!$?) {
   Write-Host "  Creating SynapseServerPassword secret" -ForegroundColor DarkYellow
-  $synapseServerPassword = Get-NewPassword
+  $synapseServerPassword = New-Password -Length 20
   $output = az keyvault secret set `
     --vault-name $keyVaultName `
     --name "SynapseServerPassword" `
