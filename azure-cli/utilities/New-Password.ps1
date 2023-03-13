@@ -6,6 +6,10 @@ function New-Password {
     [int]
     $PasswordLength,
 
+    [Parameter(Mandatory = $false)]
+    [string]
+    $AvoidCharacters,
+
     [switch]
     $NoSpecialCharacters
   )
@@ -21,6 +25,13 @@ function New-Password {
     # https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-must-meet-complexity-requirements
     $specialCharacters = [char]33..[char]47 + [char]58..[char]64 + [char]91..[char]96 + [char]123..[char]126
     $availableCharacters += $specialCharacters
+  }
+
+  # Remove any characters that the caller explicitly don't want in their password.
+  # SQL Server, for example, does not allow single quotes in passwords by default.
+  if ($AvoidCharacters) {
+    $unavailableCharacters = $AvoidCharacters.ToCharArray()
+    $availableCharacters = $availableCharacters | Where-Object { $unavailableCharacters -notcontains $_ }
   }
 
   # Generate a new random password until we hit one that contains all of the following criteria:
