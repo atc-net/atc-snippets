@@ -63,6 +63,18 @@ function Set-KeyVaultSecretPlain {
     return
   }
 
+  # On Windows systems, when passing the secret value to azure-cli and if the secrets has special characters,
+  # it doesn't always correctly escape the argument and ends up intepreting the whole command wrong.
+  # A fix is to wrap the $secretPlain in triple quotes and then it should work every time, on Windows.
+  # On Linux we don't have this issue and if we add the triple quotes on Linux,
+  # it will end up writing the secret value quoted into the key vault.
+  #
+  # Detect if we are running Windows and have to deal with this scenario.
+  # Windows systems will always return "Win32NT" and Linux and Mac will return "Unix"
+  if ([System.Environment]::OSVersion.Platform -eq 'Win32NT') {
+    $secretPlain = """$secretPlain"""
+  }
+
   # The loop below handles a number of different edge cases
   # that can occur when a secret has been soft deleted, and must first
   # be recovered before an new secret value can be written to it.
@@ -70,7 +82,7 @@ function Set-KeyVaultSecretPlain {
     $err = $( $output = az keyvault secret set `
         --vault-name $keyVaultName `
         --name $secretName `
-        --value """$secretPlain""" ) 2>&1
+        --value $secretPlain ) 2>&1
 
     if ($err) {
       if ($err -like "*Secret $secretName is currently in a deleted but recoverable state, and its name cannot be reused; in this state, the secret can only be recovered or purged.*") {
