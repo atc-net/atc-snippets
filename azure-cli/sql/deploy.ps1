@@ -34,7 +34,7 @@ param (
 Write-Host "Provision Azure SQL server" -ForegroundColor DarkGreen
 
 # import utility functions
-. "$PSScriptRoot\..\_common\utilities\get_NewPassword.ps1"
+. "$PSScriptRoot\..\utilities\New-Password.ps1"
 . "$PSScriptRoot\get_SqlConnectionString.ps1"
 
 #############################################################################################
@@ -62,7 +62,7 @@ $sqlServerPassword = az keyvault secret show `
 
 if (!$?) {
   Write-Host "  Creating SqlServerPassword secret" -ForegroundColor DarkYellow
-  $sqlServerPassword = Get-NewPassword
+  $sqlServerPassword = New-Password -Length 20 -AvoidCharacters "'"
   $output = az keyvault secret set `
     --vault-name $keyVaultName `
     --name "SqlServerPassword" `
@@ -91,7 +91,7 @@ foreach ($sqlDatabase in $sqlDatabases) {
 
     if ($LastExitCode -gt 0) {
       Write-Host "  Creating $passwordName secret" -ForegroundColor DarkYellow
-      $password = Get-NewPassword
+      $password = New-Password -Length 20 -AvoidCharacters "'"
       $output = az keyvault secret set `
         --vault-name $keyVaultName `
         --name $passwordName `
