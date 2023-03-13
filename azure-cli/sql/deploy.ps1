@@ -62,7 +62,7 @@ $sqlServerPassword = az keyvault secret show `
 
 if (!$?) {
   Write-Host "  Creating SqlServerPassword secret" -ForegroundColor DarkYellow
-  $sqlServerPassword = New-Password -Length 20
+  $sqlServerPassword = New-Password -Length 20 -AvoidCharacters "'"
   $output = az keyvault secret set `
     --vault-name $keyVaultName `
     --name "SqlServerPassword" `
@@ -91,7 +91,7 @@ foreach ($sqlDatabase in $sqlDatabases) {
 
     if ($LastExitCode -gt 0) {
       Write-Host "  Creating $passwordName secret" -ForegroundColor DarkYellow
-      $password = New-Password -Length 20
+      $password = New-Password -Length 20 -AvoidCharacters "'"
       $output = az keyvault secret set `
         --vault-name $keyVaultName `
         --name $passwordName `
