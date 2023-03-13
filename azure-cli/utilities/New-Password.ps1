@@ -10,9 +10,9 @@ function New-Password {
     $NoSpecialCharacters
   )
 
-  $upperCaseCharacters = [char]65..[char]90
-  $lowerCaseCharacters = [char]97..[char]122
-  $numbers = [char]48..[char]57
+  $upperCaseCharacters = [char]'A'..[char]'Z'
+  $lowerCaseCharacters = [char]'a'..[char]'z'
+  $numbers = [char]'0'..[char]'9'
 
   $availableCharacters = $upperCaseCharacters + $lowerCaseCharacters + $numbers
 
