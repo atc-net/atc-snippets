@@ -2,26 +2,26 @@ function Select-FreeSubnetRange {
   param(
     [Parameter(Mandatory = $true)]
     [int]
-    $SubnetMask,    
-  
+    $SubnetMask,
+
     [Parameter(Mandatory = $true)]
     [string]
     $VnetName,
-  
+
     [Parameter(Mandatory = $true)]
     [string]
     $ResourceGroupName
   ) 
-  
+
   $subnets = az network vnet subnet list `
     --resource-group $ResourceGroupName `
     --vnet-name $VnetName `
     --query "[].addressPrefix"
-    
+
   if ($LASTEXITCODE -ne 0) {
     throw $subnets
   }
-  
+
   Write-Host "Existing subnets:"
   $subnets = $subnets | ConvertFrom-Json | Sort-Object {
     $cidr = $_ -Split "/"
@@ -31,7 +31,7 @@ function Select-FreeSubnetRange {
 
   $requiredAddressCount = [System.Math]::Pow(2, 32 - $SubnetMask)
   Write-Host "Required address count in new space from input /$SubnetMask is $requiredAddressCount"
-  
+
   # Loop through all the existing subnets and try to find a valid CIDR block that can fit between two existing subnets
   for ($i = 0; $i -lt $subnets.Count - 1; $i++) {
     # Split the CIDR notation so we have network address and the subnet mask
@@ -83,7 +83,7 @@ function Select-FreeSubnetRange {
       }
     }
   }
-  
+
   # We didn't manage to find a gap
   # Get the full available VNet space
   $vnetSpace = az network vnet show `
@@ -91,7 +91,7 @@ function Select-FreeSubnetRange {
     --resource-group $ResourceGroupName `
     --query addressSpace.addressPrefixes[0] `
     --output tsv
-  
+
   $vnetCidr = $vnetSpace -Split '/'
   $vnetNetworkAddress = [IPAddress]::Parse($vnetCidr[0])
   $vnetNetworkAddressUInt = ConvertTo-UInt32 -IPAddress $vnetNetworkAddress
@@ -134,7 +134,7 @@ function Select-FreeSubnetRange {
       }
     }
   }
-  
+
   throw "Unable to find an available subnet range with subnet mask /$SubnetMask in VNet $VnetName $vnetSpace"
 }
 
@@ -148,7 +148,7 @@ function ConvertTo-UInt32 {
   [Array]::Reverse($ipAddressBytes)
   return [BitConverter]::ToUInt32($ipAddressBytes)
 }
-    
+
 function ConvertTo-IPAddress {
   param (
     [Parameter(Mandatory = $true)]
