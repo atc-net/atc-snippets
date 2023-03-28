@@ -1,6 +1,7 @@
 function Select-FreeSubnetRange {
   param(
     [Parameter(Mandatory = $true)]
+    [ValidateRange(2, 29)]
     [int]
     $SubnetMask,
 
