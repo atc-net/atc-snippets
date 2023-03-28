@@ -55,33 +55,20 @@ function Select-FreeSubnetRange {
     $nextNetworkAddress = $($subnets[$i + 1] -split "/")[0]
     $nextNetworkAddressUInt32 = ConvertTo-UInt32 -IPAddress $nextNetworkAddress
 
-    # Check if there is enough space between the current and the next subnet to fit the new subnet we want to create.
-    if ($nextNetworkAddressUInt32 - $currentBroadcastAddressUInt32 - 1 -ge $requiredAddressCount) {
-      # Add 1 to the broadcast address to get the network IP address of a new subnet
-      $candidateIpAddressUInt32 = [UInt32]($currentBroadcastAddressUInt32 + 1)
-      $candidateIpAddress = ConvertTo-IPAddress -IPAddressAsUInt32 $candidateIpAddressUInt32
+    # Add 1 to the broadcast address to get the network IP address of a new subnet
+    $candidateIpAddressUInt32 = $currentBroadcastAddressUInt32 + 1
+    $candidateIpAddress = ConvertTo-IPAddress -IPAddressAsUInt32 $candidateIpAddressUInt32
 
-      # Ensure that the IP address we found is actually a valid network address.
-      # An example of an invalid network address is 192.168.0.1/23
-      # It could either be 192.168.0.0/23 or 192.168.2.0/23, but never 192.168.1.0/23
-      if ($($candidateIpAddress.Equals($(Get-NetworkIPAddress -IPAddress $candidateIpAddress -SubnetMask $SubnetMask)))) {
-        return "$($candidateIpAddress.ToString())/$SubnetMask" 
-      }
-      else {
-        # The candidate we found was not a valid network address.
-        # Get the broadcast address of the old candidate and add 1, then we are sure to get the next first valid network address
-        # for this subnet mask. 
-        # Example: if candidate was 192.168.1.0/23, we get broadcast 192.168.1.255 and add 1 to get 192.168.2.0/23, 
-        # which is a valid subnet.
-        $broadcastAddress = Get-BroadcastIPAddress -IPAddress $candidateIpAddress -SubnetMask $Subnetmask
-        $candidateIpAddressUInt32 = $(ConvertTo-UInt32 -IPAddress $broadcastAddress) + 1
+    $boundaryIpAddressUInt32 = $nextNetworkAddressUInt32 - 1
+    $boundaryIpAddress = ConvertTo-IPAddress -IPAddressAsUInt32 $boundaryIpAddressUInt32
 
-        # Ensure that we are not overlapping into the next subnet after switching to a valid subnet network
-        if ($nextNetworkAddressUInt32 - $candidateIpAddressUInt32 -ge $requiredAddressCount) {
-          $candidateIpAddress = ConvertTo-IPAddress -IPAddressAsUInt32 $candidateIpAddressUInt32
-          return "$($candidateIpAddress.ToString())/$SubnetMask" 
-        }
-      }
+    $resultIpAddress = Select-FirstNetworkIPAddressInRange `
+      -StartIPAddress $candidateIpAddress `
+      -EndIPAddress $boundaryIpAddress `
+      -SubnetMask $SubnetMask
+
+    if ($null -ne $resultIpAddress) {
+      return "$($resultIpAddress.ToString())/$SubnetMask"
     }
   }
 
@@ -97,7 +84,7 @@ function Select-FreeSubnetRange {
   $vnetNetworkAddress = [IPAddress]::Parse($vnetCidr[0])
   $vnetNetworkAddressUInt = ConvertTo-UInt32 -IPAddress $vnetNetworkAddress
   $vnetIpAddressCount = [System.Math]::Pow(2, 32 - [int]::Parse($vnetCidr[1]))
-  $vnetBroadcastAddressUInt = [UInt32]($vnetNetworkAddressUInt + $vnetIpAddressCount - 1)
+  $vnetBroadcastAddressUInt32 = $vnetNetworkAddressUInt + [UInt32]($vnetIpAddressCount - 1)
 
   # Get the last subnet from the subnet list, so we can begin the work from where the list ended.
   $lastSubnetCidr = $subnets[$subnets.Count - 1] -split "/"
@@ -106,37 +93,22 @@ function Select-FreeSubnetRange {
   $lastSubnetBroadcastAddress = Get-BroadcastIPAddress -IPAddress $lastSubnetNetworkAddress -SubnetMask $lastSubnetMask
   $lastSubnetBroadcastAddresUInt32 = ConvertTo-UInt32 -IPAddress $lastSubnetBroadcastAddress
 
-  # Add 1 to the last subnet broadcast address to get the network IP address of a potential new subnet
-  $candidateIpAddressUInt32 = [UInt32]($lastSubnetBroadcastAddresUInt32 + 1)
+  # Add 1 to the last subnet broadcast address to get a potentional network IP address for a new subnet
+  $candidateIpAddressUInt32 = $lastSubnetBroadcastAddresUInt32 + 1
+  $candidateIpAddress = ConvertTo-IPAddress -IPAddressAsUInt32 $candidateIpAddressUInt32
 
-  # Check if there is enough space between the candidate IP address and the end of the VNet to fit the new subnet we want to create.
-  if ($vnetBroadcastAddressUInt - $candidateIpAddressUInt32 -ge $requiredAddressCount) {
-    $candidateIpAddress = ConvertTo-IPAddress -IPAddressAsUInt32 $candidateIpAddressUInt32
+  $boundaryIpAddress = ConvertTo-IPAddress -IPAddressAsUInt32 $vnetBroadcastAddressUInt32
 
-    # Ensure that the IP address we found is actually a valid network address.
-    # An example of an invalid network address is 192.168.0.1/23.
-    # It could either be 192.168.0.0/23 or 192.168.2.0/23, but never 192.168.1.0/23.
-    if ($($candidateIpAddress.Equals($(Get-NetworkIPAddress -IPAddress $candidateIpAddress -SubnetMask $SubnetMask)))) {
-      return "$($candidateIpAddress.ToString())/$SubnetMask" 
-    }
-    else {
-      # The candidate we found was not a valid network address.
-      # Get the broadcast address of the old candidate and add 1, then we are sure to get the next first valid network address
-      # for this subnet mask. 
-      # Example: if candidate was 192.168.1.0/23, we get broadcast 192.168.1.255 and add 1 to get 192.168.2.0/23, 
-      # which is a valid subnet.
-      $broadcastAddress = Get-BroadcastIPAddress -IPAddress $candidateIpAddress -SubnetMask $Subnetmask
-      $candidateIpAddressUInt32 = $(ConvertTo-UInt32 -IPAddress $broadcastAddress) + 1
-      
-      # Ensure that we are not going out of bounds of the VNet after switching to a valid subnet network
-      if ($vnetBroadcastAddressUInt - $candidateIpAddressUInt32 + 1 -ge $requiredAddressCount) {
-        $candidateIpAddress = ConvertTo-IPAddress -IPAddressAsUInt32 $candidateIpAddressUInt32
-        return "$($candidateIpAddress.ToString())/$SubnetMask" 
-      }
-    }
+  $resultIpAddress = Select-FirstNetworkIPAddressInRange `
+    -StartIPAddress $candidateIpAddress `
+    -EndIPAddress $boundaryIpAddress `
+    -SubnetMask $SubnetMask
+
+  if ($null -eq $resultIpAddress) {
+    throw "Unable to find an available subnet range with subnet mask /$SubnetMask in VNet $VnetName $vnetSpace"
   }
 
-  throw "Unable to find an available subnet range with subnet mask /$SubnetMask in VNet $VnetName $vnetSpace"
+  return "$($resultIpAddress.ToString())/$SubnetMask"
 }
 
 function ConvertTo-UInt32 {
@@ -198,6 +170,46 @@ function Get-BroadcastIPAddress {
   $networkAddress = Get-NetworkIPAddress -IPAddress $IPAddress -SubnetMask $SubnetMask
   $networkAddressUInt32 = ConvertTo-UInt32 -IPAddress $networkAddress
   $subnetAddressCount = [System.Math]::Pow(2, 32 - $SubnetMask)
-  $broadcastAddressUint32 = [UInt32]($networkAddressUInt32 + $subnetAddressCount - 1)
-  return ConvertTo-IPAddress -IPAddressAsUInt32 $broadcastAddressUint32
+  $broadcastAddressUInt32 = $networkAddressUInt32 + [UInt32]($subnetAddressCount - 1)
+  return ConvertTo-IPAddress -IPAddressAsUInt32 $broadcastAddressUInt32
+}
+
+function Select-FirstNetworkIPAddressInRange {
+  param (
+    [Parameter(Mandatory = $true)]
+    [IPAddress]
+    $StartIPAddress,
+
+    [Parameter(Mandatory = $true)]
+    [IPAddress]
+    $EndIPAddress,
+
+    [Parameter(Mandatory = $true)]
+    [int]
+    $SubnetMask
+  )
+
+  $broadcastAddress = Get-BroadcastIPAddress -IPAddress $StartIPAddress -SubnetMask $SubnetMask
+  $broadcastAddressUInt32 = ConvertTo-UInt32 -IPAddress $broadcastAddress
+  $endIpAddressUInt32 = ConvertTo-UInt32 -IPAddress $EndIPAddress
+
+  # Ensure that there is space for the subnet in the range to begin with
+  if ($endIpAddressUInt32 -ge $broadcastAddressUInt32) {
+
+    # Check if the given start IP address is already a valid network address
+    if ($($StartIPAddress.Equals($(Get-NetworkIPAddress -IPAddress $StartIPAddress -SubnetMask $SubnetMask)))) {
+      return $StartIPAddress
+    }
+
+    # The start IP address was not a valid network address, get the next valid network address
+    $nextNetworkAddressUInt32 = $broadcastAddressUInt32 + 1
+    $nextBroadcastAddressUInt32 = $nextNetworkAddressUInt32 + [UInt32][System.Math]::Pow(2, 32 - $SubnetMask) - 1
+
+    # Ensure that the broadcast address of the new subnet is still within the IP address range.
+    if ($endIpAddressUInt32 -ge $nextBroadcastAddressUInt32) {
+      return ConvertTo-IPAddress -IPAddressAsUInt32 $nextNetworkAddressUInt32
+    }
+  }
+
+  return $null
 }
