@@ -17,6 +17,8 @@ stages:
   - stage: Build
     jobs:
     - template: deploy/templates/build.yml
+      parameters:
+        serviceConnectionName: '<azure-devops-service-connection>'
 
   - stage: Development
     dependsOn: Build
@@ -26,5 +28,5 @@ stages:
     - template: deploy/templates/deploy.env.yml
       parameters:
         environmentName: dev
-        subscription: '<azure-subscription>'
+        subscription: '<azure-devops-service-connection>'
         devopsEnvironment: '<azure-devops-environment-name>'
