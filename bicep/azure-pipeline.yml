@@ -28,5 +28,5 @@ stages:
     - template: deploy/templates/deploy.env.yml
       parameters:
         environmentName: dev
-        subscription: '<azure-subscription>'
+        subscription: '<azure-devops-service-connection>'
         devopsEnvironment: '<azure-devops-environment-name>'
