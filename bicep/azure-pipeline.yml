@@ -17,6 +17,8 @@ stages:
   - stage: Build
     jobs:
     - template: deploy/templates/build.yml
+      parameters:
+        serviceConnectionName: '<azure-devops-service-connection>'
 
   - stage: Development
     dependsOn: Build

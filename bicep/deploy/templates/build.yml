@@ -1,3 +1,7 @@
+parameters:
+- name: serviceConnectionName
+  type: string
+
 jobs:
 
 - job: Build
@@ -7,6 +11,15 @@ jobs:
     vmImage: 'ubuntu-latest'
 
   steps:
+
+  - task: AzureCLI@2
+    displayName: "Build Bicep files"
+    inputs:
+      connectedServiceNameARM: ${{ parameters.serviceConnectionName }}
+      scriptType: pscore
+      scriptLocation: inlineScript
+      inlineScript: |
+        az bicep build --file main.bicep
 
   - task: PublishPipelineArtifact@1
     displayName: 'Upload deployment files'
