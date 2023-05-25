@@ -19,12 +19,31 @@ function Select-FreeSubnetRange {
     --vnet-name $VnetName `
     --query "[].addressPrefix"
 
-  if ($LASTEXITCODE -ne 0) {
-    throw $subnets
+  $subnets = $subnets | ConvertFrom-Json
+
+  # Check if there is any subnets to begin with
+  if ($subnets.Count -eq 0) {
+    Write-Host "No existing subnets"
+
+    # There is no existing subnets
+    # If the asked subnet range is smaller than the VNet's, we can just use the VNet's network IP address with the input subnet mask
+    $vnetSpace = az network vnet show `
+      --name $VnetName `
+      --resource-group $ResourceGroupName `
+      --query addressSpace.addressPrefixes[0] `
+      --output tsv
+
+    $vnetCidr = $vnetSpace -split "/"
+
+    if ($SubnetMask -lt [int]::Parse($vnetCidr[1])) {
+      throw "SubnetMask parameter value '$SubnetMask' requires mores space than what is available in all of VNet '$vnetName'. Use '$($vnetCidr[1])' or higher integer value"
+    }
+
+    return "$($vnetCidr[0])/$SubnetMask"
   }
 
   Write-Host "Existing subnets:"
-  $subnets = $subnets | ConvertFrom-Json | Sort-Object {
+  $subnets = $subnets | Sort-Object {
     $cidr = $_ -Split "/"
     Write-Host "- $_"
     ConvertTo-UInt32 -IPAddress $([IPAddress]::Parse($cidr[0]))
