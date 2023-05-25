@@ -12,7 +12,7 @@ function Select-FreeSubnetRange {
     [Parameter(Mandatory = $true)]
     [string]
     $ResourceGroupName
-  ) 
+  )
 
   $subnets = az network vnet subnet list `
     --resource-group $ResourceGroupName `
@@ -47,7 +47,7 @@ function Select-FreeSubnetRange {
     $currentBroadcastAddress = Get-BroadcastIPAddress -IPAddress $currentNetworkAddress -SubnetMask $currentSubnetMask
 
     # Convert the broadcast address to a unsigned 32 bit integer.
-    # All IPv4 addresses are 32 bit integers. 
+    # All IPv4 addresses are 32 bit integers.
     # Converting the IP addresses to integers allows us to do basic math with the IP addresses and check how far apart they are.
     $currentBroadcastAddressUInt32 = ConvertTo-UInt32 -IPAddress $currentBroadcastAddress
 
