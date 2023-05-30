@@ -19,7 +19,11 @@ function Select-FreeSubnetRange {
     --vnet-name $VnetName `
     --query "[].addressPrefix"
 
-  $subnets = $subnets | ConvertFrom-Json
+  if ($LASTEXITCODE -ne 0) {
+    throw "Failed to get subnet list for VNet '$VnetName' in resource group '$ResourceGroupName'`n$subnets"
+  }
+
+  [array]$subnets = $subnets | ConvertFrom-Json
 
   # Check if there is any subnets to begin with
   if ($subnets.Count -eq 0) {
