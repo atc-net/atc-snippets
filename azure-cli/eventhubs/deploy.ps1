@@ -94,7 +94,8 @@ foreach ($eventHubName in $eventHubNames) {
     --name $eventHubName `
     --namespace-name $eventHubNamespaceName `
     --resource-group $resourceGroupName `
-    --message-retention 7 `
+    --cleanup-policy 'Delete' `
+    --retention-time-in-hours 168 `
     --partition-count 4 `
     --enable-capture true `
     --capture-interval 300 `
